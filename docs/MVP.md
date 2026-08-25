@@ -248,7 +248,7 @@
 |----|------|
 | 插件动态加载 Swift 类型 | `@objc` 协议 + 共享 SDK dylib；MVP 不支持纯静态 SPM 插件 |
 | 签名校验 | Release 强制；Debug 可 `--skip-plugin-verify` |
-| 插件 UI | MVP 用 `NSHostingController` 包 SwiftUI；与 KeyboardShortcuts.Recorder 混排 |
+| 插件 UI | MVP 用 `NSHostingController` 包 SwiftUI；快捷键设置统一复用宿主 `ShortcutRecorderField` |
 | manifest 托管 | 先用 GitHub Releases；官方条目 **PR + CI 构建**（见 [插件发布.md](插件发布.md)） |
 
 ---

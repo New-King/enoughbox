@@ -34,6 +34,57 @@
         }
       }
     },
+    "debug.logSampleShortcut" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Log Sample Shortcut"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "打印示例快捷键"
+          }
+        }
+      }
+    },
+    "debug.menu.help" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Developer tools (Debug build only)"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "开发者工具（仅 Debug 构建）"
+          }
+        }
+      }
+    },
+    "debug.openAppSupport" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Open App Support Folder"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "打开 App Support 目录"
+          }
+        }
+      }
+    },
     "empty.action.openStore" : {
       "localizations" : {
         "en" : {
@@ -195,22 +246,6 @@
         }
       }
     },
-    "plugin.detail.reinstallHint" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "After rebuilding in Xcode, uninstall and reinstall the plugin to refresh its bundle."
-          }
-        },
-        "zh-Hans" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "若在 Xcode 里改了代码，需先卸载再安装，才会更新插件文件。"
-          }
-        }
-      }
-    },
     "plugin.detail.reinstall" : {
       "localizations" : {
         "en" : {
@@ -223,6 +258,22 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "打开插件中心"
+          }
+        }
+      }
+    },
+    "plugin.detail.reinstallHint" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "After rebuilding in Xcode, uninstall and reinstall the plugin to refresh its bundle."
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "若在 Xcode 里改了代码，需先卸载再安装，才会更新插件文件。"
           }
         }
       }
@@ -309,6 +360,54 @@
         }
       }
     },
+    "plugin.shortcut.press" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Press shortcut"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "按下快捷键"
+          }
+        }
+      }
+    },
+    "plugin.shortcut.set" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Set Shortcut"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "设置快捷键"
+          }
+        }
+      }
+    },
+    "plugin.shortcut.saved.format" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Shortcut set to %@"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "快捷键已设为 %@"
+          }
+        }
+      }
+    },
     "plugin.sample.shortcut.footer" : {
       "extractionState" : "stale",
       "localizations" : {
@@ -326,34 +425,18 @@
         }
       }
     },
-    "plugin.sample.shortcut.error.needsModifier" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Global shortcuts need ⌘, ⌃, or ⌥ (Shift alone is not enough)."
-          }
-        },
-        "zh-Hans" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "全局快捷键须含 ⌘、⌃ 或 ⌥ 之一（仅 Shift 无效）。"
-          }
-        }
-      }
-    },
     "plugin.sample.shortcut.footer.active" : {
       "localizations" : {
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Works globally while EnoughBox is running. Click the field to record."
+            "value" : "Works globally while EnoughBox is running. Click the field, then press a shortcut (must include ⌘, ⌃, or ⌥)."
           }
         },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "EnoughBox 运行时在任意 App 内生效。点击输入框录制快捷键。"
+            "value" : "EnoughBox 运行时在任意 App 内生效。先点输入框，再按快捷键（须含 ⌘、⌃ 或 ⌥）。"
           }
         }
       }

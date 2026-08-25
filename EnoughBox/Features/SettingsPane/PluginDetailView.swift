@@ -82,7 +82,7 @@ struct PluginDetailView: View {
 
                 Text("v\(plugin.version)")
                     .font(.system(size: 12, design: .monospaced))
-                    .foregroundStyle(tokens.inkFaint)
+                    .foregroundStyle(tokens.inkMuted)
             }
 
             Spacer()
@@ -99,7 +99,7 @@ struct PluginDetailView: View {
 
             Text("plugin.detail.reinstallHint")
                 .font(.system(size: 12))
-                .foregroundStyle(tokens.inkFaint)
+                .foregroundStyle(tokens.inkMuted)
                 .multilineTextAlignment(.center)
                 .frame(maxWidth: 320)
 

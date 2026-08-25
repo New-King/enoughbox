@@ -13,16 +13,18 @@ struct MainView: View {
         }
         .navigationSplitViewStyle(.balanced)
         .background(tokens.page)
+        .toolbarBackground(tokens.nav, for: .windowToolbar)
+        .toolbarBackground(.visible, for: .windowToolbar)
         .toolbar { toolbarContent }
         .sheet(isPresented: $appState.isPluginStorePresented) {
             PluginStoreView()
                 .designTokensProvider()
         }
-        .overlay(alignment: .bottom) {
+        .overlay(alignment: .top) {
             if let toastMessage = appState.toastMessage {
                 toast(message: toastMessage)
-                    .padding(.bottom, 24)
-                    .transition(.move(edge: .bottom).combined(with: .opacity))
+                    .padding(.top, 16)
+                    .transition(.move(edge: .top).combined(with: .opacity))
             }
         }
         .animation(.easeOut(duration: 0.2), value: appState.toastMessage)
@@ -76,8 +78,9 @@ struct MainView: View {
             Button {
                 appState.openPluginStore()
             } label: {
-                Label("topbar.pluginStore", systemImage: "square.grid.2x2")
+                Image(systemName: "square.grid.2x2")
             }
+            .toolbarIconStyle(tokens)
             .help(String(localized: "topbar.pluginStore"))
 
             Menu {
@@ -85,20 +88,26 @@ struct MainView: View {
                     Button {
                         appearance.mode = mode
                     } label: {
-                        Label(mode.labelKey, systemImage: mode.iconName)
+                        HStack {
+                            if appearance.mode == mode {
+                                Image(systemName: "checkmark")
+                            }
+                            Text(mode.labelKey)
+                        }
                     }
                 }
             } label: {
                 Image(systemName: appearance.mode.iconName)
             }
+            .toolbarIconStyle(tokens)
             .help(String(localized: "topbar.appearance"))
 
             #if DEBUG
             Menu {
-                Button("Open App Support Folder") {
+                Button(String(localized: "debug.openAppSupport")) {
                     NSWorkspace.shared.open(AppPaths.applicationSupport)
                 }
-                Button("Log Sample Shortcut") {
+                Button(String(localized: "debug.logSampleShortcut")) {
                     let message = HotkeyCenter.shared.debugDescription(forPluginID: "com.enoughbox.sample")
                     NSLog("EnoughBox DEBUG: \(message)")
                     appState.showToast(message)
@@ -106,21 +115,26 @@ struct MainView: View {
             } label: {
                 Image(systemName: "ladybug")
             }
-            .help("Developer tools (Debug build only)")
+            .toolbarIconStyle(tokens)
+            .help(String(localized: "debug.menu.help"))
             #endif
         }
     }
 
     private func toast(message: String) -> some View {
+        floatingBanner(message: message, foreground: tokens.ink, border: tokens.border)
+    }
+
+    private func floatingBanner(message: String, foreground: Color, border: Color) -> some View {
         Text(message)
             .font(.system(size: 13, weight: .medium))
-            .foregroundStyle(tokens.ink)
+            .foregroundStyle(foreground)
             .padding(.horizontal, 16)
             .padding(.vertical, 10)
             .background(tokens.card, in: RoundedRectangle(cornerRadius: 11, style: .continuous))
             .overlay(
                 RoundedRectangle(cornerRadius: 11, style: .continuous)
-                    .strokeBorder(tokens.border, lineWidth: 1)
+                    .strokeBorder(border, lineWidth: 1)
             )
             .appleShadow(tokens)
     }

@@ -45,22 +45,37 @@ public final class SamplePluginPlugin: NSObject, EnoughBoxPlugin {
 
 /// Hotkey UI lives in the host; plugin settings only expose plugin-specific actions.
 private struct SampleDemoSettingsView: View {
+    @Environment(\.colorScheme) private var colorScheme
+
     let onDemo: () -> Void
 
     var body: some View {
         VStack(alignment: .leading, spacing: 10) {
             Text("plugin.sample.section.demo")
                 .font(.system(size: 11, weight: .semibold))
-                .foregroundStyle(.secondary)
+                .foregroundStyle(sectionHeaderColor)
                 .textCase(.uppercase)
 
             Button(action: onDemo) {
                 Text("plugin.sample.demoAction")
+                    .foregroundStyle(bodyColor)
                     .frame(maxWidth: .infinity, alignment: .leading)
             }
             .buttonStyle(.plain)
         }
         .frame(maxWidth: .infinity, alignment: .leading)
         .padding(.vertical, 4)
+    }
+
+    private var sectionHeaderColor: Color {
+        colorScheme == .dark
+            ? Color(red: 176 / 255, green: 176 / 255, blue: 179 / 255)
+            : Color(red: 110 / 255, green: 110 / 255, blue: 115 / 255)
+    }
+
+    private var bodyColor: Color {
+        colorScheme == .dark
+            ? Color(red: 224 / 255, green: 224 / 255, blue: 224 / 255)
+            : Color(red: 29 / 255, green: 29 / 255, blue: 31 / 255)
     }
 }

@@ -33,6 +33,7 @@
 		EC50BC13A4CC6D2225BE4996 /* PluginInstallState.swift in Sources */ = {isa = PBXBuildFile; fileRef = DD499C3E3C8AF2062C274A25 /* PluginInstallState.swift */; };
 		EF0CD1419E94F60F247AE67F /* SamplePlugin.bundle in Resources */ = {isa = PBXBuildFile; fileRef = 0631057AF0F0CC4D372B6338 /* SamplePlugin.bundle */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		F11FF0CFF5B9F3F1B89C1234 /* PluginManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 339676F7E03256A3F55CA39A /* PluginManager.swift */; };
+		F388ADD80A9428352261C67E /* ShortcutRecorderField.swift in Sources */ = {isa = PBXBuildFile; fileRef = B0842B672B213124ACF3D0C9 /* ShortcutRecorderField.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -66,6 +67,7 @@
 		9704745508B442108DF65CF7 /* MainView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainView.swift; sourceTree = "<group>"; };
 		9726AE0F3378190D32FE9530 /* PluginInstaller.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PluginInstaller.swift; sourceTree = "<group>"; };
 		A968C82724FB97C0387225C1 /* HostServicesImpl.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HostServicesImpl.swift; sourceTree = "<group>"; };
+		B0842B672B213124ACF3D0C9 /* ShortcutRecorderField.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShortcutRecorderField.swift; sourceTree = "<group>"; };
 		B3414FF930E6A99F676C21DB /* EnoughBox.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = EnoughBox.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		B4AACB91BDE6536D0F957C13 /* ShortcutSettingsViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShortcutSettingsViewController.swift; sourceTree = "<group>"; };
 		C30F8231CB2E4E4C304C65A9 /* Localizable.xcstrings */ = {isa = PBXFileReference; lastKnownFileType = text.json.xcstrings; path = Localizable.xcstrings; sourceTree = "<group>"; };
@@ -169,6 +171,7 @@
 			isa = PBXGroup;
 			children = (
 				17B28F9193D2D6FD7D14B9D0 /* PluginDetailView.swift */,
+				B0842B672B213124ACF3D0C9 /* ShortcutRecorderField.swift */,
 				B4AACB91BDE6536D0F957C13 /* ShortcutSettingsViewController.swift */,
 			);
 			path = SettingsPane;
@@ -415,6 +418,7 @@
 				DBA0F5A45E7F5030055D6BC8 /* PluginModels.swift in Sources */,
 				8E6D8393EB98037D8D53C1ED /* PluginRegistry.swift in Sources */,
 				C1A61991CF58CA9516383B3A /* PluginStoreView.swift in Sources */,
+				F388ADD80A9428352261C67E /* ShortcutRecorderField.swift in Sources */,
 				DCB529BC069B942C9AD53E1C /* ShortcutSettingsViewController.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

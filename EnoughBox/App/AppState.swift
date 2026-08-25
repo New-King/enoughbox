@@ -9,6 +9,8 @@ final class AppState: ObservableObject {
     @Published var toastMessage: String?
     @Published private(set) var installPhases: [String: PluginInstallPhase] = [:]
 
+    private var toastGeneration = 0
+
     private(set) lazy var pluginManager = PluginManager { [weak self] message in
         self?.showToast(message)
     }
@@ -74,10 +76,11 @@ final class AppState: ObservableObject {
 
     func showToast(_ message: String) {
         toastMessage = message
-        let captured = message
+        toastGeneration += 1
+        let generation = toastGeneration
         Task {
             try? await Task.sleep(for: .seconds(2))
-            if toastMessage == captured {
+            if toastGeneration == generation {
                 toastMessage = nil
             }
         }
@@ -112,6 +115,7 @@ final class AppState: ObservableObject {
 
         do {
             pluginManager.unload(pluginID: plugin.id)
+            HotkeyCenter.shared.clearSavedShortcuts(forPluginID: plugin.id)
             try await installer.uninstall(plugin)
             installedPlugins.removeAll { $0.id == plugin.id }
             if selectedPluginID == plugin.id {
