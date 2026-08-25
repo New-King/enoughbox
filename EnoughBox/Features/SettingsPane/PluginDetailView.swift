@@ -19,7 +19,7 @@ struct PluginDetailView: View {
                 }
 
                 if let settings = appState.pluginManager.settingsViewController(for: plugin.id) {
-                    pluginSettingsCard(settings)
+                    pluginSettingsCard(settings, pluginID: plugin.id)
                 } else {
                     missingPluginView
                 }
@@ -56,8 +56,9 @@ struct PluginDetailView: View {
             )
     }
 
-    private func pluginSettingsCard(_ viewController: NSViewController) -> some View {
+    private func pluginSettingsCard(_ viewController: NSViewController, pluginID: String) -> some View {
         PluginSettingsContainer(viewController: viewController)
+            .id(pluginID)
             .frame(maxWidth: .infinity, minHeight: 100, alignment: .leading)
             .padding(16)
             .background(tokens.card, in: RoundedRectangle(cornerRadius: 11, style: .continuous))
