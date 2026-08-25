@@ -1,0 +1,37 @@
+name: EnoughBox
+options:
+  bundleIdPrefix: com.enoughbox
+  deploymentTarget:
+    macOS: "14.0"
+  createIntermediateGroups: true
+packages:
+  EnoughBoxPluginSDK:
+    path: Packages/EnoughBoxPluginSDK
+targets:
+  EnoughBox:
+    type: application
+    platform: macOS
+    sources:
+      - path: EnoughBox
+        excludes:
+          - "**/.DS_Store"
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: com.enoughbox.app
+        PRODUCT_NAME: EnoughBox
+        MARKETING_VERSION: 0.1.0
+        CURRENT_PROJECT_VERSION: 1
+        SWIFT_VERSION: "5.9"
+        SWIFT_EMIT_LOC_STRINGS: YES
+        MACOSX_DEPLOYMENT_TARGET: "14.0"
+        CODE_SIGN_STYLE: Automatic
+        ENABLE_HARDENED_RUNTIME: YES
+        GENERATE_INFOPLIST_FILE: YES
+        INFOPLIST_KEY_CFBundleDisplayName: EnoughBox
+        INFOPLIST_KEY_LSMinimumSystemVersion: "$(MACOSX_DEPLOYMENT_TARGET)"
+        INFOPLIST_KEY_NSHumanReadableCopyright: ""
+    dependencies:
+      - package: EnoughBoxPluginSDK
+        product: EnoughBoxPluginSDK
+    scheme:
+      testTargets: []

@@ -1,0 +1,29 @@
+{
+  "version": 1,
+  "hostMinVersion": "0.1.0",
+  "plugins": [
+    {
+      "id": "com.enoughbox.sample",
+      "name": "Sample",
+      "nameLocalized": {
+        "en": "Sample",
+        "zh-Hans": "示例"
+      },
+      "description": "Verify install, settings, and shortcuts",
+      "descriptionLocalized": {
+        "en": "Verify install, settings, and shortcuts",
+        "zh-Hans": "验证插件安装、设置与快捷键"
+      },
+      "version": "0.1.0",
+      "icon": "puzzlepiece.extension",
+      "downloadUrl": "PLACEHOLDER",
+      "sha256": "PLACEHOLDER",
+      "minHostVersion": "0.1.0",
+      "minMacOS": "14.0",
+      "architectures": ["arm64", "x86_64"],
+      "capabilities": ["hotkey", "clipboard"],
+      "repositoryUrl": "PLACEHOLDER",
+      "author": "enoughbox"
+    }
+  ]
+}
