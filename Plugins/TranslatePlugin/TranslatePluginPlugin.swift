@@ -21,9 +21,7 @@ public final class TranslatePluginPlugin: NSObject, EnoughBoxPlugin {
         guard let hotkeys = host as? HostServicesHotkeys else { return }
 
         hotkeys.registerHotkey(HotkeyCatalog.translateSelectionID) { [weak self] in
-            Task { @MainActor in
-                self?.translateSelection()
-            }
+            self?.translateSelection()
         }
     }
 
@@ -41,24 +39,29 @@ public final class TranslatePluginPlugin: NSObject, EnoughBoxPlugin {
         return NSHostingController(rootView: TranslateSettingsView(host: host))
     }
 
-    @MainActor
     private func translateSelection() {
-        let selected = (host as? HostServicesSelection)?.currentSelectedText() ?? ""
-        let text: String
-        if selected.isEmpty {
-            text = (host as? HostServicesClipboard)?.clipboardText() ?? ""
-        } else {
-            text = selected
-        }
+        let selection = host as? HostServicesSelection
+        let text = selection?.textForTranslation() ?? ""
+        let debugLine = selection?.lastSelectionDebugLine() ?? ""
+        let logPath = selection?.lastSelectionLogPath() ?? ""
+        let host = self.host
 
-        if text.isEmpty {
-            host?.showToast(TranslateL10n.string("plugin.translate.toast.noSelection"))
+        Task { @MainActor [weak self] in
+            if debugLine.contains("source=denied") || debugLine.contains("1002") {
+                host?.showToast(TranslateL10n.string("plugin.translate.toast.keystrokeDenied"))
+            } else if text.isEmpty {
+                host?.showToast(TranslateL10n.string("plugin.translate.toast.noSelection"))
+            }
+            self?.presentPanel(sourceText: text, debugLine: debugLine, logPath: logPath)
         }
+    }
 
+    @MainActor
+    private func presentPanel(sourceText: String, debugLine: String, logPath: String) {
         if panelController == nil {
             panelController = TranslationPanelController()
         }
-        panelController?.present(sourceText: text)
+        panelController?.present(sourceText: sourceText, debugLine: debugLine, logPath: logPath)
     }
 }
 

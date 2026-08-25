@@ -20,6 +20,38 @@
         }
       }
     },
+    "plugin.translate.debug.copy" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Copy log"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "复制日志"
+          }
+        }
+      }
+    },
+    "plugin.translate.debug.title" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Diagnostics"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "排查信息"
+          }
+        }
+      }
+    },
     "plugin.translate.engine.mock" : {
       "localizations" : {
         "en" : {
@@ -230,6 +262,23 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "交换语言"
+          }
+        }
+      }
+    },
+    "plugin.translate.toast.keystrokeDenied" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "macOS blocked keystrokes. Quit EnoughBox, add this running app in Accessibility, then open it from Finder (not Xcode Run)."
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "系统拦住了自动复制。请完全退出 EnoughBox，在辅助功能中打开开关，再用 Xcode 点一次运行（已改成不挂调试器）。"
           }
         }
       }

@@ -29,11 +29,16 @@ targets:
         MACOSX_DEPLOYMENT_TARGET: "14.0"
         CODE_SIGN_STYLE: Automatic
         ENABLE_HARDENED_RUNTIME: YES
+        CODE_SIGN_ENTITLEMENTS: EnoughBox/EnoughBox.entitlements
         GENERATE_INFOPLIST_FILE: YES
         INFOPLIST_KEY_CFBundleDisplayName: EnoughBox
         INFOPLIST_KEY_LSMinimumSystemVersion: "$(MACOSX_DEPLOYMENT_TARGET)"
         INFOPLIST_KEY_NSHumanReadableCopyright: ""
         INFOPLIST_KEY_NSAccessibilityUsageDescription: "EnoughBox reads selected text so plugins can translate it."
+        INFOPLIST_KEY_NSAppleEventsUsageDescription: "EnoughBox uses System Events to copy the selected text for translation."
+      configs:
+        debug:
+          ENABLE_HARDENED_RUNTIME: NO
     dependencies:
       - package: EnoughBoxPluginSDK
         product: EnoughBoxPluginSDK
@@ -92,3 +97,11 @@ targets:
     dependencies:
       - package: EnoughBoxPluginSDK
         product: EnoughBoxPluginSDK
+schemes:
+  EnoughBox:
+    build:
+      targets:
+        EnoughBox: all
+    run:
+      config: Debug
+      debugEnabled: false

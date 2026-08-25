@@ -68,6 +68,7 @@
 		1E332521763E4DEB27F1F241 /* AppPaths.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppPaths.swift; sourceTree = "<group>"; };
 		209C35A31699ABCCA41A718F /* PluginRegistry.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PluginRegistry.swift; sourceTree = "<group>"; };
 		20D4F8A95FC0E6F624CAE2D9 /* EmptyStateView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EmptyStateView.swift; sourceTree = "<group>"; };
+		2ACA6E86E67229F1AB53A0DE /* EnoughBox.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = EnoughBox.entitlements; sourceTree = "<group>"; };
 		2E798AA90D4ECE990344C323 /* AppState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppState.swift; sourceTree = "<group>"; };
 		339676F7E03256A3F55CA39A /* PluginManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PluginManager.swift; sourceTree = "<group>"; };
 		47AF3E59F422D763A0209532 /* TranslationPanel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TranslationPanel.swift; sourceTree = "<group>"; };
@@ -294,6 +295,7 @@
 		CDB60DDC1F2F177AD6E06695 /* EnoughBox */ = {
 			isa = PBXGroup;
 			children = (
+				2ACA6E86E67229F1AB53A0DE /* EnoughBox.entitlements */,
 				8F36E3F1DF931390FA757F3A /* EnoughBoxApp.swift */,
 				6557732E3A40E61B614D10DF /* App */,
 				BB19F94EA5E00F6D40BB9E87 /* Design */,
@@ -530,14 +532,16 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_ENTITLEMENTS = EnoughBox/EnoughBox.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
 				CURRENT_PROJECT_VERSION = 1;
-				ENABLE_HARDENED_RUNTIME = YES;
+				ENABLE_HARDENED_RUNTIME = NO;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_KEY_CFBundleDisplayName = EnoughBox;
 				INFOPLIST_KEY_LSMinimumSystemVersion = "$(MACOSX_DEPLOYMENT_TARGET)";
 				INFOPLIST_KEY_NSAccessibilityUsageDescription = "EnoughBox reads selected text so plugins can translate it.";
+				INFOPLIST_KEY_NSAppleEventsUsageDescription = "EnoughBox uses System Events to copy the selected text for translation.";
 				INFOPLIST_KEY_NSHumanReadableCopyright = "";
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
@@ -612,6 +616,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_ENTITLEMENTS = EnoughBox/EnoughBox.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
 				CURRENT_PROJECT_VERSION = 1;
@@ -620,6 +625,7 @@
 				INFOPLIST_KEY_CFBundleDisplayName = EnoughBox;
 				INFOPLIST_KEY_LSMinimumSystemVersion = "$(MACOSX_DEPLOYMENT_TARGET)";
 				INFOPLIST_KEY_NSAccessibilityUsageDescription = "EnoughBox reads selected text so plugins can translate it.";
+				INFOPLIST_KEY_NSAppleEventsUsageDescription = "EnoughBox uses System Events to copy the selected text for translation.";
 				INFOPLIST_KEY_NSHumanReadableCopyright = "";
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
