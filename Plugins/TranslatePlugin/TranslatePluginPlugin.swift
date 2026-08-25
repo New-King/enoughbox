@@ -111,6 +111,15 @@ private struct TranslateSettingsView: View {
     @State private var targetLanguage = TranslateSettings.targetLanguage
 
     var body: some View {
+        VStack(alignment: .leading, spacing: 14) {
+            translationSection
+            accessibilitySection
+        }
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .padding(.vertical, 4)
+    }
+
+    private var translationSection: some View {
         VStack(alignment: .leading, spacing: 12) {
             Text("plugin.translate.settings.section", bundle: TranslateL10n.bundle)
                 .font(.system(size: 11, weight: .semibold))
@@ -148,17 +157,56 @@ private struct TranslateSettingsView: View {
                 .font(.system(size: 11))
                 .foregroundStyle(mutedColor)
                 .fixedSize(horizontal: false, vertical: true)
+        }
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .padding(12)
+        .background(cardBackground, in: RoundedRectangle(cornerRadius: 10, style: .continuous))
+        .overlay(
+            RoundedRectangle(cornerRadius: 10, style: .continuous)
+                .strokeBorder(cardBorder, lineWidth: 1)
+        )
+    }
 
-            if !host.isAccessibilityTrusted() {
+    private var accessibilitySection: some View {
+        VStack(alignment: .leading, spacing: 10) {
+            Text("plugin.translate.settings.accessibility", bundle: TranslateL10n.bundle)
+                .font(.system(size: 11, weight: .semibold))
+                .foregroundStyle(sectionHeaderColor)
+                .textCase(.uppercase)
+
+            Text("plugin.translate.settings.accessibilityHint", bundle: TranslateL10n.bundle)
+                .font(.system(size: 11))
+                .foregroundStyle(mutedColor)
+                .fixedSize(horizontal: false, vertical: true)
+
+            HStack {
+                Spacer()
                 Button(action: openAccessibilitySettings) {
                     Text("plugin.translate.settings.openAccessibility", bundle: TranslateL10n.bundle)
+                        .font(.system(size: 12, weight: .medium))
+                        .padding(.horizontal, 12)
+                        .padding(.vertical, 7)
                         .foregroundStyle(bodyColor)
+                        .background(bodyColor.opacity(colorScheme == .dark ? 0.14 : 0.08), in: Capsule())
                 }
                 .buttonStyle(.plain)
+                .contentShape(Capsule())
+                .onHover { isHovered in
+                    if isHovered {
+                        NSCursor.pointingHand.push()
+                    } else {
+                        NSCursor.pop()
+                    }
+                }
             }
         }
         .frame(maxWidth: .infinity, alignment: .leading)
-        .padding(.vertical, 4)
+        .padding(12)
+        .background(cardBackground, in: RoundedRectangle(cornerRadius: 10, style: .continuous))
+        .overlay(
+            RoundedRectangle(cornerRadius: 10, style: .continuous)
+                .strokeBorder(cardBorder, lineWidth: 1)
+        )
     }
 
     private var sectionHeaderColor: Color {
@@ -177,6 +225,16 @@ private struct TranslateSettingsView: View {
         colorScheme == .dark
             ? Color(red: 176 / 255, green: 176 / 255, blue: 179 / 255)
             : Color(red: 110 / 255, green: 110 / 255, blue: 115 / 255)
+    }
+
+    private var cardBackground: Color {
+        colorScheme == .dark
+            ? Color(red: 48 / 255, green: 48 / 255, blue: 50 / 255)
+            : Color.white
+    }
+
+    private var cardBorder: Color {
+        colorScheme == .dark ? Color.white.opacity(0.12) : Color.black.opacity(0.08)
     }
 
     private func openAccessibilitySettings() {

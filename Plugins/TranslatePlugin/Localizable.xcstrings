@@ -153,6 +153,38 @@
         }
       }
     },
+    "plugin.translate.settings.accessibilityHint" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "If it does not work, remove EnoughBox.app in Accessibility, quit the app, reopen it, and enable it again."
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "如果没有效果，请在辅助功能中移除 EnoughBox.app，退出应用后，重新打开并勾选。"
+          }
+        }
+      }
+    },
+    "plugin.translate.settings.accessibility" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Accessibility"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "辅助功能"
+          }
+        }
+      }
+    },
     "plugin.translate.settings.openAccessibility" : {
       "localizations" : {
         "en" : {

@@ -59,13 +59,7 @@ struct PluginDetailView: View {
     private func pluginSettingsCard(_ viewController: NSViewController, pluginID: String) -> some View {
         PluginSettingsContainer(viewController: viewController)
             .id(pluginID)
-            .frame(maxWidth: .infinity, minHeight: 100, alignment: .leading)
-            .padding(16)
-            .background(tokens.card, in: RoundedRectangle(cornerRadius: 11, style: .continuous))
-            .overlay(
-                RoundedRectangle(cornerRadius: 11, style: .continuous)
-                    .strokeBorder(tokens.border, lineWidth: 1)
-            )
+            .frame(maxWidth: .infinity, alignment: .leading)
     }
 
     private var header: some View {

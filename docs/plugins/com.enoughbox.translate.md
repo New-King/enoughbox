@@ -103,9 +103,9 @@ ls -l "$HOME/Library/Application Support/EnoughBox/Plugins/com.enoughbox.transla
 
 在系统设置 → 隐私与安全性 → 辅助功能中：
 
-1. 找到当前正在运行的 EnoughBox。
-2. 如果有多份同名旧 App，关闭或移除明显过期的条目。
-3. 把 Xcode 当前运行的那份 `EnoughBox.app` 加入并打开。
+1. 找到 EnoughBox；如果当前授权无效，移除这个条目。
+2. 退出 EnoughBox 后，重新打开并勾选。
+3. 回到辅助功能中确认当前 EnoughBox 已出现并打开。
 4. 再在其他 App 中测试，不要只在翻译浮窗自己的编辑器里测试。
 
 更换 DerivedData 目录、Clean 后签名变化、修改 entitlements，都可能让 macOS 把它视为另一份 App。

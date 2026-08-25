@@ -64,7 +64,12 @@ private struct SampleDemoSettingsView: View {
             .buttonStyle(.plain)
         }
         .frame(maxWidth: .infinity, alignment: .leading)
-        .padding(.vertical, 4)
+        .padding(12)
+        .background(cardBackground, in: RoundedRectangle(cornerRadius: 10, style: .continuous))
+        .overlay(
+            RoundedRectangle(cornerRadius: 10, style: .continuous)
+                .strokeBorder(cardBorder, lineWidth: 1)
+        )
     }
 
     private var sectionHeaderColor: Color {
@@ -77,5 +82,15 @@ private struct SampleDemoSettingsView: View {
         colorScheme == .dark
             ? Color(red: 224 / 255, green: 224 / 255, blue: 224 / 255)
             : Color(red: 29 / 255, green: 29 / 255, blue: 31 / 255)
+    }
+
+    private var cardBackground: Color {
+        colorScheme == .dark
+            ? Color(red: 48 / 255, green: 48 / 255, blue: 50 / 255)
+            : Color.white
+    }
+
+    private var cardBorder: Color {
+        colorScheme == .dark ? Color.white.opacity(0.12) : Color.black.opacity(0.08)
     }
 }

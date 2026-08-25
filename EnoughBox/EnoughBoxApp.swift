@@ -19,7 +19,7 @@ struct EnoughBoxApp: App {
                 .designTokensProvider()
                 .frame(minWidth: 720, minHeight: 400)
         }
-        .defaultSize(width: 900, height: 520)
+        .defaultSize(width: 900, height: 560)
         .windowResizability(.contentMinSize)
     }
 }
