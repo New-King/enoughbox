@@ -8,16 +8,19 @@ import SwiftUI
 struct ShortcutRecorderField: NSViewRepresentable {
     let name: KeyboardShortcuts.Name
     let onSaved: (KeyboardShortcuts.Shortcut) -> Void
+    let onConflict: (ShortcutConflict) -> Void
 
     func makeNSView(context: Context) -> ShortcutRecorderButton {
         let button = ShortcutRecorderButton(name: name)
         button.onSaved = onSaved
+        button.onConflict = onConflict
         return button
     }
 
     func updateNSView(_ nsView: ShortcutRecorderButton, context: Context) {
         nsView.shortcutName = name
         nsView.onSaved = onSaved
+        nsView.onConflict = onConflict
         nsView.refreshTitle()
     }
 
@@ -44,6 +47,7 @@ final class ShortcutRecorderButton: NSButton {
     }
 
     var onSaved: ((KeyboardShortcuts.Shortcut) -> Void)?
+    var onConflict: ((ShortcutConflict) -> Void)?
 
     private var isRecording = false
     private var eventMonitor: Any?
@@ -235,6 +239,13 @@ final class ShortcutRecorderButton: NSButton {
         refreshTitle()
 
         guard isValidGlobalShortcut(event) else { return }
+        if let conflict = ShortcutConflictDetector.conflict(
+            for: shortcut,
+            excluding: shortcutName
+        ) {
+            onConflict?(conflict)
+            return
+        }
 
         KeyboardShortcuts.setShortcut(shortcut, for: shortcutName)
         // setShortcut registers immediately. Disable again while this control
@@ -277,5 +288,95 @@ final class ShortcutRecorderButton: NSButton {
         if modifiers.contains(.shift) { result += "⇧" }
         if modifiers.contains(.command) { result += "⌘" }
         return result
+    }
+}
+
+enum ShortcutConflict {
+    case duplicate
+    case system
+    case menuItem(String)
+
+    var localizedMessage: String {
+        switch self {
+        case .duplicate:
+            String(localized: "plugin.shortcut.conflict.duplicate")
+        case .system:
+            String(localized: "plugin.shortcut.conflict.system")
+        case let .menuItem(title):
+            String(
+                format: String(localized: "plugin.shortcut.conflict.menu.format"),
+                title
+            )
+        }
+    }
+}
+
+@MainActor
+private enum ShortcutConflictDetector {
+    static func conflict(
+        for shortcut: KeyboardShortcuts.Shortcut,
+        excluding name: KeyboardShortcuts.Name
+    ) -> ShortcutConflict? {
+        if HotkeyCenter.shared.hasShortcutConflict(shortcut, excluding: name) {
+            return .duplicate
+        }
+        if let menuItem = matchingMenuItem(for: shortcut, in: NSApp.mainMenu) {
+            return .menuItem(menuItem.title)
+        }
+        if systemShortcuts().contains(shortcut) {
+            return .system
+        }
+        return nil
+    }
+
+    private static func matchingMenuItem(
+        for shortcut: KeyboardShortcuts.Shortcut,
+        in menu: NSMenu?
+    ) -> NSMenuItem? {
+        guard let menu else { return nil }
+
+        for item in menu.items {
+            var key = item.keyEquivalent
+            var modifiers = item.keyEquivalentModifierMask
+                .intersection(.deviceIndependentFlagsMask)
+
+            if shortcut.modifiers.contains(.shift), key.lowercased() != key {
+                key = key.lowercased()
+                modifiers.insert(.shift)
+            }
+
+            let shortcutModifiers = shortcut.modifiers
+                .intersection(.deviceIndependentFlagsMask)
+            if shortcut.nsMenuItemKeyEquivalent == key,
+               shortcutModifiers == modifiers {
+                return item
+            }
+            if let match = matchingMenuItem(for: shortcut, in: item.submenu) {
+                return match
+            }
+        }
+        return nil
+    }
+
+    private static func systemShortcuts() -> Set<KeyboardShortcuts.Shortcut> {
+        var shortcutsReference: Unmanaged<CFArray>?
+        guard CopySymbolicHotKeys(&shortcutsReference) == noErr,
+              let shortcuts = shortcutsReference?.takeRetainedValue() as? [[String: Any]]
+        else {
+            return []
+        }
+
+        return Set(shortcuts.compactMap { value in
+            guard (value[kHISymbolicHotKeyEnabled] as? Bool) == true,
+                  let keyCode = value[kHISymbolicHotKeyCode] as? Int,
+                  let modifiers = value[kHISymbolicHotKeyModifiers] as? Int
+            else {
+                return nil
+            }
+            return KeyboardShortcuts.Shortcut(
+                carbonKeyCode: keyCode,
+                carbonModifiers: modifiers
+            )
+        })
     }
 }

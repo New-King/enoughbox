@@ -9,31 +9,26 @@ struct PluginDetailView: View {
     let plugin: InstalledPlugin
 
     var body: some View {
-        VStack(spacing: 0) {
-            header
-                .padding(.horizontal, 28)
-                .padding(.top, 24)
-                .padding(.bottom, 12)
+        ScrollView {
+            VStack(alignment: .leading, spacing: 16) {
+                header
 
-            if plugin.capabilities.contains(.hotkey),
-               let shortcutName = HotkeyCatalogHost.recorderName(forPluginID: plugin.id) {
-                shortcutCard(name: shortcutName)
-                    .padding(.horizontal, 28)
-                    .padding(.bottom, 12)
-            }
-
-            ScrollView {
-                VStack(alignment: .leading, spacing: 16) {
-                    if let settings = appState.pluginManager.settingsViewController(for: plugin.id) {
-                        pluginSettingsCard(settings)
-                    } else {
-                        missingPluginView
-                    }
+                if plugin.capabilities.contains(.hotkey),
+                   let shortcutName = HotkeyCatalogHost.recorderName(forPluginID: plugin.id) {
+                    shortcutCard(name: shortcutName)
                 }
-                .padding(.horizontal, 28)
-                .padding(.bottom, 24)
+
+                if let settings = appState.pluginManager.settingsViewController(for: plugin.id) {
+                    pluginSettingsCard(settings)
+                } else {
+                    missingPluginView
+                }
             }
+            .padding(.horizontal, 28)
+            .padding(.top, 20)
+            .padding(.bottom, 24)
         }
+        .defaultScrollAnchor(.top)
         .background(tokens.shell)
         .navigationTitle(Text(appState.displayName(for: plugin)))
         .onAppear {

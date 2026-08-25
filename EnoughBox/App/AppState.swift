@@ -1,12 +1,18 @@
 import Foundation
 import SwiftUI
 
+enum ToastStyle {
+    case standard
+    case error
+}
+
 @MainActor
 final class AppState: ObservableObject {
     @Published private(set) var installedPlugins: [InstalledPlugin] = []
     @Published var selectedPluginID: String?
     @Published var isPluginStorePresented = false
     @Published var toastMessage: String?
+    @Published private(set) var toastStyle: ToastStyle = .standard
     @Published private(set) var installPhases: [String: PluginInstallPhase] = [:]
 
     private var toastGeneration = 0
@@ -74,7 +80,8 @@ final class AppState: ObservableObject {
         }
     }
 
-    func showToast(_ message: String) {
+    func showToast(_ message: String, style: ToastStyle = .standard) {
+        toastStyle = style
         toastMessage = message
         toastGeneration += 1
         let generation = toastGeneration

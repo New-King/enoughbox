@@ -55,6 +55,7 @@ struct MainView: View {
             }
         }
         .listStyle(.sidebar)
+        .contentMargins(.top, 8, for: .scrollContent)
         .scrollContentBackground(.hidden)
         .background(tokens.page)
         .navigationSplitViewColumnWidth(min: 200, ideal: 220, max: 260)
@@ -122,7 +123,12 @@ struct MainView: View {
     }
 
     private func toast(message: String) -> some View {
-        floatingBanner(message: message, foreground: tokens.ink, border: tokens.border)
+        let isError = appState.toastStyle == .error
+        return floatingBanner(
+            message: message,
+            foreground: isError ? tokens.danger : tokens.ink,
+            border: isError ? tokens.danger.opacity(0.5) : tokens.border
+        )
     }
 
     private func floatingBanner(message: String, foreground: Color, border: Color) -> some View {

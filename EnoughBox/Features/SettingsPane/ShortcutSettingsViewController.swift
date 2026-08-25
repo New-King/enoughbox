@@ -28,6 +28,8 @@ struct PluginShortcutSettingsCard: View {
                         "\(shortcut)"
                     )
                     appState.showToast(message)
+                } onConflict: { conflict in
+                    appState.showToast(conflict.localizedMessage, style: .error)
                 }
                 .frame(width: 140, height: 24)
             }

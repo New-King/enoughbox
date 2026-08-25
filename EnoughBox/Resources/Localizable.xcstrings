@@ -360,6 +360,54 @@
         }
       }
     },
+    "plugin.shortcut.conflict.duplicate" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "This shortcut is already used by another EnoughBox action"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "此快捷键已被 EnoughBox 的其他功能使用"
+          }
+        }
+      }
+    },
+    "plugin.shortcut.conflict.menu.format" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "This shortcut is already used by the “%@” menu item"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "此快捷键已被菜单“%@”使用"
+          }
+        }
+      }
+    },
+    "plugin.shortcut.conflict.system" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "This shortcut is already used by macOS"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "此快捷键已被 macOS 使用"
+          }
+        }
+      }
+    },
     "plugin.shortcut.press" : {
       "localizations" : {
         "en" : {

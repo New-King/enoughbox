@@ -61,6 +61,15 @@ final class HotkeyCenter {
         return "Shortcut for \(pluginID): \(shortcut.description)"
     }
 
+    func hasShortcutConflict(
+        _ shortcut: KeyboardShortcuts.Shortcut,
+        excluding name: KeyboardShortcuts.Name
+    ) -> Bool {
+        listeningNames.contains { candidate in
+            candidate != name && KeyboardShortcuts.getShortcut(for: candidate) == shortcut
+        }
+    }
+
     func suspendForShortcutRecording() {
         hotkeysSuspendedForRecording = true
         guard !listeningNames.isEmpty else { return }

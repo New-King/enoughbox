@@ -13,6 +13,7 @@ struct DesignTokens: Equatable {
     let accentHover: Color
     let accentSoft: Color
     let border: Color
+    let danger: Color
     /// Controls, toolbar icons, links — `accent` in light, `ink` in dark (accent is too dark on nav).
     let controlTint: Color
 
@@ -33,6 +34,7 @@ struct DesignTokens: Equatable {
         accentHover: Color(red: 64 / 255, green: 64 / 255, blue: 64 / 255),
         accentSoft: Color(red: 245 / 255, green: 245 / 255, blue: 247 / 255),
         border: Color.black.opacity(0.08),
+        danger: Color(red: 215 / 255, green: 0, blue: 21 / 255),
         controlTint: Color(red: 23 / 255, green: 23 / 255, blue: 23 / 255)
     )
 
@@ -49,6 +51,7 @@ struct DesignTokens: Equatable {
         accentHover: Color(red: 90 / 255, green: 90 / 255, blue: 91 / 255),
         accentSoft: Color(red: 42 / 255, green: 42 / 255, blue: 44 / 255),
         border: Color.white.opacity(0.12),
+        danger: Color(red: 1, green: 105 / 255, blue: 97 / 255),
         controlTint: Color(red: 224 / 255, green: 224 / 255, blue: 224 / 255)
     )
 }

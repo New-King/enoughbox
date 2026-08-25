@@ -17,8 +17,9 @@ struct EnoughBoxApp: App {
                 .environmentObject(appearance)
                 .preferredColorScheme(appearance.mode.resolvedColorScheme)
                 .designTokensProvider()
+                .frame(minWidth: 720, minHeight: 400)
         }
-        .defaultSize(width: 960, height: 640)
+        .defaultSize(width: 900, height: 520)
         .windowResizability(.contentMinSize)
     }
 }
