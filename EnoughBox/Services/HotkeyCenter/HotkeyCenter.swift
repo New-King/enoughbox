@@ -104,7 +104,14 @@ final class HotkeyCenter {
     }
 
     private func installListenerIfNeeded(for name: KeyboardShortcuts.Name) {
-        guard !listeningNames.contains(name) else { return }
+        if listeningNames.contains(name) {
+            if hotkeysSuspendedForRecording {
+                KeyboardShortcuts.disable(name)
+            } else {
+                KeyboardShortcuts.enable(name)
+            }
+            return
+        }
         listeningNames.insert(name)
 
         KeyboardShortcuts.onKeyUp(for: name) { [weak self] in

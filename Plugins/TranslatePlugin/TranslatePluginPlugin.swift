@@ -40,8 +40,7 @@ public final class TranslatePluginPlugin: NSObject, EnoughBoxPlugin {
     }
 
     private func translateSelection() {
-        let selection = host as? HostServicesSelection
-        let text = selection?.textForTranslation() ?? ""
+        let text = host?.textForTranslation() ?? ""
         let host = self.host
 
         Task { @MainActor [weak self] in
@@ -150,7 +149,7 @@ private struct TranslateSettingsView: View {
                 .foregroundStyle(mutedColor)
                 .fixedSize(horizontal: false, vertical: true)
 
-            if let selection = host as? HostServicesSelection, !selection.isAccessibilityTrusted() {
+            if !host.isAccessibilityTrusted() {
                 Button(action: openAccessibilitySettings) {
                     Text("plugin.translate.settings.openAccessibility", bundle: TranslateL10n.bundle)
                         .foregroundStyle(bodyColor)
