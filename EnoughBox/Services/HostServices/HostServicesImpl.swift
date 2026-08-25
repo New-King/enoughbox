@@ -1,7 +1,7 @@
 import EnoughBoxPluginSDK
 import Foundation
 
-final class HostServicesImpl: NSObject, HostServices, HostServicesHotkeys {
+final class HostServicesImpl: NSObject, HostServices, HostServicesHotkeys, HostServicesSelection, HostServicesClipboard {
     private let toastHandler: (String) -> Void
 
     init(toastHandler: @escaping (String) -> Void) {
@@ -22,5 +22,21 @@ final class HostServicesImpl: NSObject, HostServices, HostServicesHotkeys {
         Task { @MainActor in
             HotkeyCenter.shared.unregister(identifier)
         }
+    }
+
+    func isAccessibilityTrusted() -> Bool {
+        SelectionCapture.isAccessibilityTrusted()
+    }
+
+    func requestAccessibilityTrust() {
+        SelectionCapture.requestAccessibilityTrust()
+    }
+
+    func currentSelectedText() -> String {
+        SelectionCapture.currentSelectedText()
+    }
+
+    func clipboardText() -> String {
+        SelectionCapture.clipboardText()
     }
 }

@@ -15,7 +15,7 @@ struct PluginDetailView: View {
 
                 if plugin.capabilities.contains(.hotkey),
                    let shortcutName = HotkeyCatalogHost.recorderName(forPluginID: plugin.id) {
-                    shortcutCard(name: shortcutName)
+                    shortcutCard(name: shortcutName, footerKey: shortcutFooterKey)
                 }
 
                 if let settings = appState.pluginManager.settingsViewController(for: plugin.id) {
@@ -36,8 +36,17 @@ struct PluginDetailView: View {
         }
     }
 
-    private func shortcutCard(name: KeyboardShortcuts.Name) -> some View {
-        PluginShortcutSettingsCard(shortcutName: name)
+    private var shortcutFooterKey: LocalizedStringKey {
+        switch plugin.id {
+        case "com.enoughbox.translate":
+            "plugin.translate.shortcut.footer.active"
+        default:
+            "plugin.sample.shortcut.footer.active"
+        }
+    }
+
+    private func shortcutCard(name: KeyboardShortcuts.Name, footerKey: LocalizedStringKey) -> some View {
+        PluginShortcutSettingsCard(shortcutName: name, footerKey: footerKey)
             .frame(maxWidth: .infinity, alignment: .leading)
             .padding(16)
             .background(tokens.card, in: RoundedRectangle(cornerRadius: 11, style: .continuous))

@@ -11,6 +11,7 @@ struct InstalledPlugin: Identifiable, Equatable, Hashable {
     var localizedNameKey: LocalizedStringKey {
         switch id {
         case "com.enoughbox.sample": "plugin.sample.name"
+        case "com.enoughbox.translate": "plugin.translate.name"
         default: LocalizedStringKey(id)
         }
     }
@@ -42,11 +43,11 @@ struct StorePlugin: Identifiable, Equatable {
         StorePlugin(
             id: "com.enoughbox.translate",
             iconName: "character.book.closed",
-            version: "0.0.0",
-            capabilities: [.accessibility, .network, .clipboard],
-            nameKey: "plugin.comingSoon.translate.name",
-            descriptionKey: "plugin.comingSoon.translate.description",
-            comingSoon: true
+            version: "0.1.0",
+            capabilities: [.hotkey, .accessibility, .clipboard],
+            nameKey: "plugin.translate.name",
+            descriptionKey: "plugin.translate.description",
+            comingSoon: false
         ),
         StorePlugin(
             id: "com.enoughbox.screenshot",

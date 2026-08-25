@@ -4,6 +4,7 @@ import KeyboardShortcuts
 
 extension KeyboardShortcuts.Name {
     static let sampleTrigger = Self("com.enoughbox.sample.trigger")
+    static let translateSelection = Self("com.enoughbox.translate.selection")
 }
 
 enum HotkeyCatalogHost {
@@ -11,6 +12,8 @@ enum HotkeyCatalogHost {
         switch identifier {
         case EnoughBoxPluginSDK.HotkeyCatalog.sampleTriggerID:
             return .sampleTrigger
+        case EnoughBoxPluginSDK.HotkeyCatalog.translateSelectionID:
+            return .translateSelection
         default:
             return nil
         }
@@ -20,6 +23,8 @@ enum HotkeyCatalogHost {
         switch pluginID {
         case "com.enoughbox.sample":
             return .sampleTrigger
+        case "com.enoughbox.translate":
+            return .translateSelection
         default:
             return nil
         }

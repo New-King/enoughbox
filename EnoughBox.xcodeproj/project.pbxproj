@@ -7,14 +7,18 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		0CE30C021E5B45F23E1328E8 /* Localizable.xcstrings in Resources */ = {isa = PBXBuildFile; fileRef = BE5AF464D33749B86CF7F99F /* Localizable.xcstrings */; };
+		142B97AD0BE34DBBD5B4D044 /* EnoughBoxPluginSDK in Frameworks */ = {isa = PBXBuildFile; productRef = 35309280615764E95C9CDC3B /* EnoughBoxPluginSDK */; };
 		27D1213432FCED980784FE00 /* HostServicesImpl.swift in Sources */ = {isa = PBXBuildFile; fileRef = A968C82724FB97C0387225C1 /* HostServicesImpl.swift */; };
 		28C9F2ED69BE3EE4308D1A1D /* EnoughBoxApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8F36E3F1DF931390FA757F3A /* EnoughBoxApp.swift */; };
 		33E5765256D3B926DA23D4D0 /* HotkeyCenter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6E505AD4E4312D4C01B58E38 /* HotkeyCenter.swift */; };
 		380BC38145D7A1851ABEB894 /* MainView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9704745508B442108DF65CF7 /* MainView.swift */; };
+		431EE76AF017607E5AB2B742 /* TranslatePluginPlugin.swift in Sources */ = {isa = PBXBuildFile; fileRef = C382288F5F726F2EC8AFD158 /* TranslatePluginPlugin.swift */; };
 		4A7454D68468C9573AA34C73 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = C8789202810DA85768E64FA7 /* Assets.xcassets */; };
 		4D48A13C6C53B785501459B6 /* PluginLoader.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4A9CC8B23AB20D098423F97F /* PluginLoader.swift */; };
 		604D8B097BC90CC42490EE6A /* EnoughBoxPluginSDK in Frameworks */ = {isa = PBXBuildFile; productRef = 37D4D34234B342990ED496B7 /* EnoughBoxPluginSDK */; };
 		621E8609D681721BE09E1CA8 /* AppearanceManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9310CF80D6394B6335D68306 /* AppearanceManager.swift */; };
+		6EE84A0B8EFF83004DC5E65C /* MockTranslator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 15ACD177E93242A377C7B324 /* MockTranslator.swift */; };
 		82FAC28EC76BFB87488604CF /* PluginInstallButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0969F34FDBDA5174B64EFA32 /* PluginInstallButton.swift */; };
 		83732394A0571E36606B668D /* PluginInstaller.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9726AE0F3378190D32FE9530 /* PluginInstaller.swift */; };
 		83D841C043F334BACE14CA9B /* EmptyStateView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 20D4F8A95FC0E6F624CAE2D9 /* EmptyStateView.swift */; };
@@ -23,6 +27,7 @@
 		985104E14A8B52CC82F2D951 /* PluginDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 17B28F9193D2D6FD7D14B9D0 /* PluginDetailView.swift */; };
 		A0DF783B67CC5106A4745D92 /* Localizable.xcstrings in Resources */ = {isa = PBXBuildFile; fileRef = C30F8231CB2E4E4C304C65A9 /* Localizable.xcstrings */; };
 		B4570B6FEF37DE9A2E92487A /* AppState.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2E798AA90D4ECE990344C323 /* AppState.swift */; };
+		BA6F1A0D0DA29688E644415E /* SelectionCapture.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7134855C14460D4F364127DF /* SelectionCapture.swift */; };
 		C0467D21DAED3CA431CA89BC /* EnoughBoxPluginSDK in Frameworks */ = {isa = PBXBuildFile; productRef = FF9922E62EF357B3F48B4325 /* EnoughBoxPluginSDK */; };
 		C1A61991CF58CA9516383B3A /* PluginStoreView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 51BAFC09B7948E70FAD86CE2 /* PluginStoreView.swift */; };
 		C8549FB98D8E59F55A804B45 /* SamplePluginPlugin.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6D95391879653E15EEB44FFA /* SamplePluginPlugin.swift */; };
@@ -31,12 +36,20 @@
 		DCB529BC069B942C9AD53E1C /* ShortcutSettingsViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = B4AACB91BDE6536D0F957C13 /* ShortcutSettingsViewController.swift */; };
 		DD43FDBD1E5D0F8DC7CCDCBE /* KeyboardShortcuts in Frameworks */ = {isa = PBXBuildFile; productRef = 13A24B873FA65BCCB6E801C3 /* KeyboardShortcuts */; };
 		EC50BC13A4CC6D2225BE4996 /* PluginInstallState.swift in Sources */ = {isa = PBXBuildFile; fileRef = DD499C3E3C8AF2062C274A25 /* PluginInstallState.swift */; };
+		EFA352D675D669DC673042F7 /* TranslationPanel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 47AF3E59F422D763A0209532 /* TranslationPanel.swift */; };
 		F11FF0CFF5B9F3F1B89C1234 /* PluginManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 339676F7E03256A3F55CA39A /* PluginManager.swift */; };
 		F388ADD80A9428352261C67E /* ShortcutRecorderField.swift in Sources */ = {isa = PBXBuildFile; fileRef = B0842B672B213124ACF3D0C9 /* ShortcutRecorderField.swift */; };
 		FE7F9AAFD988642BB054152F /* PluginBinarySource.swift in Sources */ = {isa = PBXBuildFile; fileRef = D32AAB711F18FC76A22860B1 /* PluginBinarySource.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
+		98774942FEF3D0EFB027EFAB /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 80498AF53C921366B4FC032D /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = C00881E8D5BEE8D6A53A447C;
+			remoteInfo = TranslatePlugin;
+		};
 		FD234377D791BF21D708DA4C /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = 80498AF53C921366B4FC032D /* Project object */;
@@ -50,17 +63,21 @@
 		0631057AF0F0CC4D372B6338 /* SamplePlugin.bundle */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = SamplePlugin.bundle; sourceTree = BUILT_PRODUCTS_DIR; };
 		0969F34FDBDA5174B64EFA32 /* PluginInstallButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PluginInstallButton.swift; sourceTree = "<group>"; };
 		11F132A4E6E47759F5683FA8 /* DesignTokens.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DesignTokens.swift; sourceTree = "<group>"; };
+		15ACD177E93242A377C7B324 /* MockTranslator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MockTranslator.swift; sourceTree = "<group>"; };
 		17B28F9193D2D6FD7D14B9D0 /* PluginDetailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PluginDetailView.swift; sourceTree = "<group>"; };
 		1E332521763E4DEB27F1F241 /* AppPaths.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppPaths.swift; sourceTree = "<group>"; };
 		209C35A31699ABCCA41A718F /* PluginRegistry.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PluginRegistry.swift; sourceTree = "<group>"; };
 		20D4F8A95FC0E6F624CAE2D9 /* EmptyStateView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EmptyStateView.swift; sourceTree = "<group>"; };
 		2E798AA90D4ECE990344C323 /* AppState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppState.swift; sourceTree = "<group>"; };
 		339676F7E03256A3F55CA39A /* PluginManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PluginManager.swift; sourceTree = "<group>"; };
+		47AF3E59F422D763A0209532 /* TranslationPanel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TranslationPanel.swift; sourceTree = "<group>"; };
 		4A9CC8B23AB20D098423F97F /* PluginLoader.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PluginLoader.swift; sourceTree = "<group>"; };
 		51BAFC09B7948E70FAD86CE2 /* PluginStoreView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PluginStoreView.swift; sourceTree = "<group>"; };
 		6D95391879653E15EEB44FFA /* SamplePluginPlugin.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SamplePluginPlugin.swift; sourceTree = "<group>"; };
 		6E505AD4E4312D4C01B58E38 /* HotkeyCenter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HotkeyCenter.swift; sourceTree = "<group>"; };
+		7134855C14460D4F364127DF /* SelectionCapture.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SelectionCapture.swift; sourceTree = "<group>"; };
 		7EF52A40906E137ED5DABA7F /* EnoughBoxPluginSDK */ = {isa = PBXFileReference; lastKnownFileType = folder; name = EnoughBoxPluginSDK; path = Packages/EnoughBoxPluginSDK; sourceTree = SOURCE_ROOT; };
+		7FE5ABD57B250A24C313561E /* TranslatePlugin.bundle */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = TranslatePlugin.bundle; sourceTree = BUILT_PRODUCTS_DIR; };
 		8F36E3F1DF931390FA757F3A /* EnoughBoxApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EnoughBoxApp.swift; sourceTree = "<group>"; };
 		9310CF80D6394B6335D68306 /* AppearanceManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppearanceManager.swift; sourceTree = "<group>"; };
 		9399E2AB5BA70E1885291B63 /* PluginModels.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PluginModels.swift; sourceTree = "<group>"; };
@@ -70,13 +87,23 @@
 		B0842B672B213124ACF3D0C9 /* ShortcutRecorderField.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShortcutRecorderField.swift; sourceTree = "<group>"; };
 		B3414FF930E6A99F676C21DB /* EnoughBox.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = EnoughBox.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		B4AACB91BDE6536D0F957C13 /* ShortcutSettingsViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShortcutSettingsViewController.swift; sourceTree = "<group>"; };
+		BE5AF464D33749B86CF7F99F /* Localizable.xcstrings */ = {isa = PBXFileReference; lastKnownFileType = text.json.xcstrings; path = Localizable.xcstrings; sourceTree = "<group>"; };
 		C30F8231CB2E4E4C304C65A9 /* Localizable.xcstrings */ = {isa = PBXFileReference; lastKnownFileType = text.json.xcstrings; path = Localizable.xcstrings; sourceTree = "<group>"; };
+		C382288F5F726F2EC8AFD158 /* TranslatePluginPlugin.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TranslatePluginPlugin.swift; sourceTree = "<group>"; };
 		C8789202810DA85768E64FA7 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		D32AAB711F18FC76A22860B1 /* PluginBinarySource.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PluginBinarySource.swift; sourceTree = "<group>"; };
 		DD499C3E3C8AF2062C274A25 /* PluginInstallState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PluginInstallState.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
+		05F903500FC6DE4861F2B7C4 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				142B97AD0BE34DBBD5B4D044 /* EnoughBoxPluginSDK in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		3B43A9CA8ABF3A5F96C0EB2E /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
@@ -114,6 +141,7 @@
 			isa = PBXGroup;
 			children = (
 				A968C82724FB97C0387225C1 /* HostServicesImpl.swift */,
+				7134855C14460D4F364127DF /* SelectionCapture.swift */,
 			);
 			path = HostServices;
 			sourceTree = "<group>";
@@ -123,6 +151,7 @@
 			children = (
 				B3414FF930E6A99F676C21DB /* EnoughBox.app */,
 				0631057AF0F0CC4D372B6338 /* SamplePlugin.bundle */,
+				7FE5ABD57B250A24C313561E /* TranslatePlugin.bundle */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -136,10 +165,22 @@
 			path = Models;
 			sourceTree = "<group>";
 		};
+		31790681035A1991E4B4A810 /* TranslatePlugin */ = {
+			isa = PBXGroup;
+			children = (
+				BE5AF464D33749B86CF7F99F /* Localizable.xcstrings */,
+				15ACD177E93242A377C7B324 /* MockTranslator.swift */,
+				C382288F5F726F2EC8AFD158 /* TranslatePluginPlugin.swift */,
+				47AF3E59F422D763A0209532 /* TranslationPanel.swift */,
+			);
+			path = TranslatePlugin;
+			sourceTree = "<group>";
+		};
 		42CAB76198354442FD9122A3 /* Plugins */ = {
 			isa = PBXGroup;
 			children = (
 				505388FDE94C6EFDE8EC59A3 /* SamplePlugin */,
+				31790681035A1991E4B4A810 /* TranslatePlugin */,
 			);
 			path = Plugins;
 			sourceTree = "<group>";
@@ -312,6 +353,26 @@
 			productReference = 0631057AF0F0CC4D372B6338 /* SamplePlugin.bundle */;
 			productType = "com.apple.product-type.bundle";
 		};
+		C00881E8D5BEE8D6A53A447C /* TranslatePlugin */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = C619C37889FAD987D4F83930 /* Build configuration list for PBXNativeTarget "TranslatePlugin" */;
+			buildPhases = (
+				99D4434477FA2B338BACFF49 /* Sources */,
+				2B61A272D8F654CBC949F15D /* Resources */,
+				05F903500FC6DE4861F2B7C4 /* Frameworks */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = TranslatePlugin;
+			packageProductDependencies = (
+				35309280615764E95C9CDC3B /* EnoughBoxPluginSDK */,
+			);
+			productName = TranslatePlugin;
+			productReference = 7FE5ABD57B250A24C313561E /* TranslatePlugin.bundle */;
+			productType = "com.apple.product-type.bundle";
+		};
 		CE660CBFAF1C528F6FFAE9AD /* EnoughBox */ = {
 			isa = PBXNativeTarget;
 			buildConfigurationList = 2A74D7219BE79BDC56147AF8 /* Build configuration list for PBXNativeTarget "EnoughBox" */;
@@ -324,6 +385,7 @@
 			);
 			dependencies = (
 				13B361A8550723BB1F6F2290 /* PBXTargetDependency */,
+				A9115B79EA272B19D885AC47 /* PBXTargetDependency */,
 			);
 			name = EnoughBox;
 			packageProductDependencies = (
@@ -344,6 +406,9 @@
 				LastUpgradeCheck = 1430;
 				TargetAttributes = {
 					99BA05AD6A96C78F2D0C142C = {
+						ProvisioningStyle = Automatic;
+					};
+					C00881E8D5BEE8D6A53A447C = {
 						ProvisioningStyle = Automatic;
 					};
 					CE660CBFAF1C528F6FFAE9AD = {
@@ -372,11 +437,20 @@
 			targets = (
 				CE660CBFAF1C528F6FFAE9AD /* EnoughBox */,
 				99BA05AD6A96C78F2D0C142C /* SamplePlugin */,
+				C00881E8D5BEE8D6A53A447C /* TranslatePlugin */,
 			);
 		};
 /* End PBXProject section */
 
 /* Begin PBXResourcesBuildPhase section */
+		2B61A272D8F654CBC949F15D /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				0CE30C021E5B45F23E1328E8 /* Localizable.xcstrings in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		40854472B8E8F0141CE48B11 /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
@@ -394,6 +468,16 @@
 			buildActionMask = 2147483647;
 			files = (
 				C8549FB98D8E59F55A804B45 /* SamplePluginPlugin.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		99D4434477FA2B338BACFF49 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				6EE84A0B8EFF83004DC5E65C /* MockTranslator.swift in Sources */,
+				431EE76AF017607E5AB2B742 /* TranslatePluginPlugin.swift in Sources */,
+				EFA352D675D669DC673042F7 /* TranslationPanel.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -420,6 +504,7 @@
 				DBA0F5A45E7F5030055D6BC8 /* PluginModels.swift in Sources */,
 				8E6D8393EB98037D8D53C1ED /* PluginRegistry.swift in Sources */,
 				C1A61991CF58CA9516383B3A /* PluginStoreView.swift in Sources */,
+				BA6F1A0D0DA29688E644415E /* SelectionCapture.swift in Sources */,
 				F388ADD80A9428352261C67E /* ShortcutRecorderField.swift in Sources */,
 				DCB529BC069B942C9AD53E1C /* ShortcutSettingsViewController.swift in Sources */,
 			);
@@ -432,6 +517,11 @@
 			isa = PBXTargetDependency;
 			target = 99BA05AD6A96C78F2D0C142C /* SamplePlugin */;
 			targetProxy = FD234377D791BF21D708DA4C /* PBXContainerItemProxy */;
+		};
+		A9115B79EA272B19D885AC47 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = C00881E8D5BEE8D6A53A447C /* TranslatePlugin */;
+			targetProxy = 98774942FEF3D0EFB027EFAB /* PBXContainerItemProxy */;
 		};
 /* End PBXTargetDependency section */
 
@@ -447,6 +537,7 @@
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_KEY_CFBundleDisplayName = EnoughBox;
 				INFOPLIST_KEY_LSMinimumSystemVersion = "$(MACOSX_DEPLOYMENT_TARGET)";
+				INFOPLIST_KEY_NSAccessibilityUsageDescription = "EnoughBox reads selected text so plugins can translate it.";
 				INFOPLIST_KEY_NSHumanReadableCopyright = "";
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
@@ -475,6 +566,25 @@
 				PRODUCT_BUNDLE_IDENTIFIER = com.enoughbox.sample;
 				PRODUCT_NAME = com.enoughbox.sample;
 				SDKROOT = macosx;
+				SWIFT_VERSION = 5.9;
+				WRAPPER_EXTENSION = plugin;
+			};
+			name = Debug;
+		};
+		492323E086636B2EB82306D4 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_STYLE = Automatic;
+				COMBINE_HIDPI_IMAGES = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_CFBundlePackageType = BNDL;
+				INFOPLIST_KEY_NSPrincipalClass = TranslatePluginPlugin;
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks @loader_path/../Frameworks";
+				MACOSX_DEPLOYMENT_TARGET = 14.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.enoughbox.translate;
+				PRODUCT_NAME = com.enoughbox.translate;
+				SDKROOT = macosx;
+				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_VERSION = 5.9;
 				WRAPPER_EXTENSION = plugin;
 			};
@@ -509,6 +619,7 @@
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_KEY_CFBundleDisplayName = EnoughBox;
 				INFOPLIST_KEY_LSMinimumSystemVersion = "$(MACOSX_DEPLOYMENT_TARGET)";
+				INFOPLIST_KEY_NSAccessibilityUsageDescription = "EnoughBox reads selected text so plugins can translate it.";
 				INFOPLIST_KEY_NSHumanReadableCopyright = "";
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
@@ -521,6 +632,25 @@
 				SDKROOT = macosx;
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_VERSION = 5.9;
+			};
+			name = Release;
+		};
+		7E4CC8DA9D1E9CD4702E93EA /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_STYLE = Automatic;
+				COMBINE_HIDPI_IMAGES = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_CFBundlePackageType = BNDL;
+				INFOPLIST_KEY_NSPrincipalClass = TranslatePluginPlugin;
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks @loader_path/../Frameworks";
+				MACOSX_DEPLOYMENT_TARGET = 14.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.enoughbox.translate;
+				PRODUCT_NAME = com.enoughbox.translate;
+				SDKROOT = macosx;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.9;
+				WRAPPER_EXTENSION = plugin;
 			};
 			name = Release;
 		};
@@ -673,6 +803,15 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Debug;
 		};
+		C619C37889FAD987D4F83930 /* Build configuration list for PBXNativeTarget "TranslatePlugin" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				492323E086636B2EB82306D4 /* Debug */,
+				7E4CC8DA9D1E9CD4702E93EA /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
 /* End XCConfigurationList section */
 
 /* Begin XCLocalSwiftPackageReference section */
@@ -698,6 +837,10 @@
 			isa = XCSwiftPackageProductDependency;
 			package = 62B8129A171C7D3964DBE560 /* XCRemoteSwiftPackageReference "KeyboardShortcuts" */;
 			productName = KeyboardShortcuts;
+		};
+		35309280615764E95C9CDC3B /* EnoughBoxPluginSDK */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = EnoughBoxPluginSDK;
 		};
 		37D4D34234B342990ED496B7 /* EnoughBoxPluginSDK */ = {
 			isa = XCSwiftPackageProductDependency;

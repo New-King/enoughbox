@@ -137,9 +137,10 @@
 
 #### Phase 3 — 业务插件（你提供参考后）
 
-- [ ] TranslatePlugin：划词 / OCR / API
+- [x] TranslatePlugin：划词翻译（模拟译文；OCR / API 稍后）
 - [ ] ScreenshotPlugin：区域截图 → 长截
-- [ ] HostServices 补齐 selection / ocr / capture / floatingPanel
+- [x] HostServices.selection（划词）
+- [ ] HostServices 补齐 ocr / capture / floatingPanel
 
 #### Phase 1.1 —  polish
 
@@ -294,6 +295,8 @@
 | `plugin.sample.demoAction` | 触发一次 Toast | Show a Toast |
 | `plugin.sample.section.shortcut` | 快捷键 | Shortcut |
 | `plugin.sample.section.demo` | 演示 | Demo |
+| `plugin.translate.name` | 翻译 | Translate |
+| `plugin.translate.description` | 在任意 App 里划词翻译 | Translate selected text from any app |
 
 （与 newking 规范一致：增删改文案先更新本表与 `.xcstrings`，再改代码。）
 

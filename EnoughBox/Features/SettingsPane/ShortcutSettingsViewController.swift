@@ -7,6 +7,7 @@ struct PluginShortcutSettingsCard: View {
     @EnvironmentObject private var appState: AppState
 
     let shortcutName: KeyboardShortcuts.Name
+    var footerKey: LocalizedStringKey = "plugin.sample.shortcut.footer.active"
 
     var body: some View {
         VStack(alignment: .leading, spacing: 10) {
@@ -34,7 +35,7 @@ struct PluginShortcutSettingsCard: View {
                 .frame(width: 140, height: 24)
             }
 
-            Text("plugin.sample.shortcut.footer.active")
+            Text(footerKey)
                 .font(.system(size: 11))
                 .foregroundStyle(tokens.inkMuted)
                 .fixedSize(horizontal: false, vertical: true)

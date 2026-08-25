@@ -33,12 +33,16 @@ targets:
         INFOPLIST_KEY_CFBundleDisplayName: EnoughBox
         INFOPLIST_KEY_LSMinimumSystemVersion: "$(MACOSX_DEPLOYMENT_TARGET)"
         INFOPLIST_KEY_NSHumanReadableCopyright: ""
+        INFOPLIST_KEY_NSAccessibilityUsageDescription: "EnoughBox reads selected text so plugins can translate it."
     dependencies:
       - package: EnoughBoxPluginSDK
         product: EnoughBoxPluginSDK
       - package: KeyboardShortcuts
         product: KeyboardShortcuts
       - target: SamplePlugin
+        embed: false
+        link: false
+      - target: TranslatePlugin
         embed: false
         link: false
     scheme:
@@ -61,6 +65,29 @@ targets:
         GENERATE_INFOPLIST_FILE: YES
         INFOPLIST_KEY_CFBundlePackageType: BNDL
         INFOPLIST_KEY_NSPrincipalClass: SamplePluginPlugin
+        LD_RUNPATH_SEARCH_PATHS: "$(inherited) @executable_path/../Frameworks @loader_path/../Frameworks"
+    dependencies:
+      - package: EnoughBoxPluginSDK
+        product: EnoughBoxPluginSDK
+  TranslatePlugin:
+    type: bundle
+    platform: macOS
+    sources:
+      - path: Plugins/TranslatePlugin
+        excludes:
+          - "**/.DS_Store"
+    settings:
+      base:
+        PRODUCT_NAME: com.enoughbox.translate
+        PRODUCT_BUNDLE_IDENTIFIER: com.enoughbox.translate
+        WRAPPER_EXTENSION: plugin
+        SWIFT_VERSION: "5.9"
+        SWIFT_EMIT_LOC_STRINGS: YES
+        MACOSX_DEPLOYMENT_TARGET: "14.0"
+        CODE_SIGN_STYLE: Automatic
+        GENERATE_INFOPLIST_FILE: YES
+        INFOPLIST_KEY_CFBundlePackageType: BNDL
+        INFOPLIST_KEY_NSPrincipalClass: TranslatePluginPlugin
         LD_RUNPATH_SEARCH_PATHS: "$(inherited) @executable_path/../Frameworks @loader_path/../Frameworks"
     dependencies:
       - package: EnoughBoxPluginSDK

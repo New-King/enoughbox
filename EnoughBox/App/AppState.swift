@@ -75,6 +75,8 @@ final class AppState: ObservableObject {
         switch plugin.id {
         case "com.enoughbox.sample":
             return String(localized: "plugin.sample.name")
+        case "com.enoughbox.translate":
+            return String(localized: "plugin.translate.name")
         default:
             return plugin.id
         }

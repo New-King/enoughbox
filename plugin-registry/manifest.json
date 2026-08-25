@@ -24,6 +24,29 @@
       "capabilities": ["hotkey", "clipboard"],
       "repositoryUrl": "PLACEHOLDER",
       "author": "enoughbox"
+    },
+    {
+      "id": "com.enoughbox.translate",
+      "name": "Translate",
+      "nameLocalized": {
+        "en": "Translate",
+        "zh-Hans": "翻译"
+      },
+      "description": "Translate selected text from any app",
+      "descriptionLocalized": {
+        "en": "Translate selected text from any app",
+        "zh-Hans": "在任意 App 里划词翻译"
+      },
+      "version": "0.1.0",
+      "icon": "character.book.closed",
+      "downloadUrl": "PLACEHOLDER",
+      "sha256": "PLACEHOLDER",
+      "minHostVersion": "0.1.0",
+      "minMacOS": "14.0",
+      "architectures": ["arm64", "x86_64"],
+      "capabilities": ["hotkey", "accessibility", "clipboard"],
+      "repositoryUrl": "PLACEHOLDER",
+      "author": "enoughbox"
     }
   ]
 }

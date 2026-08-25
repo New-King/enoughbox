@@ -199,6 +199,7 @@
       }
     },
     "plugin.comingSoon.translate.description" : {
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -215,6 +216,7 @@
       }
     },
     "plugin.comingSoon.translate.name" : {
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -360,6 +362,72 @@
         }
       }
     },
+    "plugin.sample.shortcut.footer" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Keyboard recording will be available in Phase 2."
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "快捷键录制将在 Phase 2 接入。"
+          }
+        }
+      }
+    },
+    "plugin.sample.shortcut.footer.active" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Works globally while EnoughBox is running. Click the field, then press a shortcut (must include ⌘, ⌃, or ⌥)."
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "EnoughBox 运行时在任意 App 内生效。先点输入框，再按快捷键（须含 ⌘、⌃ 或 ⌥）。"
+          }
+        }
+      }
+    },
+    "plugin.sample.shortcut.placeholder" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Global shortcut"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "全局快捷键"
+          }
+        }
+      }
+    },
+    "plugin.sample.toast" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sample plugin triggered"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "示例插件已触发"
+          }
+        }
+      }
+    },
     "plugin.shortcut.conflict.duplicate" : {
       "localizations" : {
         "en" : {
@@ -424,22 +492,6 @@
         }
       }
     },
-    "plugin.shortcut.set" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Set Shortcut"
-          }
-        },
-        "zh-Hans" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "设置快捷键"
-          }
-        }
-      }
-    },
     "plugin.shortcut.saved.format" : {
       "localizations" : {
         "en" : {
@@ -456,68 +508,66 @@
         }
       }
     },
-    "plugin.sample.shortcut.footer" : {
-      "extractionState" : "stale",
+    "plugin.shortcut.set" : {
       "localizations" : {
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Keyboard recording will be available in Phase 2."
+            "value" : "Set Shortcut"
           }
         },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "快捷键录制将在 Phase 2 接入。"
+            "value" : "设置快捷键"
           }
         }
       }
     },
-    "plugin.sample.shortcut.footer.active" : {
+    "plugin.translate.description" : {
       "localizations" : {
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Works globally while EnoughBox is running. Click the field, then press a shortcut (must include ⌘, ⌃, or ⌥)."
+            "value" : "Translate selected text from any app"
           }
         },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "EnoughBox 运行时在任意 App 内生效。先点输入框，再按快捷键（须含 ⌘、⌃ 或 ⌥）。"
+            "value" : "在任意 App 里划词翻译"
           }
         }
       }
     },
-    "plugin.sample.shortcut.placeholder" : {
+    "plugin.translate.name" : {
       "localizations" : {
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Global shortcut"
+            "value" : "Translate"
           }
         },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "全局快捷键"
+            "value" : "翻译"
           }
         }
       }
     },
-    "plugin.sample.toast" : {
-      "extractionState" : "stale",
+    "plugin.translate.shortcut.footer.active" : {
       "localizations" : {
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Sample plugin triggered"
+            "value" : "Translates selected text first. If nothing is selected, uses clipboard text. Accessibility is only needed for selection."
           }
         },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "示例插件已触发"
+            "value" : "优先翻译选中文字；没有划词则翻译剪贴板。只有划词需要辅助功能权限。"
           }
         }
       }
