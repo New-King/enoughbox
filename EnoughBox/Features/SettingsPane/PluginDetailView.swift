@@ -1,3 +1,5 @@
+import AppKit
+import KeyboardShortcuts
 import SwiftUI
 
 struct PluginDetailView: View {
@@ -7,17 +9,58 @@ struct PluginDetailView: View {
     let plugin: InstalledPlugin
 
     var body: some View {
-        ScrollView {
-            VStack(alignment: .leading, spacing: 20) {
-                header
+        VStack(spacing: 0) {
+            header
+                .padding(.horizontal, 28)
+                .padding(.top, 24)
+                .padding(.bottom, 12)
 
-                settingsForm
+            if plugin.capabilities.contains(.hotkey),
+               let shortcutName = HotkeyCatalogHost.recorderName(forPluginID: plugin.id) {
+                shortcutCard(name: shortcutName)
+                    .padding(.horizontal, 28)
+                    .padding(.bottom, 12)
             }
-            .padding(28)
-            .frame(maxWidth: .infinity, alignment: .leading)
+
+            ScrollView {
+                VStack(alignment: .leading, spacing: 16) {
+                    if let settings = appState.pluginManager.settingsViewController(for: plugin.id) {
+                        pluginSettingsCard(settings)
+                    } else {
+                        missingPluginView
+                    }
+                }
+                .padding(.horizontal, 28)
+                .padding(.bottom, 24)
+            }
         }
         .background(tokens.shell)
-        .navigationTitle(Text(plugin.localizedNameKey))
+        .navigationTitle(Text(appState.displayName(for: plugin)))
+        .onAppear {
+            appState.pluginManager.load(pluginID: plugin.id)
+        }
+    }
+
+    private func shortcutCard(name: KeyboardShortcuts.Name) -> some View {
+        PluginShortcutSettingsCard(shortcutName: name)
+            .frame(maxWidth: .infinity, alignment: .leading)
+            .padding(16)
+            .background(tokens.card, in: RoundedRectangle(cornerRadius: 11, style: .continuous))
+            .overlay(
+                RoundedRectangle(cornerRadius: 11, style: .continuous)
+                    .strokeBorder(tokens.border, lineWidth: 1)
+            )
+    }
+
+    private func pluginSettingsCard(_ viewController: NSViewController) -> some View {
+        PluginSettingsContainer(viewController: viewController)
+            .frame(maxWidth: .infinity, minHeight: 100, alignment: .leading)
+            .padding(16)
+            .background(tokens.card, in: RoundedRectangle(cornerRadius: 11, style: .continuous))
+            .overlay(
+                RoundedRectangle(cornerRadius: 11, style: .continuous)
+                    .strokeBorder(tokens.border, lineWidth: 1)
+            )
     }
 
     private var header: some View {
@@ -33,7 +76,7 @@ struct PluginDetailView: View {
                 )
 
             VStack(alignment: .leading, spacing: 4) {
-                Text(plugin.localizedNameKey)
+                Text(appState.displayName(for: plugin))
                     .font(.system(size: 20, weight: .semibold))
                     .foregroundStyle(tokens.ink)
 
@@ -46,43 +89,51 @@ struct PluginDetailView: View {
         }
     }
 
-    private var settingsForm: some View {
-        Form {
-            Section {
-                HStack {
-                    Text("plugin.sample.shortcut.placeholder")
-                        .foregroundStyle(tokens.inkMuted)
-                    Spacer()
-                    Text("⌥⇧T")
-                        .font(.system(size: 13, design: .monospaced))
-                        .foregroundStyle(tokens.inkSoft)
-                        .padding(.horizontal, 10)
-                        .padding(.vertical, 6)
-                        .background(tokens.card, in: RoundedRectangle(cornerRadius: 8, style: .continuous))
-                        .overlay(
-                            RoundedRectangle(cornerRadius: 8, style: .continuous)
-                                .strokeBorder(tokens.border, lineWidth: 1)
-                        )
-                }
-            } header: {
-                Text("plugin.sample.section.shortcut")
-            } footer: {
-                Text("plugin.sample.shortcut.footer")
-                    .foregroundStyle(tokens.inkFaint)
-            }
+    private var missingPluginView: some View {
+        VStack(spacing: 12) {
+            Text("plugin.detail.missingBundle")
+                .font(.system(size: 14))
+                .foregroundStyle(tokens.inkMuted)
+                .multilineTextAlignment(.center)
+                .frame(maxWidth: 320)
 
-            Section {
-                Button {
-                    appState.showToast(String(localized: "plugin.sample.toast"))
-                } label: {
-                    Text("plugin.sample.demoAction")
-                }
-            } header: {
-                Text("plugin.sample.section.demo")
+            Text("plugin.detail.reinstallHint")
+                .font(.system(size: 12))
+                .foregroundStyle(tokens.inkFaint)
+                .multilineTextAlignment(.center)
+                .frame(maxWidth: 320)
+
+            Button {
+                appState.openPluginStore()
+            } label: {
+                Text("plugin.detail.reinstall")
             }
+            .buttonStyle(.borderless)
         }
-        .formStyle(.grouped)
-        .scrollContentBackground(.hidden)
+        .frame(maxWidth: .infinity)
+        .padding(.vertical, 24)
+    }
+}
+
+private struct PluginSettingsContainer: NSViewControllerRepresentable {
+    let viewController: NSViewController
+
+    func makeCoordinator() -> Coordinator {
+        Coordinator(viewController: viewController)
+    }
+
+    func makeNSViewController(context: Context) -> NSViewController {
+        context.coordinator.viewController
+    }
+
+    func updateNSViewController(_ nsViewController: NSViewController, context: Context) {}
+
+    final class Coordinator {
+        let viewController: NSViewController
+
+        init(viewController: NSViewController) {
+            self.viewController = viewController
+        }
     }
 }
 

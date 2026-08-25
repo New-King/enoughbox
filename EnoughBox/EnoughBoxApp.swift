@@ -1,9 +1,14 @@
+import KeyboardShortcuts
 import SwiftUI
 
 @main
 struct EnoughBoxApp: App {
     @StateObject private var appState = AppState()
     @StateObject private var appearance = AppearanceManager()
+
+    init() {
+        KeyboardShortcuts.isEnabled = true
+    }
 
     var body: some Scene {
         WindowGroup {

@@ -9,6 +9,10 @@ final class AppState: ObservableObject {
     @Published var toastMessage: String?
     @Published private(set) var installPhases: [String: PluginInstallPhase] = [:]
 
+    private(set) lazy var pluginManager = PluginManager { [weak self] message in
+        self?.showToast(message)
+    }
+
     private let registry = PluginRegistry.shared
     private let installer = PluginInstaller()
 
@@ -22,6 +26,7 @@ final class AppState: ObservableObject {
     init() {
         installedPlugins = registry.load()
         selectedPluginID = installedPlugins.first?.id
+        pluginManager.loadInstalled(installedPlugins)
     }
 
     func openPluginStore() {
@@ -55,6 +60,18 @@ final class AppState: ObservableObject {
         installedPlugins.contains { $0.id == storePlugin.id }
     }
 
+    func displayName(for plugin: InstalledPlugin) -> String {
+        if let runtime = pluginManager.runtime(for: plugin.id) {
+            return runtime.localizedName()
+        }
+        switch plugin.id {
+        case "com.enoughbox.sample":
+            return String(localized: "plugin.sample.name")
+        default:
+            return plugin.id
+        }
+    }
+
     func showToast(_ message: String) {
         toastMessage = message
         let captured = message
@@ -83,6 +100,7 @@ final class AppState: ObservableObject {
             installedPlugins.append(plugin)
             selectedPluginID = plugin.id
             try registry.save(installedPlugins)
+            pluginManager.load(pluginID: plugin.id)
             installPhases.removeValue(forKey: storePlugin.id)
         } catch {
             installPhases[storePlugin.id] = .failed(messageKey: "pluginStore.error.install")
@@ -93,6 +111,7 @@ final class AppState: ObservableObject {
         installPhases[plugin.id] = .uninstalling
 
         do {
+            pluginManager.unload(pluginID: plugin.id)
             try await installer.uninstall(plugin)
             installedPlugins.removeAll { $0.id == plugin.id }
             if selectedPluginID == plugin.id {

@@ -41,7 +41,7 @@ struct MainView: View {
                 } else {
                     ForEach(appState.installedPlugins) { plugin in
                         Label {
-                            Text(plugin.localizedNameKey)
+                            Text(appState.displayName(for: plugin))
                         } icon: {
                             Image(systemName: plugin.iconName)
                         }
@@ -92,6 +92,22 @@ struct MainView: View {
                 Image(systemName: appearance.mode.iconName)
             }
             .help(String(localized: "topbar.appearance"))
+
+            #if DEBUG
+            Menu {
+                Button("Open App Support Folder") {
+                    NSWorkspace.shared.open(AppPaths.applicationSupport)
+                }
+                Button("Log Sample Shortcut") {
+                    let message = HotkeyCenter.shared.debugDescription(forPluginID: "com.enoughbox.sample")
+                    NSLog("EnoughBox DEBUG: \(message)")
+                    appState.showToast(message)
+                }
+            } label: {
+                Image(systemName: "ladybug")
+            }
+            .help("Developer tools (Debug build only)")
+            #endif
         }
     }
 

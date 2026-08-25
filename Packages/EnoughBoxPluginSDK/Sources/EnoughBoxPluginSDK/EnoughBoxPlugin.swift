@@ -1,7 +1,8 @@
+import AppKit
 import Foundation
 
-/// Host-facing plugin contract. `@objc` + bundle loading in Phase 2.
-@objc public protocol EnoughBoxPlugin: AnyObject {
+/// Host-facing plugin contract. Implement as `NSObject` subclass with `@objc(YourPluginClass)`.
+@objc public protocol EnoughBoxPlugin: NSObjectProtocol {
     var id: String { get }
     var iconName: String { get }
     var version: String { get }
@@ -9,10 +10,13 @@ import Foundation
     func localizedName(for locale: Locale) -> String
     func activate(host: HostServices)
     func deactivate()
+    func makeSettingsViewController(host: HostServices) -> NSViewController
 }
 
-/// System capabilities exposed by the host (stubs for Phase 1 UI).
-@objc public protocol HostServices: AnyObject {}
+/// Capabilities the host exposes to plugins at runtime.
+@objc public protocol HostServices: NSObjectProtocol {
+    @objc func showToast(_ message: String)
+}
 
 public enum PluginCapability: String, Codable, Sendable {
     case hotkey

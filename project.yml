@@ -7,6 +7,9 @@ options:
 packages:
   EnoughBoxPluginSDK:
     path: Packages/EnoughBoxPluginSDK
+  KeyboardShortcuts:
+    url: https://github.com/sindresorhus/KeyboardShortcuts
+    from: 2.2.0
 targets:
   EnoughBox:
     type: application
@@ -33,5 +36,31 @@ targets:
     dependencies:
       - package: EnoughBoxPluginSDK
         product: EnoughBoxPluginSDK
+      - package: KeyboardShortcuts
+        product: KeyboardShortcuts
+      - target: SamplePlugin
+        embed: true
     scheme:
       testTargets: []
+  SamplePlugin:
+    type: bundle
+    platform: macOS
+    sources:
+      - path: Plugins/SamplePlugin
+        excludes:
+          - "**/.DS_Store"
+    settings:
+      base:
+        PRODUCT_NAME: com.enoughbox.sample
+        PRODUCT_BUNDLE_IDENTIFIER: com.enoughbox.sample
+        WRAPPER_EXTENSION: plugin
+        SWIFT_VERSION: "5.9"
+        MACOSX_DEPLOYMENT_TARGET: "14.0"
+        CODE_SIGN_STYLE: Automatic
+        GENERATE_INFOPLIST_FILE: YES
+        INFOPLIST_KEY_CFBundlePackageType: BNDL
+        INFOPLIST_KEY_NSPrincipalClass: SamplePluginPlugin
+        LD_RUNPATH_SEARCH_PATHS: "$(inherited) @executable_path/../Frameworks @loader_path/../Frameworks"
+    dependencies:
+      - package: EnoughBoxPluginSDK
+        product: EnoughBoxPluginSDK

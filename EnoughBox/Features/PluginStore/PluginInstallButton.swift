@@ -1,6 +1,6 @@
 import SwiftUI
 
-/// App Store–style install control: pill when idle; circular ring while busy.
+/// App Store–style install control: pill when idle; ring only while busy (no digits).
 struct PluginInstallButton: View {
     let plugin: StorePlugin
 
@@ -31,10 +31,10 @@ struct PluginInstallButton: View {
             }
 
         case let .downloading(progress):
-            circularProgressRing(progress: progress, indeterminate: false)
+            circularProgressRing(progress: progress)
 
         case .installing:
-            circularProgressRing(progress: 0, indeterminate: true)
+            circularProgressRing(progress: nil)
 
         case .uninstalling:
             EmptyView()
@@ -49,7 +49,7 @@ struct PluginInstallButton: View {
     @ViewBuilder
     private var uninstallControl: some View {
         if case .uninstalling = appState.installPhase(for: plugin.id) {
-            circularProgressRing(progress: 0, indeterminate: true)
+            circularProgressRing(progress: nil)
         } else {
             Button {
                 if let installed = appState.installedPlugins.first(where: { $0.id == plugin.id }) {
@@ -77,14 +77,12 @@ struct PluginInstallButton: View {
     }
 
     @ViewBuilder
-    private func circularProgressRing(progress: Double, indeterminate: Bool) -> some View {
+    private func circularProgressRing(progress: Double?) -> some View {
         ZStack {
             Circle()
                 .stroke(tokens.border, lineWidth: 2.5)
 
-            if indeterminate {
-                IndeterminateRing(color: tokens.accent, lineWidth: 2.5)
-            } else {
+            if let progress {
                 Circle()
                     .trim(from: 0, to: min(max(progress, 0), 1))
                     .stroke(
@@ -93,20 +91,23 @@ struct PluginInstallButton: View {
                     )
                     .rotationEffect(.degrees(-90))
                     .animation(.linear(duration: 0.12), value: progress)
-
-                Text("\(Int(progress * 100))")
-                    .font(.system(size: 10, weight: .semibold, design: .rounded))
-                    .foregroundStyle(tokens.inkSoft)
-                    .monospacedDigit()
+            } else {
+                IndeterminateRing(color: tokens.accent, lineWidth: 2.5)
             }
         }
         .frame(width: ringSize, height: ringSize)
         .accessibilityElement(children: .ignore)
-        .accessibilityLabel(
-            indeterminate
-                ? Text(appState.isInstalled(plugin) ? "pluginStore.uninstalling" : "pluginStore.installing")
-                : Text("pluginStore.downloading")
-        )
+        .accessibilityLabel(accessibilityLabel(for: progress))
+    }
+
+    private func accessibilityLabel(for progress: Double?) -> Text {
+        if progress != nil {
+            return Text("pluginStore.downloading")
+        }
+        if appState.isInstalled(plugin) {
+            return Text("pluginStore.uninstalling")
+        }
+        return Text("pluginStore.installing")
     }
 }
 

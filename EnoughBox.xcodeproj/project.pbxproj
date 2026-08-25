@@ -7,9 +7,12 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		27D1213432FCED980784FE00 /* HostServicesImpl.swift in Sources */ = {isa = PBXBuildFile; fileRef = A968C82724FB97C0387225C1 /* HostServicesImpl.swift */; };
 		28C9F2ED69BE3EE4308D1A1D /* EnoughBoxApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8F36E3F1DF931390FA757F3A /* EnoughBoxApp.swift */; };
+		33E5765256D3B926DA23D4D0 /* HotkeyCenter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6E505AD4E4312D4C01B58E38 /* HotkeyCenter.swift */; };
 		380BC38145D7A1851ABEB894 /* MainView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9704745508B442108DF65CF7 /* MainView.swift */; };
 		4A7454D68468C9573AA34C73 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = C8789202810DA85768E64FA7 /* Assets.xcassets */; };
+		4D48A13C6C53B785501459B6 /* PluginLoader.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4A9CC8B23AB20D098423F97F /* PluginLoader.swift */; };
 		604D8B097BC90CC42490EE6A /* EnoughBoxPluginSDK in Frameworks */ = {isa = PBXBuildFile; productRef = 37D4D34234B342990ED496B7 /* EnoughBoxPluginSDK */; };
 		621E8609D681721BE09E1CA8 /* AppearanceManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9310CF80D6394B6335D68306 /* AppearanceManager.swift */; };
 		82FAC28EC76BFB87488604CF /* PluginInstallButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0969F34FDBDA5174B64EFA32 /* PluginInstallButton.swift */; };
@@ -20,13 +23,30 @@
 		985104E14A8B52CC82F2D951 /* PluginDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 17B28F9193D2D6FD7D14B9D0 /* PluginDetailView.swift */; };
 		A0DF783B67CC5106A4745D92 /* Localizable.xcstrings in Resources */ = {isa = PBXBuildFile; fileRef = C30F8231CB2E4E4C304C65A9 /* Localizable.xcstrings */; };
 		B4570B6FEF37DE9A2E92487A /* AppState.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2E798AA90D4ECE990344C323 /* AppState.swift */; };
+		C0467D21DAED3CA431CA89BC /* EnoughBoxPluginSDK in Frameworks */ = {isa = PBXBuildFile; productRef = FF9922E62EF357B3F48B4325 /* EnoughBoxPluginSDK */; };
 		C1A61991CF58CA9516383B3A /* PluginStoreView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 51BAFC09B7948E70FAD86CE2 /* PluginStoreView.swift */; };
+		C8549FB98D8E59F55A804B45 /* SamplePluginPlugin.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6D95391879653E15EEB44FFA /* SamplePluginPlugin.swift */; };
 		CDF06785774E0298440C8CA9 /* AppPaths.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1E332521763E4DEB27F1F241 /* AppPaths.swift */; };
 		DBA0F5A45E7F5030055D6BC8 /* PluginModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9399E2AB5BA70E1885291B63 /* PluginModels.swift */; };
+		DCB529BC069B942C9AD53E1C /* ShortcutSettingsViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = B4AACB91BDE6536D0F957C13 /* ShortcutSettingsViewController.swift */; };
+		DD43FDBD1E5D0F8DC7CCDCBE /* KeyboardShortcuts in Frameworks */ = {isa = PBXBuildFile; productRef = 13A24B873FA65BCCB6E801C3 /* KeyboardShortcuts */; };
 		EC50BC13A4CC6D2225BE4996 /* PluginInstallState.swift in Sources */ = {isa = PBXBuildFile; fileRef = DD499C3E3C8AF2062C274A25 /* PluginInstallState.swift */; };
+		EF0CD1419E94F60F247AE67F /* SamplePlugin.bundle in Resources */ = {isa = PBXBuildFile; fileRef = 0631057AF0F0CC4D372B6338 /* SamplePlugin.bundle */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
+		F11FF0CFF5B9F3F1B89C1234 /* PluginManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 339676F7E03256A3F55CA39A /* PluginManager.swift */; };
 /* End PBXBuildFile section */
 
+/* Begin PBXContainerItemProxy section */
+		FD234377D791BF21D708DA4C /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 80498AF53C921366B4FC032D /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 99BA05AD6A96C78F2D0C142C;
+			remoteInfo = SamplePlugin;
+		};
+/* End PBXContainerItemProxy section */
+
 /* Begin PBXFileReference section */
+		0631057AF0F0CC4D372B6338 /* SamplePlugin.bundle */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = SamplePlugin.bundle; sourceTree = BUILT_PRODUCTS_DIR; };
 		0969F34FDBDA5174B64EFA32 /* PluginInstallButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PluginInstallButton.swift; sourceTree = "<group>"; };
 		11F132A4E6E47759F5683FA8 /* DesignTokens.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DesignTokens.swift; sourceTree = "<group>"; };
 		17B28F9193D2D6FD7D14B9D0 /* PluginDetailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PluginDetailView.swift; sourceTree = "<group>"; };
@@ -34,14 +54,20 @@
 		209C35A31699ABCCA41A718F /* PluginRegistry.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PluginRegistry.swift; sourceTree = "<group>"; };
 		20D4F8A95FC0E6F624CAE2D9 /* EmptyStateView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EmptyStateView.swift; sourceTree = "<group>"; };
 		2E798AA90D4ECE990344C323 /* AppState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppState.swift; sourceTree = "<group>"; };
+		339676F7E03256A3F55CA39A /* PluginManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PluginManager.swift; sourceTree = "<group>"; };
+		4A9CC8B23AB20D098423F97F /* PluginLoader.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PluginLoader.swift; sourceTree = "<group>"; };
 		51BAFC09B7948E70FAD86CE2 /* PluginStoreView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PluginStoreView.swift; sourceTree = "<group>"; };
+		6D95391879653E15EEB44FFA /* SamplePluginPlugin.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SamplePluginPlugin.swift; sourceTree = "<group>"; };
+		6E505AD4E4312D4C01B58E38 /* HotkeyCenter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HotkeyCenter.swift; sourceTree = "<group>"; };
 		7EF52A40906E137ED5DABA7F /* EnoughBoxPluginSDK */ = {isa = PBXFileReference; lastKnownFileType = folder; name = EnoughBoxPluginSDK; path = Packages/EnoughBoxPluginSDK; sourceTree = SOURCE_ROOT; };
 		8F36E3F1DF931390FA757F3A /* EnoughBoxApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EnoughBoxApp.swift; sourceTree = "<group>"; };
 		9310CF80D6394B6335D68306 /* AppearanceManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppearanceManager.swift; sourceTree = "<group>"; };
 		9399E2AB5BA70E1885291B63 /* PluginModels.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PluginModels.swift; sourceTree = "<group>"; };
 		9704745508B442108DF65CF7 /* MainView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainView.swift; sourceTree = "<group>"; };
 		9726AE0F3378190D32FE9530 /* PluginInstaller.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PluginInstaller.swift; sourceTree = "<group>"; };
+		A968C82724FB97C0387225C1 /* HostServicesImpl.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HostServicesImpl.swift; sourceTree = "<group>"; };
 		B3414FF930E6A99F676C21DB /* EnoughBox.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = EnoughBox.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		B4AACB91BDE6536D0F957C13 /* ShortcutSettingsViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShortcutSettingsViewController.swift; sourceTree = "<group>"; };
 		C30F8231CB2E4E4C304C65A9 /* Localizable.xcstrings */ = {isa = PBXFileReference; lastKnownFileType = text.json.xcstrings; path = Localizable.xcstrings; sourceTree = "<group>"; };
 		C8789202810DA85768E64FA7 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		DD499C3E3C8AF2062C274A25 /* PluginInstallState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PluginInstallState.swift; sourceTree = "<group>"; };
@@ -53,6 +79,15 @@
 			buildActionMask = 2147483647;
 			files = (
 				604D8B097BC90CC42490EE6A /* EnoughBoxPluginSDK in Frameworks */,
+				DD43FDBD1E5D0F8DC7CCDCBE /* KeyboardShortcuts in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		D6A51F4499FEB68F2CB78C4B /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				C0467D21DAED3CA431CA89BC /* EnoughBoxPluginSDK in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -63,16 +98,28 @@
 			isa = PBXGroup;
 			children = (
 				1E332521763E4DEB27F1F241 /* AppPaths.swift */,
+				0627D76F7396B9B6A0C7F89F /* HostServices */,
+				B6041ED85B85832FA647D746 /* HotkeyCenter */,
 				B947E0CEB1ABF6ECE1557E25 /* PluginInstaller */,
+				926AC7450B93D459C6487DC0 /* PluginLoader */,
 				8DC4AF3A3DDF9499E3EB672A /* PluginRegistry */,
 			);
 			path = Services;
+			sourceTree = "<group>";
+		};
+		0627D76F7396B9B6A0C7F89F /* HostServices */ = {
+			isa = PBXGroup;
+			children = (
+				A968C82724FB97C0387225C1 /* HostServicesImpl.swift */,
+			);
+			path = HostServices;
 			sourceTree = "<group>";
 		};
 		28B9473C0637D7E91F5C0783 /* Products */ = {
 			isa = PBXGroup;
 			children = (
 				B3414FF930E6A99F676C21DB /* EnoughBox.app */,
+				0631057AF0F0CC4D372B6338 /* SamplePlugin.bundle */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -84,6 +131,22 @@
 				9399E2AB5BA70E1885291B63 /* PluginModels.swift */,
 			);
 			path = Models;
+			sourceTree = "<group>";
+		};
+		42CAB76198354442FD9122A3 /* Plugins */ = {
+			isa = PBXGroup;
+			children = (
+				505388FDE94C6EFDE8EC59A3 /* SamplePlugin */,
+			);
+			path = Plugins;
+			sourceTree = "<group>";
+		};
+		505388FDE94C6EFDE8EC59A3 /* SamplePlugin */ = {
+			isa = PBXGroup;
+			children = (
+				6D95391879653E15EEB44FFA /* SamplePluginPlugin.swift */,
+			);
+			path = SamplePlugin;
 			sourceTree = "<group>";
 		};
 		6189780E7AEFE841634B341A /* Main */ = {
@@ -106,6 +169,7 @@
 			isa = PBXGroup;
 			children = (
 				17B28F9193D2D6FD7D14B9D0 /* PluginDetailView.swift */,
+				B4AACB91BDE6536D0F957C13 /* ShortcutSettingsViewController.swift */,
 			);
 			path = SettingsPane;
 			sourceTree = "<group>";
@@ -127,6 +191,23 @@
 				209C35A31699ABCCA41A718F /* PluginRegistry.swift */,
 			);
 			path = PluginRegistry;
+			sourceTree = "<group>";
+		};
+		926AC7450B93D459C6487DC0 /* PluginLoader */ = {
+			isa = PBXGroup;
+			children = (
+				4A9CC8B23AB20D098423F97F /* PluginLoader.swift */,
+				339676F7E03256A3F55CA39A /* PluginManager.swift */,
+			);
+			path = PluginLoader;
+			sourceTree = "<group>";
+		};
+		B6041ED85B85832FA647D746 /* HotkeyCenter */ = {
+			isa = PBXGroup;
+			children = (
+				6E505AD4E4312D4C01B58E38 /* HotkeyCenter.swift */,
+			);
+			path = HotkeyCenter;
 			sourceTree = "<group>";
 		};
 		B947E0CEB1ABF6ECE1557E25 /* PluginInstaller */ = {
@@ -199,6 +280,7 @@
 			children = (
 				CDB60DDC1F2F177AD6E06695 /* EnoughBox */,
 				F05D40FC5D3591BAA9A87369 /* Packages */,
+				42CAB76198354442FD9122A3 /* Plugins */,
 				28B9473C0637D7E91F5C0783 /* Products */,
 			);
 			sourceTree = "<group>";
@@ -206,6 +288,25 @@
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
+		99BA05AD6A96C78F2D0C142C /* SamplePlugin */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 735323DCE46940AAB8BF071B /* Build configuration list for PBXNativeTarget "SamplePlugin" */;
+			buildPhases = (
+				52083BF885D7D7837168D2A5 /* Sources */,
+				D6A51F4499FEB68F2CB78C4B /* Frameworks */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = SamplePlugin;
+			packageProductDependencies = (
+				FF9922E62EF357B3F48B4325 /* EnoughBoxPluginSDK */,
+			);
+			productName = SamplePlugin;
+			productReference = 0631057AF0F0CC4D372B6338 /* SamplePlugin.bundle */;
+			productType = "com.apple.product-type.bundle";
+		};
 		CE660CBFAF1C528F6FFAE9AD /* EnoughBox */ = {
 			isa = PBXNativeTarget;
 			buildConfigurationList = 2A74D7219BE79BDC56147AF8 /* Build configuration list for PBXNativeTarget "EnoughBox" */;
@@ -217,10 +318,12 @@
 			buildRules = (
 			);
 			dependencies = (
+				13B361A8550723BB1F6F2290 /* PBXTargetDependency */,
 			);
 			name = EnoughBox;
 			packageProductDependencies = (
 				37D4D34234B342990ED496B7 /* EnoughBoxPluginSDK */,
+				13A24B873FA65BCCB6E801C3 /* KeyboardShortcuts */,
 			);
 			productName = EnoughBox;
 			productReference = B3414FF930E6A99F676C21DB /* EnoughBox.app */;
@@ -235,6 +338,9 @@
 				BuildIndependentTargetsInParallel = YES;
 				LastUpgradeCheck = 1430;
 				TargetAttributes = {
+					99BA05AD6A96C78F2D0C142C = {
+						ProvisioningStyle = Automatic;
+					};
 					CE660CBFAF1C528F6FFAE9AD = {
 						ProvisioningStyle = Automatic;
 					};
@@ -251,6 +357,7 @@
 			mainGroup = FBA80E53B8010B18211476F6;
 			minimizedProjectReferenceProxies = 1;
 			packageReferences = (
+				62B8129A171C7D3964DBE560 /* XCRemoteSwiftPackageReference "KeyboardShortcuts" */,
 				411671437EA74879D7EAFEED /* XCLocalSwiftPackageReference "Packages/EnoughBoxPluginSDK" */,
 			);
 			preferredProjectObjectVersion = 77;
@@ -259,6 +366,7 @@
 			projectRoot = "";
 			targets = (
 				CE660CBFAF1C528F6FFAE9AD /* EnoughBox */,
+				99BA05AD6A96C78F2D0C142C /* SamplePlugin */,
 			);
 		};
 /* End PBXProject section */
@@ -270,12 +378,21 @@
 			files = (
 				4A7454D68468C9573AA34C73 /* Assets.xcassets in Resources */,
 				A0DF783B67CC5106A4745D92 /* Localizable.xcstrings in Resources */,
+				EF0CD1419E94F60F247AE67F /* SamplePlugin.bundle in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
+		52083BF885D7D7837168D2A5 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				C8549FB98D8E59F55A804B45 /* SamplePluginPlugin.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		DA351734ABFF26014781BB12 /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
@@ -286,18 +403,31 @@
 				91AF53F228F579881F28BB2B /* DesignTokens.swift in Sources */,
 				83D841C043F334BACE14CA9B /* EmptyStateView.swift in Sources */,
 				28C9F2ED69BE3EE4308D1A1D /* EnoughBoxApp.swift in Sources */,
+				27D1213432FCED980784FE00 /* HostServicesImpl.swift in Sources */,
+				33E5765256D3B926DA23D4D0 /* HotkeyCenter.swift in Sources */,
 				380BC38145D7A1851ABEB894 /* MainView.swift in Sources */,
 				985104E14A8B52CC82F2D951 /* PluginDetailView.swift in Sources */,
 				82FAC28EC76BFB87488604CF /* PluginInstallButton.swift in Sources */,
 				EC50BC13A4CC6D2225BE4996 /* PluginInstallState.swift in Sources */,
 				83732394A0571E36606B668D /* PluginInstaller.swift in Sources */,
+				4D48A13C6C53B785501459B6 /* PluginLoader.swift in Sources */,
+				F11FF0CFF5B9F3F1B89C1234 /* PluginManager.swift in Sources */,
 				DBA0F5A45E7F5030055D6BC8 /* PluginModels.swift in Sources */,
 				8E6D8393EB98037D8D53C1ED /* PluginRegistry.swift in Sources */,
 				C1A61991CF58CA9516383B3A /* PluginStoreView.swift in Sources */,
+				DCB529BC069B942C9AD53E1C /* ShortcutSettingsViewController.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXSourcesBuildPhase section */
+
+/* Begin PBXTargetDependency section */
+		13B361A8550723BB1F6F2290 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 99BA05AD6A96C78F2D0C142C /* SamplePlugin */;
+			targetProxy = FD234377D791BF21D708DA4C /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
 
 /* Begin XCBuildConfiguration section */
 		2646FF215D805EE30B3393CD /* Debug */ = {
@@ -325,6 +455,42 @@
 				SWIFT_VERSION = 5.9;
 			};
 			name = Debug;
+		};
+		27B07AA46F867FC20729F274 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_STYLE = Automatic;
+				COMBINE_HIDPI_IMAGES = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_CFBundlePackageType = BNDL;
+				INFOPLIST_KEY_NSPrincipalClass = SamplePluginPlugin;
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks @loader_path/../Frameworks";
+				MACOSX_DEPLOYMENT_TARGET = 14.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.enoughbox.sample;
+				PRODUCT_NAME = com.enoughbox.sample;
+				SDKROOT = macosx;
+				SWIFT_VERSION = 5.9;
+				WRAPPER_EXTENSION = plugin;
+			};
+			name = Debug;
+		};
+		4967CF96B2733DB9CF3F85CA /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_STYLE = Automatic;
+				COMBINE_HIDPI_IMAGES = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_CFBundlePackageType = BNDL;
+				INFOPLIST_KEY_NSPrincipalClass = SamplePluginPlugin;
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks @loader_path/../Frameworks";
+				MACOSX_DEPLOYMENT_TARGET = 14.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.enoughbox.sample;
+				PRODUCT_NAME = com.enoughbox.sample;
+				SDKROOT = macosx;
+				SWIFT_VERSION = 5.9;
+				WRAPPER_EXTENSION = plugin;
+			};
+			name = Release;
 		};
 		549EC4D5C952F5DA660B3D98 /* Release */ = {
 			isa = XCBuildConfiguration;
@@ -492,6 +658,15 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Debug;
 		};
+		735323DCE46940AAB8BF071B /* Build configuration list for PBXNativeTarget "SamplePlugin" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				27B07AA46F867FC20729F274 /* Debug */,
+				4967CF96B2733DB9CF3F85CA /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
 /* End XCConfigurationList section */
 
 /* Begin XCLocalSwiftPackageReference section */
@@ -501,8 +676,28 @@
 		};
 /* End XCLocalSwiftPackageReference section */
 
+/* Begin XCRemoteSwiftPackageReference section */
+		62B8129A171C7D3964DBE560 /* XCRemoteSwiftPackageReference "KeyboardShortcuts" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/sindresorhus/KeyboardShortcuts";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 2.2.0;
+			};
+		};
+/* End XCRemoteSwiftPackageReference section */
+
 /* Begin XCSwiftPackageProductDependency section */
+		13A24B873FA65BCCB6E801C3 /* KeyboardShortcuts */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 62B8129A171C7D3964DBE560 /* XCRemoteSwiftPackageReference "KeyboardShortcuts" */;
+			productName = KeyboardShortcuts;
+		};
 		37D4D34234B342990ED496B7 /* EnoughBoxPluginSDK */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = EnoughBoxPluginSDK;
+		};
+		FF9922E62EF357B3F48B4325 /* EnoughBoxPluginSDK */ = {
 			isa = XCSwiftPackageProductDependency;
 			productName = EnoughBoxPluginSDK;
 		};
