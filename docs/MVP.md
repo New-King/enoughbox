@@ -129,7 +129,8 @@
 
 - [x] 安装状态 UI：下载进度 / 安装中 / 卸载中 / 失败重试
 - [x] `PluginRegistry` 持久化 + `Application Support/EnoughBox/`
-- [ ] manifest 拉取 + **真实** URLSession 下载 + SHA256 + 解压
+- [x] 安装边界：运行时只加载 Application Support；Debug 从构建产物拷贝；Release **不 embed** 插件
+- [ ] manifest 拉取 + **真实** URLSession 下载 + SHA256 + 解压（`RemoteDownloadSource`）
 - [ ] SamplePlugin：Toast + 热键 + 设置页
 - [ ] 卸载流程
 - [ ] KeyboardShortcuts + Defaults + KeychainAccess 接入
@@ -152,7 +153,9 @@
 
 ## 4. 示例插件（MVP 唯一内置产物）
 
-> 「内置」指仓库里 **带源码**，用户仍须从插件中心 **点击安装** 才会出现在侧栏；打包 App 时 **不** 复制进 `Plugins` 目录。
+> 「内置」指仓库里 **带源码**。用户须从插件中心点击安装才会出现在侧栏。  
+> Debug：安装器从 Xcode 构建产物拷贝到 Application Support。  
+> Release：App **不内嵌** `.plugin`；安装走 manifest 远程下载（尚未接线）。
 
 | 字段 | 值 |
 |------|-----|

@@ -23,16 +23,6 @@ enum PluginLoader {
         AppPaths.pluginsDirectory.appendingPathComponent("\(id).plugin", isDirectory: true)
     }
 
-    static func embeddedBundleURL(forPluginID id: String) -> URL? {
-        if let url = Bundle.main.url(forResource: id, withExtension: "plugin", subdirectory: "PlugIns") {
-            return url
-        }
-        if let url = Bundle.main.url(forResource: id, withExtension: "plugin", subdirectory: "Resources") {
-            return url
-        }
-        return Bundle.main.url(forResource: id, withExtension: "plugin")
-    }
-
     @MainActor
     static func load(from bundleURL: URL, host: HostServices) throws -> (EnoughBoxPlugin, Bundle) {
         guard FileManager.default.fileExists(atPath: bundleURL.path) else {

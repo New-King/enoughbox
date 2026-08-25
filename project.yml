@@ -39,7 +39,8 @@ targets:
       - package: KeyboardShortcuts
         product: KeyboardShortcuts
       - target: SamplePlugin
-        embed: true
+        embed: false
+        link: false
     scheme:
       testTargets: []
   SamplePlugin:
