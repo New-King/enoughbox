@@ -36,6 +36,22 @@
         }
       }
     },
+    "plugin.translate.debug.grant" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Show this app in Finder and open Accessibility"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "显示当前 App 并打开辅助功能"
+          }
+        }
+      }
+    },
     "plugin.translate.debug.title" : {
       "localizations" : {
         "en" : {

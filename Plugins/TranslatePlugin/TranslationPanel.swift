@@ -340,9 +340,30 @@ private struct TranslationPanelView: View {
                     .foregroundStyle(tokens.inkFaint)
                     .textSelection(.enabled)
             }
+            if session.debugLine.contains("source=denied") {
+                Button(action: revealRunningAppForAccessibility) {
+                    Text("plugin.translate.debug.grant", bundle: TranslateL10n.bundle)
+                        .font(.system(size: 11, weight: .medium))
+                        .foregroundStyle(tokens.ink)
+                }
+                .buttonStyle(.plain)
+            }
         }
         .padding(10)
         .background(tokens.accentSoft, in: RoundedRectangle(cornerRadius: 11, style: .continuous))
+    }
+
+    private func revealRunningAppForAccessibility() {
+        NSWorkspace.shared.activateFileViewerSelecting([Bundle.main.bundleURL])
+        let urls = [
+            "x-apple.systempreferences:com.apple.settings.PrivacySecurity.extension?Privacy_Accessibility",
+            "x-apple.systempreferences:com.apple.preference.security?Privacy_Accessibility",
+        ]
+        for string in urls {
+            if let url = URL(string: string), NSWorkspace.shared.open(url) {
+                return
+            }
+        }
     }
 
     private func languageChip(_ title: String) -> some View {
