@@ -7,7 +7,11 @@ enum SelectionCapture {
         AXIsProcessTrusted()
     }
 
-    static func requestAccessibilityTrust() {}
+    static func requestAccessibilityTrust() {
+        let key = kAXTrustedCheckOptionPrompt.takeUnretainedValue() as String
+        let options = [key: true] as CFDictionary
+        _ = AXIsProcessTrustedWithOptions(options)
+    }
 
     static func clipboardText() -> String {
         pasteboardPlainText()

@@ -16,6 +16,7 @@ import Foundation
 /// Capabilities the host exposes to plugins at runtime.
 @objc public protocol HostServices: NSObjectProtocol {
     @objc func showToast(_ message: String)
+    @objc func requestAccessibilityTrust()
     @objc func isAccessibilityTrusted() -> Bool
     @objc func currentSelectedText() -> String
     @objc func textForTranslation() -> String

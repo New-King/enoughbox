@@ -238,6 +238,7 @@ private struct TranslateSettingsView: View {
     }
 
     private func openAccessibilitySettings() {
+        host.requestAccessibilityTrust()
         let urls = [
             "x-apple.systempreferences:com.apple.settings.PrivacySecurity.extension?Privacy_Accessibility",
             "x-apple.systempreferences:com.apple.preference.security?Privacy_Accessibility",
