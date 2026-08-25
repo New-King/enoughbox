@@ -3,9 +3,6 @@ import AppKit
 import Foundation
 
 enum SelectionCapture {
-    private(set) static var lastDebugLine = ""
-    private(set) static var lastLogPath = ""
-
     static func isAccessibilityTrusted() -> Bool {
         AXIsProcessTrusted()
     }
@@ -17,40 +14,34 @@ enum SelectionCapture {
     }
 
     static func textForTranslation() -> String {
-        let trace = Trace()
-        trace.add("app=\(Bundle.main.bundleURL.path)")
-        trace.add("frontmost=\(frontmostDescription())")
-        trace.add("axTrusted=\(AXIsProcessTrusted())")
-
         if let ax = axFocusedSelectedText() {
-            trace.add("ax=ok len=\(ax.count) preview=\(preview(ax))")
-            finish(trace, source: "ax", text: ax)
             return ax
         }
-        trace.add("ax=empty")
 
-        if let copied = copySelectedText(trace: trace) {
-            trace.add("copy=ok len=\(copied.count) preview=\(preview(copied))")
-            finish(trace, source: "copy", text: copied)
+        switch copySelectedText() {
+        case .copied(let copied):
             return copied
-        }
-
-        if trace.lines.contains(where: { $0.contains("1002") || $0.contains("不允许发送按键") }) {
-            finish(trace, source: "denied", text: "")
+        case .denied:
             return ""
+        case .failed:
+            return clipboardText()
         }
-
-        let clipboard = clipboardText()
-        trace.add("clipboardFallback len=\(clipboard.count) preview=\(preview(clipboard))")
-        finish(trace, source: "clipboard", text: clipboard)
-        return clipboard
     }
 
     static func currentSelectedText() -> String {
         if let ax = axFocusedSelectedText(), !ax.isEmpty {
             return ax
         }
-        return copySelectedText(trace: Trace()) ?? ""
+        if case .copied(let copied) = copySelectedText() {
+            return copied
+        }
+        return ""
+    }
+
+    private enum CopyResult {
+        case copied(String)
+        case denied
+        case failed
     }
 
     private static func axFocusedSelectedText() -> String? {
@@ -61,10 +52,14 @@ enum SelectionCapture {
             kAXFocusedUIElementAttribute as CFString,
             &focused
         )
-        guard focusStatus == .success else { return nil }
+        guard focusStatus == .success,
+              let focusedObject = focused,
+              CFGetTypeID(focusedObject) == AXUIElementGetTypeID()
+        else { return nil }
         var selected: AnyObject?
+        let focusedElement = focusedObject as! AXUIElement
         let textStatus = AXUIElementCopyAttributeValue(
-            focused as! AXUIElement,
+            focusedElement,
             kAXSelectedTextAttribute as CFString,
             &selected
         )
@@ -73,52 +68,40 @@ enum SelectionCapture {
         return text.isEmpty ? nil : text
     }
 
-    private static func copySelectedText(trace: Trace) -> String? {
+    private static func copySelectedText() -> CopyResult {
         waitUntilModifiersReleased()
-        trace.add("modifiers=\(modifierDescription())")
 
         let pasteboard = NSPasteboard.general
         let snapshot = PasteboardSnapshot(pasteboard)
         let previousChangeCount = pasteboard.changeCount
-        trace.add("pasteboardCountBefore=\(previousChangeCount)")
 
         postHIDCommandC()
-        trace.add("hidCopy=posted")
         if waitForPasteboardChange(from: previousChangeCount, timeout: 0.35) {
-            return finishCopy(pasteboard: pasteboard, snapshot: snapshot, previousChangeCount: previousChangeCount, trace: trace)
+            return finishCopy(pasteboard: pasteboard, snapshot: snapshot)
         }
 
         let scriptError = sendSystemEventsCopy(script: "tell application \"System Events\" to keystroke \"c\" using {command down}")
-        if let scriptError {
-            trace.add("appleScriptKeystrokeError=\(scriptError)")
-        } else {
-            trace.add("appleScriptKeystroke=ok")
+        if let scriptError,
+           scriptError.contains("1002") || scriptError.contains("不允许发送按键") {
+            snapshot.restore(onto: pasteboard)
+            return .denied
         }
         if waitForPasteboardChange(from: previousChangeCount, timeout: 0.35) {
-            return finishCopy(pasteboard: pasteboard, snapshot: snapshot, previousChangeCount: previousChangeCount, trace: trace)
+            return finishCopy(pasteboard: pasteboard, snapshot: snapshot)
         }
 
         snapshot.restore(onto: pasteboard)
-        trace.add("pasteboardCountAfter=\(pasteboard.changeCount)")
-        trace.add("copy=failed changeCountUnchanged")
-        return nil
+        return .failed
     }
 
     private static func finishCopy(
         pasteboard: NSPasteboard,
-        snapshot: PasteboardSnapshot,
-        previousChangeCount: Int,
-        trace: Trace
-    ) -> String? {
-        trace.add("pasteboardCountAfter=\(pasteboard.changeCount)")
+        snapshot: PasteboardSnapshot
+    ) -> CopyResult {
         let copied = pasteboardPlainText()
         snapshot.restore(onto: pasteboard)
         let trimmed = copied.trimmingCharacters(in: .whitespacesAndNewlines)
-        if trimmed.isEmpty {
-            trace.add("copy=failed emptyAfterChange")
-            return nil
-        }
-        return trimmed
+        return trimmed.isEmpty ? .failed : .copied(trimmed)
     }
 
     private static func postHIDCommandC() {
@@ -179,31 +162,6 @@ enum SelectionCapture {
         }
     }
 
-    private static func modifierDescription() -> String {
-        var parts: [String] = []
-        let flags = NSEvent.modifierFlags
-        if flags.contains(.command) { parts.append("cmd") }
-        if flags.contains(.option) { parts.append("opt") }
-        if flags.contains(.control) { parts.append("ctrl") }
-        if flags.contains(.shift) { parts.append("shift") }
-        return parts.isEmpty ? "none" : parts.joined(separator: "+")
-    }
-
-    private static func frontmostDescription() -> String {
-        let app = NSWorkspace.shared.frontmostApplication
-        let name = app?.localizedName ?? "?"
-        let bundle = app?.bundleIdentifier ?? "?"
-        return "\(name) (\(bundle))"
-    }
-
-    private static func preview(_ text: String) -> String {
-        let collapsed = text.replacingOccurrences(of: "\n", with: " ")
-        if collapsed.count <= 40 {
-            return collapsed
-        }
-        return String(collapsed.prefix(40)) + "…"
-    }
-
     private static func pasteboardPlainText() -> String {
         let pasteboard = NSPasteboard.general
         if let text = pasteboard.string(forType: .string), !text.isEmpty {
@@ -215,40 +173,6 @@ enum SelectionCapture {
         return ""
     }
 
-    private static func finish(_ trace: Trace, source: String, text: String) {
-        lastDebugLine = "source=\(source); " + trace.lines.joined(separator: "; ")
-        lastLogPath = appendLog(lastDebugLine)
-        NSLog("EnoughBox.selection %@", lastDebugLine)
-    }
-
-    private static func appendLog(_ line: String) -> String {
-        let folder = FileManager.default.homeDirectoryForCurrentUser
-            .appendingPathComponent("Library/Logs/EnoughBox", isDirectory: true)
-        try? FileManager.default.createDirectory(at: folder, withIntermediateDirectories: true)
-        let file = folder.appendingPathComponent("selection.log")
-        let stamp = ISO8601DateFormatter().string(from: Date())
-        let record = "\(stamp) \(line)\n"
-        if let data = record.data(using: .utf8) {
-            if FileManager.default.fileExists(atPath: file.path) {
-                if let handle = try? FileHandle(forWritingTo: file) {
-                    defer { try? handle.close() }
-                    try? handle.seekToEnd()
-                    try? handle.write(contentsOf: data)
-                }
-            } else {
-                try? data.write(to: file)
-            }
-        }
-        return file.path
-    }
-}
-
-private final class Trace {
-    var lines: [String] = []
-
-    func add(_ line: String) {
-        lines.append(line)
-    }
 }
 
 private struct PasteboardSnapshot {

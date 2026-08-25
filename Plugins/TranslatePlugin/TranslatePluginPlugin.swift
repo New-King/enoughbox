@@ -42,26 +42,22 @@ public final class TranslatePluginPlugin: NSObject, EnoughBoxPlugin {
     private func translateSelection() {
         let selection = host as? HostServicesSelection
         let text = selection?.textForTranslation() ?? ""
-        let debugLine = selection?.lastSelectionDebugLine() ?? ""
-        let logPath = selection?.lastSelectionLogPath() ?? ""
         let host = self.host
 
         Task { @MainActor [weak self] in
-            if debugLine.contains("source=denied") || debugLine.contains("1002") {
-                host?.showToast(TranslateL10n.string("plugin.translate.toast.keystrokeDenied"))
-            } else if text.isEmpty {
+            if text.isEmpty {
                 host?.showToast(TranslateL10n.string("plugin.translate.toast.noSelection"))
             }
-            self?.presentPanel(sourceText: text, debugLine: debugLine, logPath: logPath)
+            self?.presentPanel(sourceText: text)
         }
     }
 
     @MainActor
-    private func presentPanel(sourceText: String, debugLine: String, logPath: String) {
+    private func presentPanel(sourceText: String) {
         if panelController == nil {
             panelController = TranslationPanelController()
         }
-        panelController?.present(sourceText: sourceText, debugLine: debugLine, logPath: logPath)
+        panelController?.present(sourceText: sourceText)
     }
 }
 

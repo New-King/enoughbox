@@ -99,15 +99,7 @@ ls -l "$HOME/Library/Application Support/EnoughBox/Plugins/com.enoughbox.transla
 
 ### 5. 辅助功能失败时
 
-日志里如果有：
-
-```text
-axTrusted=false
-1002
-EnoughBox 不允许发送按键
-```
-
-说明 macOS 没有授权当前正在运行的那份 `EnoughBox.app`。辅助功能授权绑定的是具体 App 路径和签名，不是显示名称。
+如果没有读到选区，说明 macOS 可能没有授权当前正在运行的那份 `EnoughBox.app`，或者当前 App 不支持 AX 选区读取。辅助功能授权绑定的是具体 App 路径和签名，不是显示名称。
 
 在系统设置 → 隐私与安全性 → 辅助功能中：
 

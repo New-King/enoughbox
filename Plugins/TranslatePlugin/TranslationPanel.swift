@@ -12,17 +12,13 @@ final class TranslationSession: ObservableObject {
     @Published var isTranslating = false
     @Published var targetLanguage = TranslateSettings.targetLanguage
     @Published var detectedLanguage: TranslateLanguage = .en
-    @Published var debugLine = ""
-    @Published var logPath = ""
 
     private var translateTask: Task<Void, Never>?
     private let synthesizer = AVSpeechSynthesizer()
 
-    func present(sourceText: String, debugLine: String, logPath: String) {
+    func present(sourceText: String) {
         sourceRevision = UUID()
         self.sourceText = sourceText
-        self.debugLine = debugLine
-        self.logPath = logPath
         targetLanguage = TranslateSettings.targetLanguage
         detectedLanguage = LanguageDetector.detect(sourceText)
         if sourceText.isEmpty {
@@ -67,8 +63,11 @@ final class TranslationSession: ObservableObject {
     }
 
     func clearSource() {
+        translateTask?.cancel()
+        translateTask = nil
         sourceText = ""
         translatedText = ""
+        isTranslating = false
     }
 
     func copy(_ text: String) {
@@ -128,8 +127,8 @@ final class TranslationPanelController: NSWindowController {
 
     private var cancellables = Set<AnyCancellable>()
 
-    func present(sourceText: String, debugLine: String, logPath: String) {
-        session.present(sourceText: sourceText, debugLine: debugLine, logPath: logPath)
+    func present(sourceText: String) {
+        session.present(sourceText: sourceText)
         guard let window else { return }
         positionNearMouse(window)
         window.orderFrontRegardless()
@@ -159,9 +158,6 @@ private struct TranslationPanelView: View {
             sourceCard
             languageBar
             resultCard
-            if !session.debugLine.isEmpty {
-                debugCard
-            }
         }
         .padding(12)
         .background(tokens.page)
@@ -309,61 +305,6 @@ private struct TranslationPanelView: View {
                 .strokeBorder(tokens.border, lineWidth: 1)
         )
         .clipShape(RoundedRectangle(cornerRadius: 11, style: .continuous))
-    }
-
-    private var debugCard: some View {
-        VStack(alignment: .leading, spacing: 6) {
-            HStack {
-                Text("plugin.translate.debug.title", bundle: TranslateL10n.bundle)
-                    .font(.system(size: 11, weight: .semibold))
-                    .foregroundStyle(tokens.inkMuted)
-                Spacer()
-                Button {
-                    NSPasteboard.general.clearContents()
-                    let payload = session.debugLine + "\n" + session.logPath
-                    NSPasteboard.general.setString(payload, forType: .string)
-                } label: {
-                    Text("plugin.translate.debug.copy", bundle: TranslateL10n.bundle)
-                        .font(.system(size: 11))
-                        .foregroundStyle(tokens.inkSoft)
-                }
-                .buttonStyle(.plain)
-            }
-            Text(session.debugLine)
-                .font(.system(size: 10, design: .monospaced))
-                .foregroundStyle(tokens.inkMuted)
-                .textSelection(.enabled)
-                .fixedSize(horizontal: false, vertical: true)
-            if !session.logPath.isEmpty {
-                Text(session.logPath)
-                    .font(.system(size: 10, design: .monospaced))
-                    .foregroundStyle(tokens.inkFaint)
-                    .textSelection(.enabled)
-            }
-            if session.debugLine.contains("source=denied") {
-                Button(action: revealRunningAppForAccessibility) {
-                    Text("plugin.translate.debug.grant", bundle: TranslateL10n.bundle)
-                        .font(.system(size: 11, weight: .medium))
-                        .foregroundStyle(tokens.ink)
-                }
-                .buttonStyle(.plain)
-            }
-        }
-        .padding(10)
-        .background(tokens.accentSoft, in: RoundedRectangle(cornerRadius: 11, style: .continuous))
-    }
-
-    private func revealRunningAppForAccessibility() {
-        NSWorkspace.shared.activateFileViewerSelecting([Bundle.main.bundleURL])
-        let urls = [
-            "x-apple.systempreferences:com.apple.settings.PrivacySecurity.extension?Privacy_Accessibility",
-            "x-apple.systempreferences:com.apple.preference.security?Privacy_Accessibility",
-        ]
-        for string in urls {
-            if let url = URL(string: string), NSWorkspace.shared.open(url) {
-                return
-            }
-        }
     }
 
     private func languageChip(_ title: String) -> some View {

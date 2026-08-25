@@ -20,54 +20,6 @@
         }
       }
     },
-    "plugin.translate.debug.copy" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Copy log"
-          }
-        },
-        "zh-Hans" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "复制日志"
-          }
-        }
-      }
-    },
-    "plugin.translate.debug.grant" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Show this app in Finder and open Accessibility"
-          }
-        },
-        "zh-Hans" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "显示当前 App 并打开辅助功能"
-          }
-        }
-      }
-    },
-    "plugin.translate.debug.title" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Diagnostics"
-          }
-        },
-        "zh-Hans" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "排查信息"
-          }
-        }
-      }
-    },
     "plugin.translate.engine.mock" : {
       "localizations" : {
         "en" : {

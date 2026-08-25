@@ -40,14 +40,6 @@ final class HostServicesImpl: NSObject, HostServices, HostServicesHotkeys, HostS
         SelectionCapture.textForTranslation()
     }
 
-    func lastSelectionDebugLine() -> String {
-        SelectionCapture.lastDebugLine
-    }
-
-    func lastSelectionLogPath() -> String {
-        SelectionCapture.lastLogPath
-    }
-
     func clipboardText() -> String {
         SelectionCapture.clipboardText()
     }

@@ -9,6 +9,4 @@ public protocol HostServicesSelection: HostServices {
     func currentSelectedText() -> String
     /// Selected text if present; clipboard text only when no selection is detected.
     func textForTranslation() -> String
-    func lastSelectionDebugLine() -> String
-    func lastSelectionLogPath() -> String
 }

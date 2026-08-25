@@ -92,7 +92,10 @@ final class HotkeyCenter {
     func clearSavedShortcuts(forPluginID pluginID: String) {
         guard let name = HotkeyCatalogHost.recorderName(forPluginID: pluginID) else { return }
 
-        for identifier in handlers.keys where HotkeyCatalogHost.shortcutName(for: identifier) == name {
+        let identifiers = handlers.keys.filter {
+            HotkeyCatalogHost.shortcutName(for: $0) == name
+        }
+        for identifier in identifiers {
             unregister(identifier)
         }
 
