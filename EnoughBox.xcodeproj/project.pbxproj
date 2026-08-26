@@ -15,6 +15,13 @@
 		C0DE0001C0DE0001C0DE0002 /* Translator.swift in Sources */ = {isa = PBXBuildFile; fileRef = C0DE0001C0DE0001C0DE0001 /* Translator.swift */; };
 		C0DE0001C0DE0001C0DE0004 /* YoudaoTranslator.swift in Sources */ = {isa = PBXBuildFile; fileRef = C0DE0001C0DE0001C0DE0003 /* YoudaoTranslator.swift */; };
 		C0DE0001C0DE0001C0DE0006 /* DeepSeekTranslator.swift in Sources */ = {isa = PBXBuildFile; fileRef = C0DE0001C0DE0001C0DE0005 /* DeepSeekTranslator.swift */; };
+		C0DE0001C0DE0001C0DE0011 /* CropGeometry.swift in Sources */ = {isa = PBXBuildFile; fileRef = C0DE0001C0DE0001C0DE0010 /* CropGeometry.swift */; };
+		C0DE0001C0DE0001C0DE0013 /* ScreenCapture.swift in Sources */ = {isa = PBXBuildFile; fileRef = C0DE0001C0DE0001C0DE0012 /* ScreenCapture.swift */; };
+		C0DE0001C0DE0001C0DE0015 /* ScreenshotMosaic.swift in Sources */ = {isa = PBXBuildFile; fileRef = C0DE0001C0DE0001C0DE0014 /* ScreenshotMosaic.swift */; };
+		C0DE0001C0DE0001C0DE0017 /* ScreenshotOverlay.swift in Sources */ = {isa = PBXBuildFile; fileRef = C0DE0001C0DE0001C0DE0016 /* ScreenshotOverlay.swift */; };
+		C0DE0001C0DE0001C0DE0019 /* ScreenshotPin.swift in Sources */ = {isa = PBXBuildFile; fileRef = C0DE0001C0DE0001C0DE0018 /* ScreenshotPin.swift */; };
+		C0DE0001C0DE0001C0DE001B /* ScreenshotTool.swift in Sources */ = {isa = PBXBuildFile; fileRef = C0DE0001C0DE0001C0DE001A /* ScreenshotTool.swift */; };
+		C0DE0001C0DE0001C0DE001D /* ScreenshotLocalizable.xcstrings in Resources */ = {isa = PBXBuildFile; fileRef = C0DE0001C0DE0001C0DE001C /* ScreenshotLocalizable.xcstrings */; };
 		46DF70774D7DB46B95026D79 /* ToolManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 73E3DEEA794027A64CD6CBE8 /* ToolManager.swift */; };
 		4A7454D68468C9573AA34C73 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = C8789202810DA85768E64FA7 /* Assets.xcassets */; };
 		4B6D64409B89CD73E5D69CE6 /* ToolModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = 01C5758E291DD9B1841DCA2A /* ToolModels.swift */; };
@@ -52,6 +59,13 @@
 		C0DE0001C0DE0001C0DE0001 /* Translator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Translator.swift; sourceTree = "<group>"; };
 		C0DE0001C0DE0001C0DE0003 /* YoudaoTranslator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = YoudaoTranslator.swift; sourceTree = "<group>"; };
 		C0DE0001C0DE0001C0DE0005 /* DeepSeekTranslator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeepSeekTranslator.swift; sourceTree = "<group>"; };
+		C0DE0001C0DE0001C0DE0010 /* CropGeometry.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CropGeometry.swift; sourceTree = "<group>"; };
+		C0DE0001C0DE0001C0DE0012 /* ScreenCapture.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScreenCapture.swift; sourceTree = "<group>"; };
+		C0DE0001C0DE0001C0DE0014 /* ScreenshotMosaic.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScreenshotMosaic.swift; sourceTree = "<group>"; };
+		C0DE0001C0DE0001C0DE0016 /* ScreenshotOverlay.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScreenshotOverlay.swift; sourceTree = "<group>"; };
+		C0DE0001C0DE0001C0DE0018 /* ScreenshotPin.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScreenshotPin.swift; sourceTree = "<group>"; };
+		C0DE0001C0DE0001C0DE001A /* ScreenshotTool.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScreenshotTool.swift; sourceTree = "<group>"; };
+		C0DE0001C0DE0001C0DE001C /* ScreenshotLocalizable.xcstrings */ = {isa = PBXFileReference; lastKnownFileType = text.json.xcstrings; path = ScreenshotLocalizable.xcstrings; sourceTree = "<group>"; };
 		7BF25D8EFD48AABA211A16FA /* TranslationPanel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TranslationPanel.swift; sourceTree = "<group>"; };
 		8F36E3F1DF931390FA757F3A /* EnoughBoxApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EnoughBoxApp.swift; sourceTree = "<group>"; };
 		9310CF80D6394B6335D68306 /* AppearanceManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppearanceManager.swift; sourceTree = "<group>"; };
@@ -93,6 +107,8 @@
 			isa = PBXGroup;
 			children = (
 				7134855C14460D4F364127DF /* SelectionCapture.swift */,
+				C0DE0001C0DE0001C0DE0010 /* CropGeometry.swift */,
+				C0DE0001C0DE0001C0DE0012 /* ScreenCapture.swift */,
 			);
 			path = HostServices;
 			sourceTree = "<group>";
@@ -164,6 +180,7 @@
 				083908293E76A762F10D74D7 /* ToolCenter */,
 				ECAA72AA49241462FC195E1A /* ToolDetail */,
 				A302DFB6B64DD1DA7D76CA01 /* Translate */,
+				C0DE0001C0DE0001C0DE001E /* Screenshot */,
 			);
 			path = Features;
 			sourceTree = "<group>";
@@ -178,6 +195,17 @@
 				C0DE0001C0DE0001C0DE0003 /* YoudaoTranslator.swift */,
 			);
 			path = Translate;
+			sourceTree = "<group>";
+		};
+		C0DE0001C0DE0001C0DE001E /* Screenshot */ = {
+			isa = PBXGroup;
+			children = (
+				C0DE0001C0DE0001C0DE0014 /* ScreenshotMosaic.swift */,
+				C0DE0001C0DE0001C0DE0016 /* ScreenshotOverlay.swift */,
+				C0DE0001C0DE0001C0DE0018 /* ScreenshotPin.swift */,
+				C0DE0001C0DE0001C0DE001A /* ScreenshotTool.swift */,
+			);
+			path = Screenshot;
 			sourceTree = "<group>";
 		};
 		B6041ED85B85832FA647D746 /* HotkeyCenter */ = {
@@ -203,6 +231,7 @@
 				C8789202810DA85768E64FA7 /* Assets.xcassets */,
 				C30F8231CB2E4E4C304C65A9 /* Localizable.xcstrings */,
 				0FA66E929DCC86DFF4633E2F /* TranslateLocalizable.xcstrings */,
+				C0DE0001C0DE0001C0DE001C /* ScreenshotLocalizable.xcstrings */,
 			);
 			path = Resources;
 			sourceTree = "<group>";
@@ -314,6 +343,7 @@
 				4A7454D68468C9573AA34C73 /* Assets.xcassets in Resources */,
 				A0DF783B67CC5106A4745D92 /* Localizable.xcstrings in Resources */,
 				17C806E4613DC1A954704A6E /* TranslateLocalizable.xcstrings in Resources */,
+				C0DE0001C0DE0001C0DE001D /* ScreenshotLocalizable.xcstrings in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -333,6 +363,8 @@
 				33E5765256D3B926DA23D4D0 /* HotkeyCenter.swift in Sources */,
 				380BC38145D7A1851ABEB894 /* MainView.swift in Sources */,
 				BA6F1A0D0DA29688E644415E /* SelectionCapture.swift in Sources */,
+				C0DE0001C0DE0001C0DE0011 /* CropGeometry.swift in Sources */,
+				C0DE0001C0DE0001C0DE0013 /* ScreenCapture.swift in Sources */,
 				F388ADD80A9428352261C67E /* ShortcutRecorderField.swift in Sources */,
 				DCB529BC069B942C9AD53E1C /* ShortcutSettingsViewController.swift in Sources */,
 				4EC05B0EBE4900CC66185019 /* ToolCenterView.swift in Sources */,
@@ -346,6 +378,10 @@
 				B695927C48B9EB1ED80AF2FB /* TranslationPanel.swift in Sources */,
 				C0DE0001C0DE0001C0DE0004 /* YoudaoTranslator.swift in Sources */,
 				C0DE0001C0DE0001C0DE0006 /* DeepSeekTranslator.swift in Sources */,
+				C0DE0001C0DE0001C0DE0015 /* ScreenshotMosaic.swift in Sources */,
+				C0DE0001C0DE0001C0DE0017 /* ScreenshotOverlay.swift in Sources */,
+				C0DE0001C0DE0001C0DE0019 /* ScreenshotPin.swift in Sources */,
+				C0DE0001C0DE0001C0DE001B /* ScreenshotTool.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -366,6 +402,7 @@
 				INFOPLIST_KEY_LSMinimumSystemVersion = "$(MACOSX_DEPLOYMENT_TARGET)";
 				INFOPLIST_KEY_NSAccessibilityUsageDescription = "EnoughBox reads selected text so tools can translate it.";
 				INFOPLIST_KEY_NSAppleEventsUsageDescription = "EnoughBox uses System Events to copy selected text for tools.";
+				INFOPLIST_KEY_NSScreenCaptureUsageDescription = "EnoughBox captures a screen region so you can copy, save, or pin a screenshot.";
 				INFOPLIST_KEY_NSHumanReadableCopyright = "";
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
@@ -395,6 +432,7 @@
 				INFOPLIST_KEY_LSMinimumSystemVersion = "$(MACOSX_DEPLOYMENT_TARGET)";
 				INFOPLIST_KEY_NSAccessibilityUsageDescription = "EnoughBox reads selected text so tools can translate it.";
 				INFOPLIST_KEY_NSAppleEventsUsageDescription = "EnoughBox uses System Events to copy selected text for tools.";
+				INFOPLIST_KEY_NSScreenCaptureUsageDescription = "EnoughBox captures a screen region so you can copy, save, or pin a screenshot.";
 				INFOPLIST_KEY_NSHumanReadableCopyright = "";
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",

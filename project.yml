@@ -16,9 +16,6 @@ targets:
       - path: EnoughBox
         excludes:
           - "**/.DS_Store"
-      - path: EnoughBox/Features/Translate
-        excludes:
-          - "**/.DS_Store"
     settings:
       base:
         PRODUCT_BUNDLE_IDENTIFIER: com.enoughbox.app
@@ -37,6 +34,7 @@ targets:
         INFOPLIST_KEY_NSHumanReadableCopyright: ""
         INFOPLIST_KEY_NSAccessibilityUsageDescription: "EnoughBox reads selected text so tools can translate it."
         INFOPLIST_KEY_NSAppleEventsUsageDescription: "EnoughBox uses System Events to copy selected text for tools."
+        INFOPLIST_KEY_NSScreenCaptureUsageDescription: "EnoughBox captures a screen region so you can copy, save, or pin a screenshot."
       configs:
         debug:
           ENABLE_HARDENED_RUNTIME: NO

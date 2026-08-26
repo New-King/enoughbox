@@ -13,3 +13,4 @@
 ## 工具列表
 
 - [翻译工具](./com.enoughbox.translate.md)
+- [截图工具](./com.enoughbox.screenshot.md)

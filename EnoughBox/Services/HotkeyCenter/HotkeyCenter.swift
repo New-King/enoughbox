@@ -3,19 +3,29 @@ import KeyboardShortcuts
 
 extension KeyboardShortcuts.Name {
     static let translateSelection = Self("com.enoughbox.translate.selection")
+    static let screenshotRegion = Self("com.enoughbox.screenshot.region")
 }
 
 enum HotkeyCatalog {
     static let translateSelectionID = "com.enoughbox.translate.selection"
+    static let screenshotRegionID = "com.enoughbox.screenshot.region"
 }
 
 enum HotkeyCatalogHost {
     static func shortcutName(for identifier: String) -> KeyboardShortcuts.Name? {
-        identifier == HotkeyCatalog.translateSelectionID ? .translateSelection : nil
+        switch identifier {
+        case HotkeyCatalog.translateSelectionID: .translateSelection
+        case HotkeyCatalog.screenshotRegionID: .screenshotRegion
+        default: nil
+        }
     }
 
     static func recorderName(forToolID toolID: String) -> KeyboardShortcuts.Name? {
-        toolID == "com.enoughbox.translate" ? .translateSelection : nil
+        switch toolID {
+        case "com.enoughbox.translate": .translateSelection
+        case "com.enoughbox.screenshot": .screenshotRegion
+        default: nil
+        }
     }
 }
 

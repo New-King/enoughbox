@@ -54,6 +54,8 @@ final class AppState: ObservableObject {
         switch tool.id {
         case "com.enoughbox.translate":
             return String(localized: "plugin.translate.name")
+        case "com.enoughbox.screenshot":
+            return String(localized: "plugin.screenshot.name")
         default:
             return tool.id
         }

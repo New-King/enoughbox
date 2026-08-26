@@ -21,6 +21,8 @@ struct ToolDetailView: View {
 
                 if tool.id == TranslateTool.id {
                     TranslateSettingsView()
+                } else if tool.id == ScreenshotTool.id {
+                    ScreenshotSettingsView()
                 } else {
                     missingToolView
                 }
@@ -51,6 +53,8 @@ struct ToolDetailView: View {
         switch tool.id {
         case "com.enoughbox.translate":
             "plugin.translate.shortcut.footer.active"
+        case "com.enoughbox.screenshot":
+            "plugin.screenshot.shortcut.footer.active"
         default:
             "plugin.sample.shortcut.footer.active"
         }

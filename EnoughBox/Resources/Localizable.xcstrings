@@ -434,6 +434,66 @@
         }
       }
     },
+    "plugin.screenshot.description" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Region screenshot, pin, mosaic, and color sample"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "区域截图、钉图、马赛克与取色"
+          }
+        }
+      }
+    },
+    "plugin.screenshot.name" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Screenshot"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "截图"
+          }
+        }
+      }
+    },
+    "plugin.screenshot.settings.colorHint" : {
+
+    },
+    "plugin.screenshot.settings.hint" : {
+
+    },
+    "plugin.screenshot.settings.openPermission" : {
+
+    },
+    "plugin.screenshot.settings.section" : {
+
+    },
+    "plugin.screenshot.shortcut.footer.active" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Drag to capture a region. Move the pointer to sample color; press / to copy the color and exit."
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "拖动框选区域。移动指针可看颜色；按 / 复制颜色并结束截图。"
+          }
+        }
+      }
+    },
     "plugin.shortcut.conflict.duplicate" : {
       "localizations" : {
         "en" : {
