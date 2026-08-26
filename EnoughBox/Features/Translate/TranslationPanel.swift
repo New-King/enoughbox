@@ -167,9 +167,11 @@ final class TranslationPanelController: NSWindowController {
                 panel?.level = pinned ? .statusBar : .floating
             }
             .store(in: &cancellables)
+        installCloseKeyMonitor()
     }
 
     private var cancellables = Set<AnyCancellable>()
+    private var keyMonitor: Any?
 
     func present(sourceText: String) {
         session.present(sourceText: sourceText)
@@ -177,6 +179,29 @@ final class TranslationPanelController: NSWindowController {
         positionNearMouse(window)
         window.orderFrontRegardless()
         window.makeKey()
+    }
+
+    override func close() {
+        window?.orderOut(nil)
+    }
+
+    private func installCloseKeyMonitor() {
+        keyMonitor = NSEvent.addLocalMonitorForEvents(matching: .keyDown) { [weak self] event in
+            guard let self, self.window?.isKeyWindow == true else { return event }
+            if event.keyCode == 53 {
+                self.close()
+                return nil
+            }
+            let modifiers = event.modifierFlags.intersection(.deviceIndependentFlagsMask)
+            if modifiers == .command,
+               let key = event.charactersIgnoringModifiers?.lowercased(),
+               key == "w" || key == "q"
+            {
+                self.close()
+                return nil
+            }
+            return event
+        }
     }
 
     private func positionNearMouse(_ window: NSWindow) {
