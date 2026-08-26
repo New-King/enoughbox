@@ -62,14 +62,18 @@ final class AppState: ObservableObject {
     }
 
     func showToast(_ message: String, style: ToastStyle = .standard) {
-        toastStyle = style
-        toastMessage = message
-        toastGeneration += 1
-        let generation = toastGeneration
-        Task {
-            try? await Task.sleep(for: .seconds(2))
-            if toastGeneration == generation {
-                toastMessage = nil
+        // Defer so AppKit hotkey / recorder callbacks never publish during SwiftUI body updates.
+        DispatchQueue.main.async { [weak self] in
+            guard let self else { return }
+            self.toastStyle = style
+            self.toastMessage = message
+            self.toastGeneration += 1
+            let generation = self.toastGeneration
+            Task { @MainActor in
+                try? await Task.sleep(for: .seconds(2))
+                if self.toastGeneration == generation {
+                    self.toastMessage = nil
+                }
             }
         }
     }

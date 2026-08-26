@@ -64,7 +64,9 @@ final class ScreenshotOverlayController {
     func start() {
         guard !sessionActive, !Self.isSessionOnScreen else { return }
         if !ScreenCapture.requestAccess() {
-            onPermissionDenied?()
+            DispatchQueue.main.async { [weak self] in
+                self?.onPermissionDenied?()
+            }
             return
         }
         sessionActive = true
@@ -77,7 +79,9 @@ final class ScreenshotOverlayController {
                 self.present(displays: displays, protectedWindowIDs: protectedIDs)
             } catch {
                 self.endSession()
-                self.onFailed?()
+                DispatchQueue.main.async { [weak self] in
+                    self?.onFailed?()
+                }
             }
         }
     }
@@ -120,10 +124,23 @@ final class ScreenshotOverlayController {
 
     private func installKeyMonitors() {
         keyMonitor = NSEvent.addLocalMonitorForEvents(matching: .keyDown) { [weak self] event in
-            guard let self, event.window is ScreenshotPanel else { return event }
+            guard let self, let panel = event.window as? ScreenshotPanel else { return event }
+            let view = panel.overlayView
             if event.keyCode == 53 {
                 self.dismiss(copyColor: false)
                 return nil
+            }
+            if !view.isSelectionCommitted {
+                if event.modifierFlags.contains(.command),
+                   event.charactersIgnoringModifiers?.lowercased() == "c",
+                   let text = view.currentColorPasteboard() {
+                    self.handle(.copyColor(text), from: view)
+                    return nil
+                }
+                if event.charactersIgnoringModifiers == "/" {
+                    view.cycleColorFormat()
+                    return nil
+                }
             }
             return event
         }
@@ -152,13 +169,11 @@ final class ScreenshotOverlayController {
         switch action {
         case .cancel:
             dismiss(copyColor: false)
-        case .copyColor(let text, let dismissAfter):
+        case .copyColor(let text):
             NSPasteboard.general.clearContents()
             NSPasteboard.general.setString(text, forType: .string)
-            if dismissAfter {
-                dismiss(copyColor: true)
-            }
-            onCopied?(String(format: ScreenshotL10n.string("plugin.screenshot.toast.color"), text))
+            dismiss(copyColor: true)
+            ScreenshotCenterToast.show(ScreenshotL10n.string("plugin.screenshot.toast.colorCopied"))
         case .confirm:
             guard let image = view.croppedImage() else {
                 dismiss(copyColor: false)
@@ -166,14 +181,19 @@ final class ScreenshotOverlayController {
             }
             writePasteboard(image)
             dismiss(copyColor: false)
-            onCopied?(ScreenshotL10n.string("plugin.screenshot.toast.copied"))
+            let message = ScreenshotL10n.string("plugin.screenshot.toast.copied")
+            DispatchQueue.main.async { [weak self] in
+                self?.onCopied?(message)
+            }
         case .save:
             guard let image = view.croppedImage() else { return }
             save(image)
         case .pin:
             guard let image = view.croppedImage() else { return }
+            let screenRect = view.selectionScreenRect()
+            let scale = view.displayScale
+            pinController.pin(image, screenRect: screenRect, scale: scale)
             dismiss(copyColor: false)
-            pinController.pin(image)
         case .captureWindow(let windowID, let frame):
             markCapturePending()
             let scale = view.displayScale
@@ -181,7 +201,9 @@ final class ScreenshotOverlayController {
                 guard let self else { return }
                 guard let image = await ScreenCapture.captureWindow(windowID, scale: scale) else {
                     view.isCapturePending = false
-                    self.onFailed?()
+                    DispatchQueue.main.async { [weak self] in
+                        self?.onFailed?()
+                    }
                     return
                 }
                 view.applyWindowCapture(image, windowRect: frame)
@@ -201,7 +223,10 @@ final class ScreenshotOverlayController {
             if response == .OK, let url = panel.url, let data = pngData(image) {
                 try? data.write(to: url)
                 self.dismiss(copyColor: false)
-                self.onSaved?(url.lastPathComponent)
+                let name = url.lastPathComponent
+                DispatchQueue.main.async { [weak self] in
+                    self?.onSaved?(name)
+                }
             } else {
                 for overlay in overlays { overlay.orderFrontRegardless() }
             }
@@ -253,7 +278,7 @@ private enum ScreenshotOverlayAction {
     case confirm
     case save
     case pin
-    case copyColor(String, dismissAfter: Bool)
+    case copyColor(String)
     case captureWindow(CGWindowID, CGRect)
 }
 
@@ -275,13 +300,24 @@ private final class ScreenshotOverlayView: NSView {
     private var isCustomDragging = false
     private var hoverPoint: CGPoint = .zero
     private var sampled: SampledColor?
+    private var colorDisplayFormat: ColorDisplayFormat = .hex
     var isCapturePending = false
     var onAction: ((ScreenshotOverlayAction) -> Void)?
 
+    var isSelectionCommitted: Bool { committed }
+    var displayScale: CGFloat { frozen.screen.backingScaleFactor }
+
+    func currentColorPasteboard() -> String? {
+        sampled?.pasteboard(for: colorDisplayFormat)
+    }
+
+    func cycleColorFormat() {
+        colorDisplayFormat = colorDisplayFormat.next
+        refreshColorHUDContent()
+    }
+
     private let toolbar = ScreenshotToolbar()
     private let colorHUD = ScreenshotColorHUD()
-
-    var displayScale: CGFloat { frozen.screen.backingScaleFactor }
 
     init(frame: CGRect, frozen: FrozenDisplay, pickableWindows: [ScreenshotGeometry.PickableWindow]) {
         self.frozen = frozen
@@ -484,8 +520,12 @@ private final class ScreenshotOverlayView: NSView {
         if event.modifierFlags.contains(.command),
            event.charactersIgnoringModifiers?.lowercased() == "c",
            !committed,
-           let sampled {
-            onAction?(.copyColor(sampled.pasteboard, dismissAfter: false))
+           let text = currentColorPasteboard() {
+            onAction?(.copyColor(text))
+            return
+        }
+        if event.charactersIgnoringModifiers == "/" && !committed {
+            cycleColorFormat()
             return
         }
         super.keyDown(with: event)
@@ -502,6 +542,11 @@ private final class ScreenshotOverlayView: NSView {
             )
         }
         return try? ScreenCapture.crop(workingImage, localRect: selection, screenSize: bounds.size)
+    }
+
+    func selectionScreenRect() -> CGRect {
+        guard !selection.isEmpty, let window else { return .zero }
+        return window.convertToScreen(convert(selection, to: nil))
     }
 
     override func mouseExited(with event: NSEvent) {
@@ -529,6 +574,7 @@ private final class ScreenshotOverlayView: NSView {
                     NSBezierPath(rect: handleRect(edge)).fill()
                 }
             }
+            drawSizeBadge()
         }
         drawMosaicPreviewIfNeeded()
     }
@@ -624,20 +670,53 @@ private final class ScreenshotOverlayView: NSView {
         toolbar.frame = CGRect(origin: origin, size: barSize)
     }
 
+    private func drawSizeBadge() {
+        let width = Int(selection.width.rounded())
+        let height = Int(selection.height.rounded())
+        guard width > 0, height > 0 else { return }
+        let text = "\(width) × \(height) pt"
+        let attributes: [NSAttributedString.Key: Any] = [
+            .font: NSFont.monospacedDigitSystemFont(ofSize: 11, weight: .semibold),
+            .foregroundColor: NSColor.white,
+        ]
+        let size = (text as NSString).size(withAttributes: attributes)
+        var rect = CGRect(
+            x: selection.midX - size.width / 2 - 8,
+            y: selection.maxY + 8,
+            width: size.width + 16,
+            height: size.height + 8
+        )
+        rect.origin.x = max(6, min(rect.origin.x, bounds.maxX - rect.width - 6))
+        rect.origin.y = min(rect.origin.y, bounds.maxY - rect.height - 6)
+        let path = NSBezierPath(roundedRect: rect, xRadius: rect.height / 2, yRadius: rect.height / 2)
+        NSColor(white: 0.08, alpha: 0.82).setFill()
+        path.fill()
+        text.draw(
+            at: CGPoint(x: rect.minX + 8, y: rect.minY + 4),
+            withAttributes: attributes
+        )
+    }
+
     private func refreshColor() {
         sampled = PixelSampler.sample(image: frozen.image, viewPoint: hoverPoint, viewSize: bounds.size)
         if !committed, !isCustomDragging {
-            let screenPoint = screenPoint(fromViewPoint: hoverPoint)
-            colorHUD.update(
-                sample: sampled,
-                screenPoint: screenPoint,
-                image: frozen.image,
-                viewPoint: hoverPoint,
-                viewSize: bounds.size
-            )
+            refreshColorHUDContent()
             refreshColorHUDVisibility()
             placeColorHUD()
         }
+    }
+
+    private func refreshColorHUDContent() {
+        guard sampled != nil else { return }
+        let screenPoint = screenPoint(fromViewPoint: hoverPoint)
+        colorHUD.update(
+            sample: sampled,
+            screenPoint: screenPoint,
+            image: frozen.image,
+            viewPoint: hoverPoint,
+            viewSize: bounds.size,
+            format: colorDisplayFormat
+        )
     }
 
     private func placeColorHUD() {
@@ -731,11 +810,35 @@ private final class ScreenshotOverlayView: NSView {
     }
 }
 
+private enum ColorDisplayFormat: CaseIterable {
+    case hex
+    case rgb
+    case hsl
+
+    var next: ColorDisplayFormat {
+        let all = ColorDisplayFormat.allCases
+        let index = all.firstIndex(of: self) ?? 0
+        return all[(index + 1) % all.count]
+    }
+}
+
 private struct SampledColor {
     let hex: String
     let rgb: String
-    var pasteboard: String { hex }
+    let hsl: String
     let nsColor: NSColor
+
+    func text(for format: ColorDisplayFormat) -> String {
+        switch format {
+        case .hex: hex
+        case .rgb: rgb
+        case .hsl: hsl
+        }
+    }
+
+    func pasteboard(for format: ColorDisplayFormat) -> String {
+        text(for: format)
+    }
 }
 
 private enum PixelSampler {
@@ -753,131 +856,165 @@ private enum PixelSampler {
         let b = Int((color.blueComponent * 255).rounded())
         let hex = String(format: "#%02X%02X%02X", r, g, b)
         let rgb = "rgb(\(r), \(g), \(b))"
-        return SampledColor(hex: hex, rgb: rgb, nsColor: color)
+        let hsl = hslString(from: color)
+        return SampledColor(hex: hex, rgb: rgb, hsl: hsl, nsColor: color)
+    }
+
+    private static func hslString(from color: NSColor) -> String {
+        var hue: CGFloat = 0
+        var saturation: CGFloat = 0
+        var brightness: CGFloat = 0
+        var alpha: CGFloat = 0
+        color.getHue(&hue, saturation: &saturation, brightness: &brightness, alpha: &alpha)
+        let h = Int((hue * 360).rounded())
+        let s = Int((saturation * 100).rounded())
+        let l = Int((brightness * 100).rounded())
+        return "hsl(\(h), \(s)%, \(l)%)"
     }
 }
 
 private final class ScreenshotToolbar: NSView {
-    enum Item { case mosaic, pin, save, cancel, confirm }
+    enum Item: Int, CaseIterable {
+        case pin, mosaic, save, cancel, confirm
+    }
+
     var onPick: ((Item) -> Void)?
     private var mosaicButton: NSButton?
+    private var buttons: [NSButton] = []
+
+    private let buttonSide: CGFloat = 32
+    private let buttonSpacing: CGFloat = 2
+    private let horizontalPadding: CGFloat = 8
 
     override var intrinsicContentSize: NSSize { fittingSize }
 
     override init(frame frameRect: NSRect) {
         super.init(frame: frameRect)
         wantsLayer = true
-        layer?.backgroundColor = NSColor(calibratedWhite: 0.12, alpha: 0.92).cgColor
-        layer?.cornerRadius = 11
+        layer?.backgroundColor = NSColor(white: 0.1, alpha: 0.94).cgColor
+        layer?.cornerRadius = 12
         layer?.borderWidth = 1
-        layer?.borderColor = NSColor.white.withAlphaComponent(0.12).cgColor
+        layer?.borderColor = NSColor.white.withAlphaComponent(0.14).cgColor
 
+        let symbolConfig = NSImage.SymbolConfiguration(pointSize: 14, weight: .semibold)
         let items: [(Item, String, String)] = [
+            (.pin, "pin.fill", "plugin.screenshot.action.pin"),
             (.mosaic, "square.grid.3x3.fill", "plugin.screenshot.action.mosaic"),
-            (.pin, "pin", "plugin.screenshot.action.pin"),
-            (.save, "square.and.arrow.down", "plugin.screenshot.action.save"),
+            (.save, "square.and.arrow.down.fill", "plugin.screenshot.action.save"),
             (.cancel, "xmark", "plugin.screenshot.action.cancel"),
             (.confirm, "checkmark", "plugin.screenshot.action.confirm"),
         ]
-        var x: CGFloat = 6
+
         for (item, symbol, key) in items {
-            let button = NSButton(frame: CGRect(x: x, y: 4, width: 28, height: 28))
-            button.image = NSImage(systemSymbolName: symbol, accessibilityDescription: ScreenshotL10n.string(key))
+            let button = NSButton(frame: .zero)
+            button.image = NSImage(systemSymbolName: symbol, accessibilityDescription: nil)?
+                .withSymbolConfiguration(symbolConfig)
             button.imagePosition = .imageOnly
+            button.imageScaling = .scaleProportionallyDown
             button.isBordered = false
-            button.contentTintColor = .white
+            button.contentTintColor = NSColor(white: 0.96, alpha: 1)
             button.toolTip = ScreenshotL10n.string(key)
             button.target = self
-            button.tag = items.firstIndex(where: { $0.0 == item }) ?? 0
+            button.tag = item.rawValue
             button.sendAction(on: .leftMouseUp)
             button.action = #selector(tap(_:))
+            button.wantsLayer = true
+            button.layer?.cornerRadius = 7
             addSubview(button)
+            buttons.append(button)
             if item == .mosaic { mosaicButton = button }
-            x += 30
         }
-        setFrameSize(NSSize(width: x + 2, height: 36))
     }
 
     required init?(coder: NSCoder) { nil }
 
-    override var fittingSize: NSSize { NSSize(width: 6 + 30 * 5 + 2, height: 36) }
+    override var fittingSize: NSSize {
+        let count = CGFloat(Item.allCases.count)
+        let width = horizontalPadding * 2 + count * buttonSide + (count - 1) * buttonSpacing
+        return NSSize(width: width, height: 40)
+    }
+
+    override func layout() {
+        super.layout()
+        var x = horizontalPadding
+        let y = (bounds.height - buttonSide) / 2
+        for button in buttons {
+            button.frame = CGRect(x: x, y: y, width: buttonSide, height: buttonSide)
+            x += buttonSide + buttonSpacing
+        }
+    }
 
     func setMosaicArmed(_ armed: Bool) {
-        mosaicButton?.contentTintColor = armed ? NSColor(white: 0.85, alpha: 1) : .white
+        mosaicButton?.contentTintColor = armed ? NSColor(white: 0.98, alpha: 1) : NSColor(white: 0.96, alpha: 1)
         mosaicButton?.layer?.backgroundColor = armed
-            ? NSColor.white.withAlphaComponent(0.18).cgColor
+            ? NSColor.white.withAlphaComponent(0.2).cgColor
             : nil
     }
 
     @objc private func tap(_ sender: NSButton) {
-        let items: [Item] = [.mosaic, .pin, .save, .cancel, .confirm]
-        guard items.indices.contains(sender.tag) else { return }
-        onPick?(items[sender.tag])
+        guard let item = Item(rawValue: sender.tag) else { return }
+        onPick?(item)
     }
 }
 
 private final class ScreenshotMagnifierView: NSView {
     private var sampleImage: CGImage?
+    private let gridColumns = 11
+    private let gridRows = 11
 
     override func draw(_ dirtyRect: NSRect) {
         guard let context = NSGraphicsContext.current?.cgContext else { return }
-        context.setFillColor(CGColor(gray: 1, alpha: 1))
+
+        context.setFillColor(CGColor(gray: 0.97, alpha: 0.98))
         context.fill(bounds)
 
-        if let sampleImage {
-            context.saveGState()
-            context.interpolationQuality = .none
-            context.draw(sampleImage, in: bounds)
-            context.restoreGState()
-        }
-
-        // Ring reticle: arms stop before the target pixel so the sample stays visible.
-        let center = CGPoint(x: bounds.midX, y: bounds.midY)
-        let pixelSize = CGSize(
-            width: bounds.width / CGFloat(max(sampleImage?.width ?? 11, 1)),
-            height: bounds.height / CGFloat(max(sampleImage?.height ?? 11, 1))
-        )
-        let ring = CGRect(
-            x: center.x - pixelSize.width / 2,
-            y: center.y - pixelSize.height / 2,
-            width: pixelSize.width,
-            height: pixelSize.height
-        ).insetBy(dx: -1, dy: -1)
-
-        let reticle = CGMutablePath()
-        reticle.addRect(ring)
-        let arms: [(CGPoint, CGPoint)] = [
-            (CGPoint(x: ring.midX, y: bounds.minY), CGPoint(x: ring.midX, y: ring.minY)),
-            (CGPoint(x: ring.midX, y: ring.maxY), CGPoint(x: ring.midX, y: bounds.maxY)),
-            (CGPoint(x: bounds.minX, y: ring.midY), CGPoint(x: ring.minX, y: ring.midY)),
-            (CGPoint(x: ring.maxX, y: ring.midY), CGPoint(x: bounds.maxX, y: ring.midY)),
-        ]
-        for (start, end) in arms where end.x > start.x || end.y > start.y {
-            reticle.move(to: start)
-            reticle.addLine(to: end)
-        }
+        guard let sampleImage else { return }
 
         context.saveGState()
-        context.addPath(reticle)
-        context.setStrokeColor(CGColor(gray: 0, alpha: 0.76))
-        context.setLineWidth(2)
-        context.strokePath()
-        context.addPath(reticle)
-        context.setStrokeColor(CGColor(gray: 1, alpha: 0.92))
-        context.setLineWidth(1)
+        context.interpolationQuality = .none
+        context.draw(sampleImage, in: bounds)
+        context.restoreGState()
+
+        let cellW = bounds.width / CGFloat(gridColumns)
+        let cellH = bounds.height / CGFloat(gridRows)
+
+        context.saveGState()
+        context.setStrokeColor(CGColor(gray: 0.55, alpha: 0.22))
+        context.setLineWidth(0.5)
+        for column in 0...gridColumns {
+            let x = CGFloat(column) * cellW
+            context.move(to: CGPoint(x: x, y: 0))
+            context.addLine(to: CGPoint(x: x, y: bounds.height))
+        }
+        for row in 0...gridRows {
+            let y = CGFloat(row) * cellH
+            context.move(to: CGPoint(x: 0, y: y))
+            context.addLine(to: CGPoint(x: bounds.width, y: y))
+        }
         context.strokePath()
         context.restoreGState()
+
+        let centerCol = gridColumns / 2
+        let centerRow = gridRows / 2
+        let focus = CGRect(
+            x: CGFloat(centerCol) * cellW + 0.5,
+            y: CGFloat(centerRow) * cellH + 0.5,
+            width: cellW - 1,
+            height: cellH - 1
+        )
+        context.setStrokeColor(CGColor(gray: 0.12, alpha: 0.92))
+        context.setLineWidth(1.5)
+        context.stroke(focus)
     }
 
     func update(image: CGImage, viewPoint: CGPoint, viewSize: CGSize) {
-        let sampleSize = 11
-        let half = CGFloat(sampleSize) / 2
+        let half = CGFloat(gridColumns) / 2
         let pixelRect = CropGeometry.cropRect(
             localRect: CGRect(
                 x: viewPoint.x - half,
                 y: viewPoint.y - half,
-                width: CGFloat(sampleSize),
-                height: CGFloat(sampleSize)
+                width: CGFloat(gridColumns),
+                height: CGFloat(gridRows)
             ),
             screenSize: viewSize,
             imageSize: CGSize(width: image.width, height: image.height)
@@ -889,56 +1026,69 @@ private final class ScreenshotMagnifierView: NSView {
 
 private final class ScreenshotColorHUD: NSView {
     private let magnifier = ScreenshotMagnifierView(frame: .zero)
-    private let coordTitle = NSTextField(labelWithString: "")
-    private let coordValue = NSTextField(labelWithString: "")
-    private let colorTitle = NSTextField(labelWithString: "")
-    private let colorValue = NSTextField(labelWithString: "")
+    private let footerBar = NSView(frame: .zero)
+    private let coordLabel = NSTextField(labelWithString: "")
+    private let colorLabel = NSTextField(labelWithString: "")
     private let hintLabel = NSTextField(labelWithString: "")
 
-    private static let magnifierSize: CGFloat = 88
-    private static let panelWidth: CGFloat = 196
-    private static let padding: CGFloat = 10
+    private static let panelWidth: CGFloat = 136
+    private static let magnifierHeight: CGFloat = 132
+    private static let footerHeight: CGFloat = 44
+    private static let hintHeight: CGFloat = 16
+    private static let cornerRadius: CGFloat = 14
 
     override init(frame frameRect: NSRect) {
         super.init(frame: frameRect)
         wantsLayer = true
-        layer?.backgroundColor = NSColor.white.cgColor
-        layer?.cornerRadius = 6
-        layer?.borderWidth = 1
-        layer?.borderColor = NSColor(calibratedWhite: 0.78, alpha: 1).cgColor
+        layer?.cornerRadius = Self.cornerRadius
+        layer?.masksToBounds = false
+        layer?.shadowColor = NSColor.black.withAlphaComponent(0.14).cgColor
+        layer?.shadowOffset = CGSize(width: 0, height: 6)
+        layer?.shadowRadius = 14
+        layer?.shadowOpacity = 1
+        layer?.borderWidth = 0.5
+        layer?.borderColor = NSColor.white.withAlphaComponent(0.35).cgColor
+        layer?.backgroundColor = NSColor(white: 0.97, alpha: 1).cgColor
 
-        coordTitle.stringValue = ScreenshotL10n.string("plugin.screenshot.color.coord")
-        colorTitle.stringValue = ScreenshotL10n.string("plugin.screenshot.color.value")
-        hintLabel.stringValue = ScreenshotL10n.string("plugin.screenshot.color.copyHint")
+        magnifier.wantsLayer = true
+        magnifier.layer?.maskedCorners = [.layerMinXMinYCorner, .layerMaxXMinYCorner]
+        magnifier.layer?.cornerRadius = Self.cornerRadius
+        magnifier.layer?.masksToBounds = true
 
-        for field in [coordTitle, colorTitle] {
-            field.font = .systemFont(ofSize: 12)
-            field.textColor = NSColor(calibratedWhite: 0.45, alpha: 1)
-        }
-        for field in [coordValue, colorValue] {
-            field.font = .monospacedDigitSystemFont(ofSize: 12, weight: .regular)
-            field.textColor = NSColor(calibratedWhite: 0.15, alpha: 1)
-        }
-        hintLabel.font = .systemFont(ofSize: 11)
+        footerBar.wantsLayer = true
+        footerBar.layer?.backgroundColor = NSColor(calibratedWhite: 0.22, alpha: 1).cgColor
+
+        coordLabel.font = .monospacedDigitSystemFont(ofSize: 10, weight: .medium)
+        coordLabel.textColor = NSColor(white: 0.96, alpha: 1)
+        coordLabel.lineBreakMode = .byTruncatingTail
+        colorLabel.font = .monospacedDigitSystemFont(ofSize: 9, weight: .semibold)
+        colorLabel.textColor = NSColor(white: 0.98, alpha: 1)
+        colorLabel.lineBreakMode = .byTruncatingTail
+
+        hintLabel.font = .systemFont(ofSize: 9, weight: .regular)
         hintLabel.textColor = NSColor(calibratedWhite: 0.55, alpha: 1)
+        hintLabel.alignment = .center
+        hintLabel.stringValue = ScreenshotL10n.string("plugin.screenshot.color.hints")
 
-        for field in [coordTitle, coordValue, colorTitle, colorValue, hintLabel] {
+        for field in [coordLabel, colorLabel, hintLabel] {
             field.backgroundColor = .clear
             field.isBezeled = false
-            addSubview(field)
         }
-        magnifier.wantsLayer = true
-        magnifier.layer?.borderWidth = 1
-        magnifier.layer?.borderColor = NSColor(calibratedWhite: 0.85, alpha: 1).cgColor
+
         addSubview(magnifier)
+        addSubview(footerBar)
+        footerBar.addSubview(coordLabel)
+        footerBar.addSubview(colorLabel)
+        addSubview(hintLabel)
     }
 
     required init?(coder: NSCoder) { nil }
 
     override var fittingSize: NSSize {
-        let infoHeight: CGFloat = 72
-        let height = Self.padding + Self.magnifierSize + 8 + infoHeight + Self.padding
-        return NSSize(width: Self.panelWidth, height: height)
+        NSSize(
+            width: Self.panelWidth,
+            height: Self.magnifierHeight + Self.footerHeight + Self.hintHeight
+        )
     }
 
     func update(
@@ -946,7 +1096,8 @@ private final class ScreenshotColorHUD: NSView {
         screenPoint: CGPoint,
         image: CGImage,
         viewPoint: CGPoint,
-        viewSize: CGSize
+        viewSize: CGSize,
+        format: ColorDisplayFormat
     ) {
         guard let sample else {
             isHidden = true
@@ -954,25 +1105,20 @@ private final class ScreenshotColorHUD: NSView {
         }
         isHidden = false
         magnifier.update(image: image, viewPoint: viewPoint, viewSize: viewSize)
-        coordValue.stringValue = "\(Int(screenPoint.x.rounded())), \(Int(screenPoint.y.rounded()))"
-        colorValue.stringValue = sample.hex
+        coordLabel.stringValue = "(\(Int(screenPoint.x.rounded())), \(Int(screenPoint.y.rounded())))"
+        colorLabel.stringValue = sample.text(for: format)
         needsLayout = true
     }
 
     override func layout() {
         super.layout()
         let width = bounds.width
-        magnifier.frame = CGRect(
-            x: Self.padding,
-            y: bounds.height - Self.padding - Self.magnifierSize,
-            width: width - Self.padding * 2,
-            height: Self.magnifierSize
-        )
-        let rowY = Self.padding + 44
-        coordTitle.frame = CGRect(x: Self.padding, y: rowY, width: 44, height: 16)
-        coordValue.frame = CGRect(x: Self.padding + 48, y: rowY, width: width - Self.padding * 2 - 48, height: 16)
-        colorTitle.frame = CGRect(x: Self.padding, y: rowY - 20, width: 44, height: 16)
-        colorValue.frame = CGRect(x: Self.padding + 48, y: rowY - 20, width: width - Self.padding * 2 - 48, height: 16)
-        hintLabel.frame = CGRect(x: Self.padding, y: Self.padding, width: width - Self.padding * 2, height: 16)
+        magnifier.frame = CGRect(x: 0, y: Self.footerHeight + Self.hintHeight, width: width, height: Self.magnifierHeight)
+        footerBar.frame = CGRect(x: 0, y: Self.hintHeight, width: width, height: Self.footerHeight)
+        let inset: CGFloat = 10
+        let labelWidth = width - inset * 2
+        coordLabel.frame = CGRect(x: inset, y: 24, width: labelWidth, height: 14)
+        colorLabel.frame = CGRect(x: inset, y: 8, width: labelWidth, height: 14)
+        hintLabel.frame = CGRect(x: 6, y: 0, width: width - 12, height: Self.hintHeight)
     }
 }

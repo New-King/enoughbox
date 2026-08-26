@@ -120,6 +120,40 @@
         }
       }
     },
+    "plugin.screenshot.color.hints" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "⌘C copy · / switch"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "⌘C 复制 · / 切换"
+          }
+        }
+      }
+    },
+    "plugin.screenshot.color.switchHint" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Press / to switch color format"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "按 / 键切换颜色信息"
+          }
+        }
+      }
+    },
     "plugin.screenshot.color.value" : {
       "extractionState" : "stale",
       "localizations" : {
@@ -143,13 +177,13 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Move the pointer to sample color in the magnifier. Press ⌘C to copy the HEX value."
+            "value" : "Move the pointer to sample color. Press ⌘C to copy; press / to switch HEX, RGB, or HSL."
           }
         },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "移动指针可在放大镜中取色。按 ⌘C 复制色值。"
+            "value" : "移动指针可取色。按 ⌘C 复制；按 / 在 HEX、RGB、HSL 间切换。"
           }
         }
       }
@@ -218,6 +252,23 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "已复制 %@"
+          }
+        }
+      }
+    },
+    "plugin.screenshot.toast.colorCopied" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Color copied"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "已复制颜色信息"
           }
         }
       }

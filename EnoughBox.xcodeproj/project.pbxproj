@@ -20,6 +20,7 @@
 		C0DE0001C0DE0001C0DE0023 /* ScreenshotGeometry.swift in Sources */ = {isa = PBXBuildFile; fileRef = C0DE0001C0DE0001C0DE0022 /* ScreenshotGeometry.swift */; };
 		C0DE0001C0DE0001C0DE0013 /* ScreenCapture.swift in Sources */ = {isa = PBXBuildFile; fileRef = C0DE0001C0DE0001C0DE0012 /* ScreenCapture.swift */; };
 		C0DE0001C0DE0001C0DE0015 /* ScreenshotMosaic.swift in Sources */ = {isa = PBXBuildFile; fileRef = C0DE0001C0DE0001C0DE0014 /* ScreenshotMosaic.swift */; };
+		C0DE0001C0DE0001C0DE0025 /* ScreenshotCenterToast.swift in Sources */ = {isa = PBXBuildFile; fileRef = C0DE0001C0DE0001C0DE0024 /* ScreenshotCenterToast.swift */; };
 		C0DE0001C0DE0001C0DE0017 /* ScreenshotOverlay.swift in Sources */ = {isa = PBXBuildFile; fileRef = C0DE0001C0DE0001C0DE0016 /* ScreenshotOverlay.swift */; };
 		C0DE0001C0DE0001C0DE0019 /* ScreenshotPin.swift in Sources */ = {isa = PBXBuildFile; fileRef = C0DE0001C0DE0001C0DE0018 /* ScreenshotPin.swift */; };
 		C0DE0001C0DE0001C0DE001B /* ScreenshotTool.swift in Sources */ = {isa = PBXBuildFile; fileRef = C0DE0001C0DE0001C0DE001A /* ScreenshotTool.swift */; };
@@ -66,6 +67,7 @@
 		C0DE0001C0DE0001C0DE0022 /* ScreenshotGeometry.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScreenshotGeometry.swift; sourceTree = "<group>"; };
 		C0DE0001C0DE0001C0DE0012 /* ScreenCapture.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScreenCapture.swift; sourceTree = "<group>"; };
 		C0DE0001C0DE0001C0DE0014 /* ScreenshotMosaic.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScreenshotMosaic.swift; sourceTree = "<group>"; };
+		C0DE0001C0DE0001C0DE0024 /* ScreenshotCenterToast.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScreenshotCenterToast.swift; sourceTree = "<group>"; };
 		C0DE0001C0DE0001C0DE0016 /* ScreenshotOverlay.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScreenshotOverlay.swift; sourceTree = "<group>"; };
 		C0DE0001C0DE0001C0DE0018 /* ScreenshotPin.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScreenshotPin.swift; sourceTree = "<group>"; };
 		C0DE0001C0DE0001C0DE001A /* ScreenshotTool.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScreenshotTool.swift; sourceTree = "<group>"; };
@@ -207,6 +209,7 @@
 			isa = PBXGroup;
 			children = (
 				C0DE0001C0DE0001C0DE0014 /* ScreenshotMosaic.swift */,
+				C0DE0001C0DE0001C0DE0024 /* ScreenshotCenterToast.swift */,
 				C0DE0001C0DE0001C0DE0016 /* ScreenshotOverlay.swift */,
 				C0DE0001C0DE0001C0DE0018 /* ScreenshotPin.swift */,
 				C0DE0001C0DE0001C0DE001A /* ScreenshotTool.swift */,
@@ -387,6 +390,7 @@
 				C0DE0001C0DE0001C0DE0004 /* YoudaoTranslator.swift in Sources */,
 				C0DE0001C0DE0001C0DE0006 /* DeepSeekTranslator.swift in Sources */,
 				C0DE0001C0DE0001C0DE0015 /* ScreenshotMosaic.swift in Sources */,
+				C0DE0001C0DE0001C0DE0025 /* ScreenshotCenterToast.swift in Sources */,
 				C0DE0001C0DE0001C0DE0017 /* ScreenshotOverlay.swift in Sources */,
 				C0DE0001C0DE0001C0DE0019 /* ScreenshotPin.swift in Sources */,
 				C0DE0001C0DE0001C0DE001B /* ScreenshotTool.swift in Sources */,

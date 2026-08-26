@@ -28,6 +28,16 @@ struct MainView: View {
             }
         }
         .animation(.easeOut(duration: 0.2), value: appState.toastMessage)
+        .onAppear(perform: clearWindowFocus)
+        .onChange(of: appState.selectedToolID) { _, _ in
+            clearWindowFocus()
+        }
+    }
+
+    private func clearWindowFocus() {
+        DispatchQueue.main.async {
+            NSApp.keyWindow?.makeFirstResponder(nil)
+        }
     }
 
     @ViewBuilder

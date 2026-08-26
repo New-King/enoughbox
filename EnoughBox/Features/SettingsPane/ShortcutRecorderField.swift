@@ -243,7 +243,9 @@ final class ShortcutRecorderButton: NSButton {
             for: shortcut,
             excluding: shortcutName
         ) {
-            onConflict?(conflict)
+            DispatchQueue.main.async { [weak self] in
+                self?.onConflict?(conflict)
+            }
             return
         }
 
@@ -251,7 +253,9 @@ final class ShortcutRecorderButton: NSButton {
         // setShortcut registers immediately. Disable again while this control
         // keeps recording, otherwise the new hotkey steals the next attempt.
         HotkeyCenter.shared.suspendForShortcutRecording()
-        onSaved?(shortcut)
+        DispatchQueue.main.async { [weak self] in
+            self?.onSaved?(shortcut)
+        }
     }
 
     private func isValidGlobalShortcut(_ event: NSEvent) -> Bool {

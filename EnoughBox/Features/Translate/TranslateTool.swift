@@ -76,6 +76,7 @@ struct TranslateSettingsView: View {
             credentialsSection
             accessibilitySection
         }
+        .defaultFocus($focusedField, nil)
         .frame(maxWidth: .infinity, alignment: .leading)
         .padding(.vertical, 4)
         .environment(\.openURL, OpenURLAction { _ in .discarded })
