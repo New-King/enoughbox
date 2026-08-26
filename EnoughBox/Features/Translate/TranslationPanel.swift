@@ -36,9 +36,14 @@ final class TranslationPanelModel: ObservableObject {
         translate()
     }
 
+    /// Cycles the session engine without writing `TranslateSettings.engine`.
+    func cycleEngine() {
+        engine = engine.next()
+        translate()
+    }
+
     func translate() {
         TranslateSettings.targetLanguage = targetLanguage
-        engine = TranslateSettings.engine
         detectedLanguage = LanguageDetector.detect(sourceText)
         let text = sourceText.trimmingCharacters(in: .whitespacesAndNewlines)
         let target = targetLanguage
@@ -129,31 +134,37 @@ final class TranslationPanelModel: ObservableObject {
     }
 }
 
+/// Borderless `NSPanel` cannot become key unless this is overridden, so TextEditor never focuses.
+private final class TranslationNSPanel: NSPanel {
+    override var canBecomeKey: Bool { true }
+    override var canBecomeMain: Bool { false }
+}
+
 @MainActor
 final class TranslationPanelController: NSWindowController {
     private let session = TranslationPanelModel()
+    private var hostingController: NSHostingController<TranslationPanelView>!
+    private var lastFittedSize: CGSize = .zero
 
     convenience init() {
-        let panel = NSPanel(
-            contentRect: NSRect(x: 0, y: 0, width: 380, height: 468),
-            styleMask: [.titled, .closable, .fullSizeContentView, .nonactivatingPanel, .utilityWindow],
+        let panel = TranslationNSPanel(
+            contentRect: NSRect(x: 0, y: 0, width: 380, height: 200),
+            styleMask: [.borderless, .nonactivatingPanel],
             backing: .buffered,
             defer: false
         )
-        panel.titleVisibility = .hidden
-        panel.titlebarAppearsTransparent = true
+        panel.isOpaque = false
+        panel.backgroundColor = .clear
+        panel.hasShadow = true
         panel.isFloatingPanel = true
         panel.level = .floating
         panel.hidesOnDeactivate = false
-        panel.isMovableByWindowBackground = true
+        panel.isMovableByWindowBackground = false
         panel.becomesKeyOnlyIfNeeded = false
-        panel.standardWindowButton(.closeButton)?.isHidden = true
-        panel.standardWindowButton(.miniaturizeButton)?.isHidden = true
-        panel.standardWindowButton(.zoomButton)?.isHidden = true
         panel.collectionBehavior = [.canJoinAllSpaces, .fullScreenAuxiliary]
 
         self.init(window: panel)
-        panel.contentViewController = NSHostingController(
+        let hosting = NSHostingController(
             rootView: TranslationPanelView(
                 session: session,
                 onClose: { [weak self] in
@@ -161,10 +172,19 @@ final class TranslationPanelController: NSWindowController {
                 }
             )
         )
+        hostingController = hosting
+        panel.contentViewController = hosting
         session.$isPinned
             .receive(on: RunLoop.main)
             .sink { [weak panel] pinned in
                 panel?.level = pinned ? .statusBar : .floating
+            }
+            .store(in: &cancellables)
+        Publishers.CombineLatest(session.$translatedText, session.$isTranslating)
+            .dropFirst()
+            .receive(on: RunLoop.main)
+            .sink { [weak self] _, _ in
+                self?.scheduleFit()
             }
             .store(in: &cancellables)
         installCloseKeyMonitor()
@@ -174,11 +194,13 @@ final class TranslationPanelController: NSWindowController {
     private var keyMonitor: Any?
 
     func present(sourceText: String) {
+        lastFittedSize = .zero
         session.present(sourceText: sourceText)
         guard let window else { return }
         positionNearMouse(window)
         window.orderFrontRegardless()
         window.makeKey()
+        scheduleFit()
     }
 
     override func close() {
@@ -214,6 +236,41 @@ final class TranslationPanelController: NSWindowController {
         }
         window.setFrameOrigin(origin)
     }
+
+    private func scheduleFit() {
+        DispatchQueue.main.async { [weak self] in
+            self?.fitToFittingSize()
+            DispatchQueue.main.async {
+                self?.fitToFittingSize()
+            }
+        }
+    }
+
+    /// Resize only after translation content changes — not on every layout pass
+    /// (that loop stole TextEditor focus and flickered the cursor).
+    private func fitToFittingSize() {
+        guard let window, let hostingController else { return }
+        let fitted = hostingController.sizeThatFits(in: CGSize(width: 380, height: 10_000))
+        let height = ceil(fitted.height)
+        guard height > 40 else { return }
+        let next = CGSize(width: 380, height: height)
+        guard abs(next.width - lastFittedSize.width) > 0.5 || abs(next.height - lastFittedSize.height) > 0.5 else {
+            return
+        }
+        lastFittedSize = next
+        var frame = window.frame
+        let top = frame.maxY
+        frame.size = next
+        frame.origin.y = top - next.height
+        if let screen = window.screen ?? NSScreen.screens.first(where: { NSMouseInRect(NSEvent.mouseLocation, $0.frame, false) }) ?? NSScreen.main {
+            let visible = screen.visibleFrame.insetBy(dx: 8, dy: 8)
+            if frame.maxX > visible.maxX { frame.origin.x = visible.maxX - frame.width }
+            if frame.minX < visible.minX { frame.origin.x = visible.minX }
+            if frame.maxY > visible.maxY { frame.origin.y = visible.maxY - frame.height }
+            if frame.minY < visible.minY { frame.origin.y = visible.minY }
+        }
+        window.setFrame(frame, display: true)
+    }
 }
 
 private struct TranslationPanelView: View {
@@ -229,8 +286,14 @@ private struct TranslationPanelView: View {
             resultCard
         }
         .padding(12)
-        .background(tokens.page)
         .frame(width: 380)
+        .background(tokens.page)
+        .clipShape(RoundedRectangle(cornerRadius: 11, style: .continuous))
+        .overlay(
+            RoundedRectangle(cornerRadius: 11, style: .continuous)
+                .strokeBorder(tokens.border, lineWidth: 1)
+        )
+        .fixedSize(horizontal: true, vertical: true)
         .modifier(AppleTranslationBridge(session: session))
     }
 
@@ -244,6 +307,7 @@ private struct TranslationPanelView: View {
                 onClose()
             }
         }
+        .background(WindowDragRegion())
     }
 
     private var sourceCard: some View {
@@ -323,7 +387,7 @@ private struct TranslationPanelView: View {
     }
 
     private var resultCard: some View {
-        VStack(alignment: .leading, spacing: 8) {
+        VStack(alignment: .leading, spacing: 0) {
             HStack {
                 Image(systemName: "character.book.closed.fill")
                     .font(.system(size: 12))
@@ -331,10 +395,15 @@ private struct TranslationPanelView: View {
                 Text(session.engine.localizedName)
                     .font(.system(size: 12, weight: .medium))
                     .foregroundStyle(tokens.ink)
+                Button(action: session.cycleEngine) {
+                    Image(systemName: "arrow.triangle.2.circlepath")
+                        .font(.system(size: 11, weight: .semibold))
+                        .foregroundStyle(tokens.inkMuted)
+                }
+                .buttonStyle(.plain)
+                .help(TranslateL10n.string("plugin.translate.cycleEngine"))
+                .accessibilityLabel(TranslateL10n.string("plugin.translate.cycleEngine"))
                 Spacer()
-                Image(systemName: "chevron.down")
-                    .font(.system(size: 10, weight: .semibold))
-                    .foregroundStyle(tokens.inkFaint)
             }
             .padding(.horizontal, 10)
             .padding(.vertical, 8)
@@ -346,14 +415,18 @@ private struct TranslationPanelView: View {
                         .controlSize(.small)
                         .frame(maxWidth: .infinity, minHeight: 56, alignment: .center)
                 } else {
-                    Text(session.translatedText.isEmpty ? TranslateL10n.string("plugin.translate.result.empty") : session.translatedText)
-                        .font(.system(size: 14))
-                        .foregroundStyle(session.translatedText.isEmpty ? tokens.inkFaint : tokens.ink)
-                        .frame(maxWidth: .infinity, minHeight: 56, alignment: .topLeading)
-                        .textSelection(.enabled)
+                    GrowingResultText(
+                        text: session.translatedText.isEmpty
+                            ? TranslateL10n.string("plugin.translate.result.empty")
+                            : session.translatedText,
+                        isPlaceholder: session.translatedText.isEmpty,
+                        ink: tokens.ink,
+                        inkFaint: tokens.inkFaint
+                    )
                 }
             }
             .padding(.horizontal, 10)
+            .padding(.vertical, 8)
 
             HStack(spacing: 8) {
                 panelIconButton("speaker.wave.2") {
@@ -368,6 +441,10 @@ private struct TranslationPanelView: View {
             }
             .padding(.horizontal, 10)
             .padding(.bottom, 10)
+            .padding(.top, 2)
+            .frame(maxWidth: .infinity, alignment: .leading)
+            .background(tokens.card)
+            .layoutPriority(1)
         }
         .background(tokens.card, in: RoundedRectangle(cornerRadius: 11, style: .continuous))
         .overlay(
@@ -399,6 +476,73 @@ private struct TranslationPanelView: View {
 
     private var tokens: PanelTokens {
         PanelTokens.tokens(for: colorScheme)
+    }
+}
+
+/// Result body grows with the translation, then scrolls. Buttons stay outside this view.
+private struct GrowingResultText: View {
+    let text: String
+    let isPlaceholder: Bool
+    let ink: Color
+    let inkFaint: Color
+
+    private let minHeight: CGFloat = 56
+    private let maxHeight: CGFloat = 280
+
+    @State private var textHeight: CGFloat = 56
+
+    var body: some View {
+        ScrollView {
+            Text(text)
+                .font(.system(size: 14))
+                .foregroundStyle(isPlaceholder ? inkFaint : ink)
+                .frame(maxWidth: .infinity, alignment: .topLeading)
+                .textSelection(.enabled)
+                .fixedSize(horizontal: false, vertical: true)
+                .background(
+                    GeometryReader { geo in
+                        Color.clear.preference(key: ResultTextHeightKey.self, value: geo.size.height)
+                    }
+                )
+        }
+        .scrollBounceBehavior(.basedOnSize)
+        .onPreferenceChange(ResultTextHeightKey.self) { newValue in
+            let next = min(max(ceil(newValue), minHeight), maxHeight)
+            if abs(next - textHeight) >= 1 {
+                textHeight = next
+            }
+        }
+        .frame(height: min(max(textHeight, minHeight), maxHeight), alignment: .top)
+        .clipped()
+    }
+}
+
+private struct ResultTextHeightKey: PreferenceKey {
+    static var defaultValue: CGFloat = 0
+
+    static func reduce(value: inout CGFloat, nextValue: () -> CGFloat) {
+        value = max(value, nextValue())
+    }
+}
+
+/// Header-only drag so TextEditor clicks are not eaten by window-move.
+private struct WindowDragRegion: NSViewRepresentable {
+    func makeNSView(context: Context) -> NSView {
+        WindowDragView()
+    }
+
+    func updateNSView(_ nsView: NSView, context: Context) {}
+}
+
+private final class WindowDragView: NSView {
+    override var mouseDownCanMoveWindow: Bool { true }
+
+    override func mouseDown(with event: NSEvent) {
+        window?.performDrag(with: event)
+    }
+
+    override func resetCursorRects() {
+        addCursorRect(bounds, cursor: .arrow)
     }
 }
 

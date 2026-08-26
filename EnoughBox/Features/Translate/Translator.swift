@@ -14,6 +14,13 @@ enum TranslationEngine: String, CaseIterable, Identifiable {
     var localizedName: String {
         TranslateL10n.string("plugin.translate.engine.\(rawValue)")
     }
+
+    /// Session-only cycle: Youdao → DeepSeek → System → Youdao.
+    func next() -> TranslationEngine {
+        let all = Array(Self.allCases)
+        guard let index = all.firstIndex(of: self) else { return self }
+        return all[(index + 1) % all.count]
+    }
 }
 
 enum TranslatorError: LocalizedError {

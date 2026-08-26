@@ -18,6 +18,23 @@
         }
       }
     },
+    "plugin.translate.cycleEngine" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Try next engine"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "切换下一个翻译平台"
+          }
+        }
+      }
+    },
     "plugin.translate.engine.deepseek" : {
       "extractionState" : "stale",
       "localizations" : {
