@@ -28,7 +28,7 @@ final class TranslateTool {
     }
 
     func makeSettingsViewController() -> NSViewController {
-        NSHostingController(rootView: TranslateSettingsView())
+        TranslateSettingsHostingController(rootView: TranslateSettingsView())
     }
 
     private func translateSelection() {
@@ -49,6 +49,22 @@ final class TranslateTool {
             panelController = TranslationPanelController()
         }
         panelController?.present(sourceText: sourceText)
+    }
+}
+
+private final class TranslateSettingsHostingController: NSHostingController<TranslateSettingsView> {
+    private var didClearInitialFocus = false
+
+    override func viewDidAppear() {
+        super.viewDidAppear()
+        guard !didClearInitialFocus else { return }
+        didClearInitialFocus = true
+        DispatchQueue.main.async { [weak self] in
+            guard let self, let window = self.view.window else { return }
+            if window.firstResponder is NSTextView || window.firstResponder is NSTextField {
+                window.makeFirstResponder(self.view)
+            }
+        }
     }
 }
 

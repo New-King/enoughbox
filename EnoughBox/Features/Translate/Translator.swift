@@ -117,7 +117,7 @@ enum TranslateSettings {
 
     static var engine: TranslationEngine {
         get {
-            TranslationEngine(rawValue: UserDefaults.standard.string(forKey: engineKey) ?? "") ?? .system
+            TranslationEngine(rawValue: UserDefaults.standard.string(forKey: engineKey) ?? "") ?? .youdao
         }
         set {
             UserDefaults.standard.set(newValue.rawValue, forKey: engineKey)
