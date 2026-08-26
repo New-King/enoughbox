@@ -2,9 +2,12 @@ import AppKit
 import AVFoundation
 import Combine
 import SwiftUI
+#if canImport(Translation)
+import Translation
+#endif
 
 @MainActor
-final class TranslationSession: ObservableObject {
+final class TranslationPanelModel: ObservableObject {
     @Published var sourceRevision = UUID()
     @Published var sourceText = ""
     @Published var translatedText = ""
@@ -12,14 +15,18 @@ final class TranslationSession: ObservableObject {
     @Published var isTranslating = false
     @Published var targetLanguage = TranslateSettings.targetLanguage
     @Published var detectedLanguage: TranslateLanguage = .en
+    @Published var engine = TranslateSettings.engine
+    @Published var appleRequestID: UUID?
 
     private var translateTask: Task<Void, Never>?
+    private var requestID = UUID()
     private let synthesizer = AVSpeechSynthesizer()
 
     func present(sourceText: String) {
         sourceRevision = UUID()
         self.sourceText = sourceText
         targetLanguage = TranslateSettings.targetLanguage
+        engine = TranslateSettings.engine
         detectedLanguage = LanguageDetector.detect(sourceText)
         if sourceText.isEmpty {
             translatedText = ""
@@ -31,28 +38,65 @@ final class TranslationSession: ObservableObject {
 
     func translate() {
         TranslateSettings.targetLanguage = targetLanguage
+        engine = TranslateSettings.engine
         detectedLanguage = LanguageDetector.detect(sourceText)
-        let text = sourceText
+        let text = sourceText.trimmingCharacters(in: .whitespacesAndNewlines)
         let target = targetLanguage
+        let source = detectedLanguage
         translateTask?.cancel()
+        let id = UUID()
+        requestID = id
+        appleRequestID = nil
+        guard !text.isEmpty else {
+            translatedText = ""
+            isTranslating = false
+            return
+        }
         isTranslating = true
+        if engine == .system {
+            #if canImport(Translation)
+            if #available(macOS 15.0, *) {
+                appleRequestID = id
+                return
+            }
+            #endif
+            translatedText = TranslatorError.systemUnavailable.localizedDescription
+            isTranslating = false
+            return
+        }
+
         translateTask = Task {
-            try? await Task.sleep(for: .milliseconds(180))
-            guard !Task.isCancelled else { return }
-            translatedText = MockTranslator.translate(text, to: target)
+            do {
+                let translator = try TranslateSettings.translator(for: engine)
+                let result = try await translator.translate(text, from: source, to: target)
+                guard !Task.isCancelled, requestID == id else { return }
+                translatedText = result
+            } catch is CancellationError {
+                return
+            } catch {
+                guard requestID == id else { return }
+                translatedText = error.localizedDescription
+            }
             isTranslating = false
         }
     }
 
+    func completeAppleTranslation(requestID: UUID, text: String) {
+        guard self.requestID == requestID else { return }
+        translatedText = text
+        isTranslating = false
+        appleRequestID = nil
+    }
+
+    func failAppleTranslation(requestID: UUID, message: String) {
+        guard self.requestID == requestID else { return }
+        translatedText = message
+        isTranslating = false
+        appleRequestID = nil
+    }
+
     func swapLanguages() {
-        let previousSource = sourceText
-        sourceText = translatedText.replacingOccurrences(
-            of: "\n\n\(TranslateL10n.string("plugin.translate.mock.note"))",
-            with: ""
-        )
-        if sourceText.hasPrefix(TranslateL10n.string("plugin.translate.mock.note")) {
-            sourceText = previousSource
-        }
+        sourceText = translatedText
         let previousTarget = targetLanguage
         targetLanguage = detectedLanguage
         detectedLanguage = previousTarget
@@ -87,7 +131,7 @@ final class TranslationSession: ObservableObject {
 
 @MainActor
 final class TranslationPanelController: NSWindowController {
-    private let session = TranslationSession()
+    private let session = TranslationPanelModel()
 
     convenience init() {
         let panel = NSPanel(
@@ -148,7 +192,7 @@ final class TranslationPanelController: NSWindowController {
 }
 
 private struct TranslationPanelView: View {
-    @ObservedObject var session: TranslationSession
+    @ObservedObject var session: TranslationPanelModel
     @Environment(\.colorScheme) private var colorScheme
     let onClose: () -> Void
 
@@ -162,6 +206,7 @@ private struct TranslationPanelView: View {
         .padding(12)
         .background(tokens.page)
         .frame(width: 380)
+        .modifier(AppleTranslationBridge(session: session))
     }
 
     private var header: some View {
@@ -258,7 +303,7 @@ private struct TranslationPanelView: View {
                 Image(systemName: "character.book.closed.fill")
                     .font(.system(size: 12))
                     .foregroundStyle(tokens.ink)
-                Text("plugin.translate.engine.mock", tableName: TranslateL10n.tableName, bundle: TranslateL10n.bundle)
+                Text(session.engine.localizedName)
                     .font(.system(size: 12, weight: .medium))
                     .foregroundStyle(tokens.ink)
                 Spacer()
@@ -372,3 +417,67 @@ private struct PanelTokens {
         border: Color.white.opacity(0.12)
     )
 }
+
+private struct AppleTranslationBridge: ViewModifier {
+    @ObservedObject var session: TranslationPanelModel
+
+    func body(content: Content) -> some View {
+        #if canImport(Translation)
+        if #available(macOS 15.0, *) {
+            AppleTranslationTaskBridge(session: session, content: content)
+        } else {
+            content
+        }
+        #else
+        content
+        #endif
+    }
+}
+
+#if canImport(Translation)
+@available(macOS 15.0, *)
+private struct AppleTranslationTaskBridge<Panel: View>: View {
+    @ObservedObject var session: TranslationPanelModel
+    let content: Panel
+    @State private var configuration: TranslationSession.Configuration?
+
+    var body: some View {
+        content
+            .onAppear(perform: applyConfiguration)
+            .onChange(of: session.appleRequestID) { _, requestID in
+                guard requestID != nil else { return }
+                applyConfiguration()
+            }
+            .translationTask(configuration) { appleSession in
+                guard let requestID = session.appleRequestID else { return }
+                let text = session.sourceText
+                do {
+                    let response = try await appleSession.translate(text)
+                    session.completeAppleTranslation(requestID: requestID, text: response.targetText)
+                } catch is CancellationError {
+                    return
+                } catch {
+                    session.failAppleTranslation(
+                        requestID: requestID,
+                        message: error.localizedDescription.isEmpty
+                            ? TranslatorError.systemFailed.localizedDescription
+                            : error.localizedDescription
+                    )
+                }
+            }
+    }
+
+    private func applyConfiguration() {
+        guard session.appleRequestID != nil else { return }
+        let source = Locale.Language(identifier: session.detectedLanguage.appleIdentifier)
+        let target = Locale.Language(identifier: session.targetLanguage.appleIdentifier)
+        if configuration == nil {
+            configuration = TranslationSession.Configuration(source: source, target: target)
+            return
+        }
+        configuration?.source = source
+        configuration?.target = target
+        configuration?.invalidate()
+    }
+}
+#endif

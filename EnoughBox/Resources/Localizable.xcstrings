@@ -549,9 +549,6 @@
         }
       }
     },
-    "plugin.translate.engine.mock" : {
-
-    },
     "plugin.translate.name" : {
       "localizations" : {
         "en" : {
@@ -574,10 +571,25 @@
     "plugin.translate.settings.accessibilityHint" : {
 
     },
+    "plugin.translate.settings.apiKey" : {
+
+    },
+    "plugin.translate.settings.appID" : {
+
+    },
+    "plugin.translate.settings.appSecret" : {
+
+    },
+    "plugin.translate.settings.baseURL" : {
+
+    },
+    "plugin.translate.settings.credentials" : {
+
+    },
     "plugin.translate.settings.engine" : {
 
     },
-    "plugin.translate.settings.footer" : {
+    "plugin.translate.settings.model" : {
 
     },
     "plugin.translate.settings.openAccessibility" : {

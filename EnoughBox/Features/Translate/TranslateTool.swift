@@ -61,68 +61,34 @@ enum TranslateL10n {
     }
 }
 
-enum TranslateLanguage: String, CaseIterable, Identifiable {
-    case zhHans = "zh-Hans"
-    case en
-
-    var id: String { rawValue }
-
-    var localizedName: String {
-        switch self {
-        case .zhHans:
-            return TranslateL10n.string("plugin.translate.language.zhHans")
-        case .en:
-            return TranslateL10n.string("plugin.translate.language.en")
-        }
-    }
-
-    var speechLanguage: String {
-        switch self {
-        case .zhHans: return "zh-CN"
-        case .en: return "en-US"
-        }
-    }
-}
-
-enum TranslateSettings {
-    private static let targetKey = "com.enoughbox.translate.targetLanguage"
-
-    static var targetLanguage: TranslateLanguage {
-        get {
-            TranslateLanguage(rawValue: UserDefaults.standard.string(forKey: targetKey) ?? "") ?? .zhHans
-        }
-        set {
-            UserDefaults.standard.set(newValue.rawValue, forKey: targetKey)
-        }
-    }
-}
-
 private struct TranslateSettingsView: View {
-    @Environment(\.colorScheme) private var colorScheme
+    @Environment(\.designTokens) private var tokens
 
     @State private var targetLanguage = TranslateSettings.targetLanguage
+    @State private var engine = TranslateSettings.engine
+    @State private var youdaoAppID = TranslateSettings.youdaoAppID
+    @State private var youdaoAppSecret = TranslateSettings.youdaoAppSecret
+    @State private var youdaoAPIKey = TranslateSettings.youdaoAPIKey
+    @State private var deepSeekAPIKey = TranslateSettings.deepSeekAPIKey
+    @State private var deepSeekModel = TranslateSettings.deepSeekModel
+    @State private var deepSeekBaseURL = TranslateSettings.deepSeekBaseURL
 
     var body: some View {
         VStack(alignment: .leading, spacing: 14) {
             translationSection
+            credentialsSection
             accessibilitySection
         }
         .frame(maxWidth: .infinity, alignment: .leading)
         .padding(.vertical, 4)
+        .environment(\.openURL, OpenURLAction { _ in .discarded })
     }
 
     private var translationSection: some View {
         VStack(alignment: .leading, spacing: 12) {
-            Text("plugin.translate.settings.section", tableName: TranslateL10n.tableName, bundle: TranslateL10n.bundle)
-                .font(.system(size: 11, weight: .semibold))
-                .foregroundStyle(sectionHeaderColor)
-                .textCase(.uppercase)
+            settingsHeader("plugin.translate.settings.section")
 
-            HStack {
-                Text("plugin.translate.settings.target", tableName: TranslateL10n.tableName, bundle: TranslateL10n.bundle)
-                    .font(.system(size: 13))
-                    .foregroundStyle(bodyColor)
-                Spacer(minLength: 8)
+            settingsRow("plugin.translate.settings.target") {
                 Picker("", selection: $targetLanguage) {
                     ForEach(TranslateLanguage.allCases) { language in
                         Text(language.localizedName).tag(language)
@@ -135,40 +101,115 @@ private struct TranslateSettingsView: View {
                 }
             }
 
-            HStack {
-                Text("plugin.translate.settings.engine", tableName: TranslateL10n.tableName, bundle: TranslateL10n.bundle)
-                    .font(.system(size: 13))
-                    .foregroundStyle(bodyColor)
-                Spacer(minLength: 8)
-                Text("plugin.translate.engine.mock", tableName: TranslateL10n.tableName, bundle: TranslateL10n.bundle)
-                    .font(.system(size: 13))
-                    .foregroundStyle(mutedColor)
+            settingsRow("plugin.translate.settings.engine") {
+                Picker("", selection: $engine) {
+                    ForEach(TranslationEngine.allCases) { item in
+                        Text(item.localizedName).tag(item)
+                    }
+                }
+                .labelsHidden()
+                .frame(width: 160)
+                .onChange(of: engine) { _, newValue in
+                    TranslateSettings.engine = newValue
+                }
             }
 
-            Text("plugin.translate.settings.footer", tableName: TranslateL10n.tableName, bundle: TranslateL10n.bundle)
-                .font(.system(size: 11))
-                .foregroundStyle(mutedColor)
-                .fixedSize(horizontal: false, vertical: true)
+            hintText(engineFooterKey)
         }
-        .frame(maxWidth: .infinity, alignment: .leading)
-        .padding(12)
-        .background(cardBackground, in: RoundedRectangle(cornerRadius: 10, style: .continuous))
-        .overlay(
-            RoundedRectangle(cornerRadius: 10, style: .continuous)
-                .strokeBorder(cardBorder, lineWidth: 1)
-        )
+        .settingsCard(tokens: tokens)
+    }
+
+    @ViewBuilder
+    private var credentialsSection: some View {
+        switch engine {
+        case .youdao:
+            VStack(alignment: .leading, spacing: 12) {
+                settingsHeader("plugin.translate.settings.credentials")
+                labeledField("plugin.translate.settings.appID", text: $youdaoAppID) {
+                    TranslateSettings.youdaoAppID = youdaoAppID
+                }
+                labeledField("plugin.translate.settings.appSecret", text: $youdaoAppSecret) {
+                    TranslateSettings.youdaoAppSecret = youdaoAppSecret
+                }
+                labeledField("plugin.translate.settings.apiKey", text: $youdaoAPIKey) {
+                    TranslateSettings.youdaoAPIKey = youdaoAPIKey
+                }
+                hintText("plugin.translate.settings.youdaoHint")
+            }
+            .settingsCard(tokens: tokens)
+        case .deepseek:
+            VStack(alignment: .leading, spacing: 12) {
+                settingsHeader("plugin.translate.settings.credentials")
+                labeledField("plugin.translate.settings.apiKey", text: $deepSeekAPIKey) {
+                    TranslateSettings.deepSeekAPIKey = deepSeekAPIKey
+                }
+                labeledField("plugin.translate.settings.model", text: $deepSeekModel) {
+                    TranslateSettings.deepSeekModel = deepSeekModel
+                }
+                labeledField("plugin.translate.settings.baseURL", text: $deepSeekBaseURL) {
+                    TranslateSettings.deepSeekBaseURL = deepSeekBaseURL
+                }
+                hintText("plugin.translate.settings.deepseekHint")
+            }
+            .settingsCard(tokens: tokens)
+        case .system:
+            EmptyView()
+        }
+    }
+
+    private var engineFooterKey: String {
+        switch engine {
+        case .system:
+            return "plugin.translate.settings.systemHint"
+        case .youdao, .deepseek:
+            return "plugin.translate.settings.footer"
+        }
+    }
+
+    private func hintText(_ key: String) -> some View {
+        Text(verbatim: TranslateL10n.string(key))
+            .font(.system(size: 11))
+            .foregroundStyle(tokens.inkMuted)
+            .fixedSize(horizontal: false, vertical: true)
+    }
+
+    private func settingsHeader(_ key: LocalizedStringKey) -> some View {
+        Text(key, tableName: TranslateL10n.tableName, bundle: TranslateL10n.bundle)
+            .font(.system(size: 11, weight: .semibold))
+            .foregroundStyle(tokens.inkMuted)
+            .textCase(.uppercase)
+    }
+
+    private func settingsRow<Content: View>(_ key: LocalizedStringKey, @ViewBuilder content: () -> Content) -> some View {
+        HStack {
+            Text(key, tableName: TranslateL10n.tableName, bundle: TranslateL10n.bundle)
+                .font(.system(size: 13))
+                .foregroundStyle(tokens.ink)
+            Spacer(minLength: 8)
+            content()
+        }
+    }
+
+    private func labeledField(_ key: LocalizedStringKey, text: Binding<String>, save: @escaping () -> Void) -> some View {
+        VStack(alignment: .leading, spacing: 6) {
+            Text(key, tableName: TranslateL10n.tableName, bundle: TranslateL10n.bundle)
+                .font(.system(size: 12))
+                .foregroundStyle(tokens.inkSoft)
+            TextField("", text: text)
+                .textFieldStyle(.roundedBorder)
+                .onChange(of: text.wrappedValue) { _, _ in
+                    save()
+                }
+        }
     }
 
     private var accessibilitySection: some View {
         VStack(alignment: .leading, spacing: 10) {
-            Text("plugin.translate.settings.accessibility", tableName: TranslateL10n.tableName, bundle: TranslateL10n.bundle)
-                .font(.system(size: 11, weight: .semibold))
-                .foregroundStyle(sectionHeaderColor)
-                .textCase(.uppercase)
+            settingsHeader("plugin.translate.settings.accessibility")
 
             Text("plugin.translate.settings.accessibilityHint", tableName: TranslateL10n.tableName, bundle: TranslateL10n.bundle)
                 .font(.system(size: 11))
-                .foregroundStyle(mutedColor)
+                .foregroundStyle(tokens.inkMuted)
                 .fixedSize(horizontal: false, vertical: true)
 
             HStack {
@@ -178,8 +219,8 @@ private struct TranslateSettingsView: View {
                         .font(.system(size: 12, weight: .medium))
                         .padding(.horizontal, 12)
                         .padding(.vertical, 7)
-                        .foregroundStyle(bodyColor)
-                        .background(bodyColor.opacity(colorScheme == .dark ? 0.14 : 0.08), in: Capsule())
+                        .foregroundStyle(tokens.ink)
+                        .background(tokens.ink.opacity(0.1), in: Capsule())
                 }
                 .buttonStyle(.plain)
                 .contentShape(Capsule())
@@ -192,53 +233,22 @@ private struct TranslateSettingsView: View {
                 }
             }
         }
-        .frame(maxWidth: .infinity, alignment: .leading)
-        .padding(12)
-        .background(cardBackground, in: RoundedRectangle(cornerRadius: 10, style: .continuous))
-        .overlay(
-            RoundedRectangle(cornerRadius: 10, style: .continuous)
-                .strokeBorder(cardBorder, lineWidth: 1)
-        )
-    }
-
-    private var sectionHeaderColor: Color {
-        colorScheme == .dark
-            ? Color(red: 176 / 255, green: 176 / 255, blue: 179 / 255)
-            : Color(red: 110 / 255, green: 110 / 255, blue: 115 / 255)
-    }
-
-    private var bodyColor: Color {
-        colorScheme == .dark
-            ? Color(red: 224 / 255, green: 224 / 255, blue: 224 / 255)
-            : Color(red: 29 / 255, green: 29 / 255, blue: 31 / 255)
-    }
-
-    private var mutedColor: Color {
-        colorScheme == .dark
-            ? Color(red: 176 / 255, green: 176 / 255, blue: 179 / 255)
-            : Color(red: 110 / 255, green: 110 / 255, blue: 115 / 255)
-    }
-
-    private var cardBackground: Color {
-        colorScheme == .dark
-            ? Color(red: 48 / 255, green: 48 / 255, blue: 50 / 255)
-            : Color.white
-    }
-
-    private var cardBorder: Color {
-        colorScheme == .dark ? Color.white.opacity(0.12) : Color.black.opacity(0.08)
+        .settingsCard(tokens: tokens)
     }
 
     private func openAccessibilitySettings() {
         SelectionCapture.requestAccessibilityTrust()
-        let urls = [
-            "x-apple.systempreferences:com.apple.settings.PrivacySecurity.extension?Privacy_Accessibility",
-            "x-apple.systempreferences:com.apple.preference.security?Privacy_Accessibility",
-        ]
-        for string in urls {
-            if let url = URL(string: string), NSWorkspace.shared.open(url) {
-                return
-            }
-        }
+    }
+}
+
+private extension View {
+    func settingsCard(tokens: DesignTokens) -> some View {
+        frame(maxWidth: .infinity, alignment: .leading)
+            .padding(12)
+            .background(tokens.card, in: RoundedRectangle(cornerRadius: 10, style: .continuous))
+            .overlay(
+                RoundedRectangle(cornerRadius: 10, style: .continuous)
+                    .strokeBorder(tokens.border, lineWidth: 1)
+            )
     }
 }

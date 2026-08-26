@@ -5,7 +5,8 @@
 - 源码：`EnoughBox/Features/Translate/`
 - 运行时：`EnoughBox.app` 内置工具
 - 启用状态：`~/Library/Application Support/EnoughBox/registry.json`
-- 当前翻译引擎：Mock，仅用于验证界面和流程
+- 当前翻译引擎：有道 NMT / DeepSeek / 系统翻译
+- 密钥：UserDefaults，与目标语言等设置相同
 - 快捷键：`com.enoughbox.translate.selection`
 
 内置翻译工具负责快捷键、翻译流程和面板 UI；选区读取由宿主服务提供。
@@ -99,7 +100,9 @@ cat "$HOME/Library/Application Support/EnoughBox/registry.json"
 - [ ] `Cmd+B` 成功
 - [ ] EnoughBox 能启动
 - [ ] 翻译工具能正常打开
-- [ ] 翻译浮窗内输入文字可以得到 Mock 译文
+- [ ] 翻译浮窗内输入文字可以得到译文
+- [ ] 可在设置中切换有道 / DeepSeek / 系统翻译
+- [ ] 有道与 DeepSeek 的密钥可在设置中保存并用于翻译
 - [ ] 在外部 App 选中文字后按快捷键可以翻译
 - [ ] 没有选区且剪贴板为空时显示无选区提示
 - [ ] 辅助功能未授权时不会把剪贴板旧内容误当成当前选区

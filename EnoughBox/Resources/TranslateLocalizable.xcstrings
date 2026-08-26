@@ -18,19 +18,291 @@
         }
       }
     },
+    "plugin.translate.engine.deepseek" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "DeepSeek"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "DeepSeek"
+          }
+        }
+      }
+    },
     "plugin.translate.engine.mock" : {
       "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Youdao (mock)"
+            "value" : "Mock"
           }
         },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "有道翻译（模拟）"
+            "value" : "模拟"
+          }
+        }
+      }
+    },
+    "plugin.translate.engine.system" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "System"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "系统翻译"
+          }
+        }
+      }
+    },
+    "plugin.translate.engine.youdao" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Youdao"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "有道翻译"
+          }
+        }
+      }
+    },
+    "plugin.translate.error.cancelled" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Translation cancelled"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "已取消翻译"
+          }
+        }
+      }
+    },
+    "plugin.translate.error.empty" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Enter text to translate"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "请输入要翻译的文本"
+          }
+        }
+      }
+    },
+    "plugin.translate.error.http" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "HTTP %d"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "HTTP %d"
+          }
+        }
+      }
+    },
+    "plugin.translate.error.invalidURL" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "The API URL is invalid"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "接口 URL 无效"
+          }
+        }
+      }
+    },
+    "plugin.translate.error.missingDeepSeek" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Add your DeepSeek API key in tool settings"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "请先在工具设置里填写 DeepSeek API Key"
+          }
+        }
+      }
+    },
+    "plugin.translate.error.missingYoudao" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Add your Youdao app ID and secret in tool settings"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "请先在工具设置里填写有道应用 ID 和应用密钥"
+          }
+        }
+      }
+    },
+    "plugin.translate.error.network" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Network request failed"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "网络请求失败"
+          }
+        }
+      }
+    },
+    "plugin.translate.error.systemFailed" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Translation failed"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "翻译失败"
+          }
+        }
+      }
+    },
+    "plugin.translate.error.systemUnavailable" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "System translation needs macOS 15 or later"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "系统翻译需要 macOS 15 或更高版本"
+          }
+        }
+      }
+    },
+    "plugin.translate.error.timeout" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Translation timed out"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "翻译超时"
+          }
+        }
+      }
+    },
+    "plugin.translate.error.youdaoCode" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Youdao error %@"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "有道错误 %@"
+          }
+        }
+      }
+    },
+    "plugin.translate.error.youdaoQuota" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Youdao quota or rate limit was exceeded"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "有道额度不足或请求过于频繁"
+          }
+        }
+      }
+    },
+    "plugin.translate.error.youdaoSign" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Youdao signature failed. Check the app ID and secret."
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "有道签名失败，请检查应用 ID 和应用密钥"
           }
         }
       }
@@ -154,6 +426,108 @@
         }
       }
     },
+    "plugin.translate.settings.apiKey" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "API key"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "API Key"
+          }
+        }
+      }
+    },
+    "plugin.translate.settings.appID" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "App ID"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "应用 ID"
+          }
+        }
+      }
+    },
+    "plugin.translate.settings.appSecret" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "App secret"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "应用密钥"
+          }
+        }
+      }
+    },
+    "plugin.translate.settings.baseURL" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "API URL"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "接口 URL"
+          }
+        }
+      }
+    },
+    "plugin.translate.settings.credentials" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Credentials"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "密钥"
+          }
+        }
+      }
+    },
+    "plugin.translate.settings.deepseekHint" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Fill the full chat completions URL, for example https://api.deepseek.com/chat/completions. Default model is deepseek-v4-flash."
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "请填写完整接口 URL，例如 https://api.deepseek.com/chat/completions。默认模型为 deepseek-v4-flash。"
+          }
+        }
+      }
+    },
     "plugin.translate.settings.engine" : {
       "extractionState" : "stale",
       "localizations" : {
@@ -177,13 +551,47 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Results are mocked until a translation API is connected. Selection is used first; otherwise clipboard text."
+            "value" : "Selection is used first; otherwise clipboard text."
           }
         },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "目前使用模拟译文，正式 API 稍后再接。优先翻译划词；没有选中则用剪贴板里的文本。"
+            "value" : "优先翻译划词；没有选中则用剪贴板。"
+          }
+        }
+      }
+    },
+    "plugin.translate.settings.mockHint" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Mock results for UI testing. No network request is sent."
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "仅用于界面联调，不会发网络请求。"
+          }
+        }
+      }
+    },
+    "plugin.translate.settings.model" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Model ID"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "模型 ID"
           }
         }
       }
@@ -222,6 +630,23 @@
         }
       }
     },
+    "plugin.translate.settings.systemHint" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Uses Apple Translation on macOS 15 or later. The system may download language packs on first use. Selection is used first; otherwise clipboard text."
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "使用 macOS 15 及以上的系统翻译。首次使用时系统可能会下载语言包。优先划词，没有选中则用剪贴板。"
+          }
+        }
+      }
+    },
     "plugin.translate.settings.target" : {
       "extractionState" : "stale",
       "localizations" : {
@@ -235,6 +660,23 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "目标语言"
+          }
+        }
+      }
+    },
+    "plugin.translate.settings.youdaoHint" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Use Youdao text translation (NMT). App ID and app secret are required. API key is optional if it is the same as the app ID."
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "使用有道文本翻译（NMT）。应用 ID 和应用密钥必填；若控制台把应用 ID 标成 API Key，填其中一个即可。"
           }
         }
       }
