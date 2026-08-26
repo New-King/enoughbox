@@ -4,6 +4,12 @@ import AppKit
 final class ScreenshotPinController: NSObject, NSWindowDelegate {
     private var panels: [NSPanel] = []
 
+    var protectedWindowIDs: Set<CGWindowID> {
+        Set(panels.compactMap { panel in
+            panel.windowNumber > 0 ? CGWindowID(panel.windowNumber) : nil
+        })
+    }
+
     func pin(_ image: CGImage) {
         let screen = NSScreen.screens.first(where: { $0.frame.contains(NSEvent.mouseLocation) }) ?? NSScreen.main
         guard let screen else { return }

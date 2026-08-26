@@ -16,6 +16,8 @@
 		C0DE0001C0DE0001C0DE0004 /* YoudaoTranslator.swift in Sources */ = {isa = PBXBuildFile; fileRef = C0DE0001C0DE0001C0DE0003 /* YoudaoTranslator.swift */; };
 		C0DE0001C0DE0001C0DE0006 /* DeepSeekTranslator.swift in Sources */ = {isa = PBXBuildFile; fileRef = C0DE0001C0DE0001C0DE0005 /* DeepSeekTranslator.swift */; };
 		C0DE0001C0DE0001C0DE0011 /* CropGeometry.swift in Sources */ = {isa = PBXBuildFile; fileRef = C0DE0001C0DE0001C0DE0010 /* CropGeometry.swift */; };
+		C0DE0001C0DE0001C0DE0021 /* ScreenshotCapturePolicy.swift in Sources */ = {isa = PBXBuildFile; fileRef = C0DE0001C0DE0001C0DE0020 /* ScreenshotCapturePolicy.swift */; };
+		C0DE0001C0DE0001C0DE0023 /* ScreenshotGeometry.swift in Sources */ = {isa = PBXBuildFile; fileRef = C0DE0001C0DE0001C0DE0022 /* ScreenshotGeometry.swift */; };
 		C0DE0001C0DE0001C0DE0013 /* ScreenCapture.swift in Sources */ = {isa = PBXBuildFile; fileRef = C0DE0001C0DE0001C0DE0012 /* ScreenCapture.swift */; };
 		C0DE0001C0DE0001C0DE0015 /* ScreenshotMosaic.swift in Sources */ = {isa = PBXBuildFile; fileRef = C0DE0001C0DE0001C0DE0014 /* ScreenshotMosaic.swift */; };
 		C0DE0001C0DE0001C0DE0017 /* ScreenshotOverlay.swift in Sources */ = {isa = PBXBuildFile; fileRef = C0DE0001C0DE0001C0DE0016 /* ScreenshotOverlay.swift */; };
@@ -60,6 +62,8 @@
 		C0DE0001C0DE0001C0DE0003 /* YoudaoTranslator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = YoudaoTranslator.swift; sourceTree = "<group>"; };
 		C0DE0001C0DE0001C0DE0005 /* DeepSeekTranslator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeepSeekTranslator.swift; sourceTree = "<group>"; };
 		C0DE0001C0DE0001C0DE0010 /* CropGeometry.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CropGeometry.swift; sourceTree = "<group>"; };
+		C0DE0001C0DE0001C0DE0020 /* ScreenshotCapturePolicy.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScreenshotCapturePolicy.swift; sourceTree = "<group>"; };
+		C0DE0001C0DE0001C0DE0022 /* ScreenshotGeometry.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScreenshotGeometry.swift; sourceTree = "<group>"; };
 		C0DE0001C0DE0001C0DE0012 /* ScreenCapture.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScreenCapture.swift; sourceTree = "<group>"; };
 		C0DE0001C0DE0001C0DE0014 /* ScreenshotMosaic.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScreenshotMosaic.swift; sourceTree = "<group>"; };
 		C0DE0001C0DE0001C0DE0016 /* ScreenshotOverlay.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScreenshotOverlay.swift; sourceTree = "<group>"; };
@@ -108,6 +112,8 @@
 			children = (
 				7134855C14460D4F364127DF /* SelectionCapture.swift */,
 				C0DE0001C0DE0001C0DE0010 /* CropGeometry.swift */,
+				C0DE0001C0DE0001C0DE0020 /* ScreenshotCapturePolicy.swift */,
+				C0DE0001C0DE0001C0DE0022 /* ScreenshotGeometry.swift */,
 				C0DE0001C0DE0001C0DE0012 /* ScreenCapture.swift */,
 			);
 			path = HostServices;
@@ -364,6 +370,8 @@
 				380BC38145D7A1851ABEB894 /* MainView.swift in Sources */,
 				BA6F1A0D0DA29688E644415E /* SelectionCapture.swift in Sources */,
 				C0DE0001C0DE0001C0DE0011 /* CropGeometry.swift in Sources */,
+				C0DE0001C0DE0001C0DE0021 /* ScreenshotCapturePolicy.swift in Sources */,
+				C0DE0001C0DE0001C0DE0023 /* ScreenshotGeometry.swift in Sources */,
 				C0DE0001C0DE0001C0DE0013 /* ScreenCapture.swift in Sources */,
 				F388ADD80A9428352261C67E /* ShortcutRecorderField.swift in Sources */,
 				DCB529BC069B942C9AD53E1C /* ShortcutSettingsViewController.swift in Sources */,

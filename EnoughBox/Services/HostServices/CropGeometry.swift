@@ -19,4 +19,21 @@ enum CropGeometry {
         .integral
         .intersection(CGRect(x: 0, y: 0, width: imageSize.width, height: imageSize.height))
     }
+
+    /// Maps a selection inside a snapped window rect onto a window-only capture.
+    static func cropRectWithinWindow(
+        selection: CGRect,
+        windowRect: CGRect,
+        screenSize: CGSize,
+        imageSize: CGSize
+    ) -> CGRect {
+        guard windowRect.width > 0, windowRect.height > 0 else { return .zero }
+        let relative = CGRect(
+            x: selection.minX - windowRect.minX,
+            y: selection.minY - windowRect.minY,
+            width: selection.width,
+            height: selection.height
+        )
+        return cropRect(localRect: relative, screenSize: windowRect.size, imageSize: imageSize)
+    }
 }

@@ -3,12 +3,53 @@ import CoreGraphics
 import UniformTypeIdentifiers
 
 private final class ScreenshotPanel: NSPanel {
+    let overlayView: ScreenshotOverlayView
+
+    init(screen: NSScreen, frozen: FrozenDisplay, pickableWindows: [ScreenshotGeometry.PickableWindow]) {
+        let frame = screen.frame
+        overlayView = ScreenshotOverlayView(
+            frame: CGRect(origin: .zero, size: frame.size),
+            frozen: frozen,
+            pickableWindows: pickableWindows
+        )
+        super.init(
+            contentRect: frame,
+            styleMask: [.borderless, .nonactivatingPanel],
+            backing: .buffered,
+            defer: false
+        )
+        isReleasedWhenClosed = false
+        setFrame(frame, display: false)
+        level = NSWindow.Level(rawValue: Int(CGShieldingWindowLevel()))
+        collectionBehavior = [.canJoinAllSpaces, .fullScreenAuxiliary, .stationary, .ignoresCycle]
+        isOpaque = true
+        backgroundColor = .black
+        sharingType = .none
+        hasShadow = false
+        animationBehavior = .none
+        hidesOnDeactivate = false
+        acceptsMouseMovedEvents = true
+        ignoresMouseEvents = false
+
+        let container = NSView(frame: CGRect(origin: .zero, size: frame.size))
+        let imageView = NSImageView(frame: container.bounds)
+        imageView.image = NSImage(cgImage: frozen.image, size: frame.size)
+        imageView.imageScaling = .scaleAxesIndependently
+        imageView.autoresizingMask = [.width, .height]
+        container.addSubview(imageView)
+        overlayView.autoresizingMask = [.width, .height]
+        container.addSubview(overlayView)
+        contentView = container
+    }
+
     override var canBecomeKey: Bool { true }
     override var canBecomeMain: Bool { false }
 }
 
 @MainActor
 final class ScreenshotOverlayController {
+    private(set) static var isSessionOnScreen = false
+
     var onCopied: ((String) -> Void)?
     var onSaved: ((String) -> Void)?
     var onPermissionDenied: (() -> Void)?
@@ -17,21 +58,25 @@ final class ScreenshotOverlayController {
     private var panels: [ScreenshotPanel] = []
     private let pinController = ScreenshotPinController()
     private var sessionActive = false
+    private var keyMonitor: Any?
+    private var globalKeyMonitor: Any?
 
     func start() {
-        guard !sessionActive else { return }
+        guard !sessionActive, !Self.isSessionOnScreen else { return }
         if !ScreenCapture.requestAccess() {
             onPermissionDenied?()
             return
         }
         sessionActive = true
+        Self.isSessionOnScreen = true
+        let protectedIDs = protectedWindowIDs()
         Task { @MainActor [weak self] in
             guard let self else { return }
             do {
-                let frames = try await ScreenCapture.freezeDisplays()
-                self.present(frames: frames)
+                let displays = try await ScreenCapture.freezeDisplays(protectedWindowIDs: protectedIDs)
+                self.present(displays: displays, protectedWindowIDs: protectedIDs)
             } catch {
-                self.sessionActive = false
+                self.endSession()
                 self.onFailed?()
             }
         }
@@ -41,56 +86,78 @@ final class ScreenshotOverlayController {
         dismiss(copyColor: false)
     }
 
-    private func present(frames: [FrozenDisplay]) {
+    private func protectedWindowIDs() -> Set<CGWindowID> {
+        pinController.protectedWindowIDs
+    }
+
+    private func present(displays: [FrozenDisplay], protectedWindowIDs: Set<CGWindowID>) {
         let mouse = NSEvent.mouseLocation
         var created: [ScreenshotPanel] = []
-        for frame in frames {
-            let view = ScreenshotOverlayView(
-                frame: CGRect(origin: .zero, size: frame.screen.frame.size),
-                frozen: frame
+        for frozen in displays {
+            let pickable = ScreenshotGeometry.pickableWindows(
+                on: frozen.screen,
+                protectedWindowIDs: protectedWindowIDs
             )
-            view.onAction = { [weak self] action in
-                self?.handle(action, from: view)
+            let panel = ScreenshotPanel(screen: frozen.screen, frozen: frozen, pickableWindows: pickable)
+            panel.overlayView.onAction = { [weak self] action in
+                self?.handle(action, from: panel.overlayView)
             }
-            let panel = ScreenshotPanel(
-                contentRect: frame.screen.frame,
-                styleMask: [.borderless, .nonactivatingPanel],
-                backing: .buffered,
-                defer: false
-            )
-            panel.setFrame(frame.screen.frame, display: false)
-            panel.level = .screenSaver
-            panel.collectionBehavior = [.canJoinAllSpaces, .fullScreenAuxiliary]
-            panel.isOpaque = true
-            panel.backgroundColor = .black
-            panel.sharingType = .none
-            panel.hasShadow = false
-            panel.animationBehavior = .none
-            panel.acceptsMouseMovedEvents = true
-            panel.ignoresMouseEvents = false
-            panel.contentView = view
             created.append(panel)
         }
         panels = created
         for panel in created {
             panel.orderFrontRegardless()
         }
+        installKeyMonitors()
         let active = created.first(where: { $0.frame.contains(mouse) }) ?? created.first
         active?.makeKey()
-        if let view = active?.contentView as? ScreenshotOverlayView {
+        if let view = active?.overlayView {
             active?.makeFirstResponder(view)
+            view.bootstrap(atScreenPoint: mouse)
         }
         NSCursor.crosshair.set()
+    }
+
+    private func installKeyMonitors() {
+        keyMonitor = NSEvent.addLocalMonitorForEvents(matching: .keyDown) { [weak self] event in
+            guard let self, event.window is ScreenshotPanel else { return event }
+            if event.keyCode == 53 {
+                self.dismiss(copyColor: false)
+                return nil
+            }
+            return event
+        }
+        globalKeyMonitor = NSEvent.addGlobalMonitorForEvents(matching: .keyDown) { [weak self] event in
+            guard event.keyCode == 53 else { return }
+            self?.dismiss(copyColor: false)
+        }
+    }
+
+    private func removeKeyMonitors() {
+        if let keyMonitor {
+            NSEvent.removeMonitor(keyMonitor)
+            self.keyMonitor = nil
+        }
+        if let globalKeyMonitor {
+            NSEvent.removeMonitor(globalKeyMonitor)
+            self.globalKeyMonitor = nil
+        }
+    }
+
+    private func markCapturePending() {
+        panels.forEach { $0.overlayView.isCapturePending = true }
     }
 
     private func handle(_ action: ScreenshotOverlayAction, from view: ScreenshotOverlayView) {
         switch action {
         case .cancel:
             dismiss(copyColor: false)
-        case .copyColor(let text):
+        case .copyColor(let text, let dismissAfter):
             NSPasteboard.general.clearContents()
             NSPasteboard.general.setString(text, forType: .string)
-            dismiss(copyColor: true)
+            if dismissAfter {
+                dismiss(copyColor: true)
+            }
             onCopied?(String(format: ScreenshotL10n.string("plugin.screenshot.toast.color"), text))
         case .confirm:
             guard let image = view.croppedImage() else {
@@ -107,6 +174,18 @@ final class ScreenshotOverlayController {
             guard let image = view.croppedImage() else { return }
             dismiss(copyColor: false)
             pinController.pin(image)
+        case .captureWindow(let windowID, let frame):
+            markCapturePending()
+            let scale = view.displayScale
+            Task { @MainActor [weak self] in
+                guard let self else { return }
+                guard let image = await ScreenCapture.captureWindow(windowID, scale: scale) else {
+                    view.isCapturePending = false
+                    self.onFailed?()
+                    return
+                }
+                view.applyWindowCapture(image, windowRect: frame)
+            }
         }
     }
 
@@ -153,13 +232,19 @@ final class ScreenshotOverlayController {
     }
 
     private func dismiss(copyColor: Bool) {
+        endSession()
+        _ = copyColor
+    }
+
+    private func endSession() {
+        removeKeyMonitors()
         NSCursor.arrow.set()
         for panel in panels {
             panel.orderOut(nil)
         }
         panels = []
         sessionActive = false
-        _ = copyColor
+        Self.isSessionOnScreen = false
     }
 }
 
@@ -168,7 +253,8 @@ private enum ScreenshotOverlayAction {
     case confirm
     case save
     case pin
-    case copyColor(String)
+    case copyColor(String, dismissAfter: Bool)
+    case captureWindow(CGWindowID, CGRect)
 }
 
 private enum ResizeEdge {
@@ -177,22 +263,29 @@ private enum ResizeEdge {
 
 private final class ScreenshotOverlayView: NSView {
     private let frozen: FrozenDisplay
+    private let pickableWindows: [ScreenshotGeometry.PickableWindow]
     private var workingImage: CGImage
+    private var windowCaptureRect: CGRect?
     private var selection = CGRect.zero
     private var committed = false
     private var mosaicArmed = false
     private var dragStart: CGPoint?
     private var dragEdge: ResizeEdge?
     private var mosaicStart: CGPoint?
+    private var isCustomDragging = false
     private var hoverPoint: CGPoint = .zero
     private var sampled: SampledColor?
+    var isCapturePending = false
     var onAction: ((ScreenshotOverlayAction) -> Void)?
 
     private let toolbar = ScreenshotToolbar()
     private let colorHUD = ScreenshotColorHUD()
 
-    init(frame: CGRect, frozen: FrozenDisplay) {
+    var displayScale: CGFloat { frozen.screen.backingScaleFactor }
+
+    init(frame: CGRect, frozen: FrozenDisplay, pickableWindows: [ScreenshotGeometry.PickableWindow]) {
         self.frozen = frozen
+        self.pickableWindows = pickableWindows
         self.workingImage = frozen.image
         super.init(frame: frame)
         wantsLayer = true
@@ -205,6 +298,30 @@ private final class ScreenshotOverlayView: NSView {
     }
 
     required init?(coder: NSCoder) { nil }
+
+    func bootstrap(atScreenPoint screenPoint: CGPoint) {
+        let local = CGPoint(
+            x: screenPoint.x - frozen.screen.frame.origin.x,
+            y: screenPoint.y - frozen.screen.frame.origin.y
+        )
+        hoverPoint = local
+        applyWindowSnap(at: local)
+        refreshColor()
+        needsDisplay = true
+    }
+
+    func applyWindowCapture(_ image: CGImage, windowRect: CGRect) {
+        workingImage = image
+        windowCaptureRect = windowRect
+        selection = windowRect
+        isCapturePending = false
+        commitSelection()
+        needsDisplay = true
+    }
+
+    private var acceptsPointerInput: Bool {
+        ScreenshotGeometry.selectionAcceptsPointerInput(capturePending: isCapturePending)
+    }
 
     override var acceptsFirstResponder: Bool { true }
     override func acceptsFirstMouse(for event: NSEvent?) -> Bool { true }
@@ -220,8 +337,12 @@ private final class ScreenshotOverlayView: NSView {
     }
 
     override func mouseMoved(with event: NSEvent) {
+        guard acceptsPointerInput else { return }
         hoverPoint = convert(event.locationInWindow, from: nil)
         refreshColor()
+        if !committed, !isCustomDragging {
+            applyWindowSnap(at: hoverPoint)
+        }
         if committed, !mosaicArmed {
             window?.invalidateCursorRects(for: self)
         }
@@ -244,6 +365,7 @@ private final class ScreenshotOverlayView: NSView {
     }
 
     override func mouseDown(with event: NSEvent) {
+        guard acceptsPointerInput else { return }
         let point = convert(event.locationInWindow, from: nil)
         if committed {
             if let edge = hitHandle(point) {
@@ -263,19 +385,17 @@ private final class ScreenshotOverlayView: NSView {
             return
         }
         dragStart = point
-        selection = CGRect(origin: point, size: .zero)
-        committed = false
-        needsDisplay = true
+        isCustomDragging = false
     }
 
     override func mouseDragged(with event: NSEvent) {
+        guard acceptsPointerInput else { return }
         let point = convert(event.locationInWindow, from: nil)
         hoverPoint = point
         refreshColor()
         if let mosaicStart, mosaicArmed {
-            needsDisplay = true
-            self.mosaicStart = mosaicStart
             currentMosaicEnd = point
+            needsDisplay = true
             return
         }
         if committed, let edge = dragEdge, let start = dragStart {
@@ -286,18 +406,28 @@ private final class ScreenshotOverlayView: NSView {
             return
         }
         guard let start = dragStart, !committed else { return }
-        selection = CGRect(
-            x: min(start.x, point.x),
-            y: min(start.y, point.y),
-            width: abs(point.x - start.x),
-            height: abs(point.y - start.y)
+        if !isCustomDragging, !ScreenshotGeometry.isClick(from: start, to: point) {
+            isCustomDragging = true
+            selection = CGRect(origin: start, size: .zero)
+        }
+        guard isCustomDragging else { return }
+        selection = ScreenshotGeometry.clamp(
+            CGRect(
+                x: min(start.x, point.x),
+                y: min(start.y, point.y),
+                width: abs(point.x - start.x),
+                height: abs(point.y - start.y)
+            ),
+            to: bounds
         )
+        colorHUD.isHidden = true
         needsDisplay = true
     }
 
     private var currentMosaicEnd: CGPoint?
 
     override func mouseUp(with event: NSEvent) {
+        guard acceptsPointerInput else { return }
         let point = convert(event.locationInWindow, from: nil)
         if let mosaicStart, mosaicArmed {
             let rect = CGRect(
@@ -315,14 +445,29 @@ private final class ScreenshotOverlayView: NSView {
             return
         }
         dragEdge = nil
+        guard let start = dragStart else { return }
         dragStart = nil
-        if !committed, selection.width >= 8, selection.height >= 8 {
-            committed = true
-            toolbar.isHidden = false
-            layoutChrome()
-        } else if !committed {
-            selection = .zero
+        if !committed {
+            if isCustomDragging {
+                if selection.width >= 8, selection.height >= 8 {
+                    commitSelection()
+                } else {
+                    selection = .zero
+                    isCustomDragging = false
+                    applyWindowSnap(at: hoverPoint)
+                    refreshColorHUDVisibility()
+                }
+            } else if ScreenshotGeometry.isClick(from: start, to: point),
+                      let target = ScreenshotGeometry.window(at: point, in: pickableWindows) {
+                onAction?(.captureWindow(target.windowID, target.frame))
+            } else {
+                applyWindowSnap(at: point)
+                if selection.width >= 8, selection.height >= 8 {
+                    commitSelection()
+                }
+            }
         }
+        isCustomDragging = false
         window?.invalidateCursorRects(for: self)
         needsDisplay = true
     }
@@ -336,23 +481,26 @@ private final class ScreenshotOverlayView: NSView {
             if committed { onAction?(.confirm) }
             return
         }
-        if event.charactersIgnoringModifiers == "/" {
-            if let sampled {
-                onAction?(.copyColor(sampled.pasteboard))
-            } else {
-                onAction?(.cancel)
-            }
+        if event.modifierFlags.contains(.command),
+           event.charactersIgnoringModifiers?.lowercased() == "c",
+           !committed,
+           let sampled {
+            onAction?(.copyColor(sampled.pasteboard, dismissAfter: false))
             return
         }
         super.keyDown(with: event)
     }
 
-    func currentColorText() -> String? {
-        sampled?.pasteboard
-    }
-
     func croppedImage() -> CGImage? {
         guard !selection.isEmpty else { return nil }
+        if let windowCaptureRect {
+            return try? ScreenCapture.cropWithinWindow(
+                workingImage,
+                selection: selection,
+                windowRect: windowCaptureRect,
+                screenSize: bounds.size
+            )
+        }
         return try? ScreenCapture.crop(workingImage, localRect: selection, screenSize: bounds.size)
     }
 
@@ -361,21 +509,19 @@ private final class ScreenshotOverlayView: NSView {
     }
 
     override func draw(_ dirtyRect: NSRect) {
-        super.draw(dirtyRect)
-        let image = NSImage(cgImage: workingImage, size: bounds.size)
-        image.draw(in: bounds)
+        let dimAlpha: CGFloat = 0.36
         if selection.isEmpty {
-            NSColor.black.withAlphaComponent(0.36).setFill()
+            NSColor.black.withAlphaComponent(dimAlpha).setFill()
             bounds.fill()
         } else {
             let dim = NSBezierPath(rect: bounds)
             dim.append(NSBezierPath(rect: selection))
             dim.windingRule = .evenOdd
-            NSColor.black.withAlphaComponent(0.36).setFill()
+            NSColor.black.withAlphaComponent(dimAlpha).setFill()
             dim.fill()
             NSColor.white.setStroke()
             let border = NSBezierPath(rect: selection.insetBy(dx: 0.5, dy: 0.5))
-            border.lineWidth = 1
+            border.lineWidth = committed ? 1 : 2
             border.stroke()
             if committed {
                 NSColor.white.setFill()
@@ -405,13 +551,49 @@ private final class ScreenshotOverlayView: NSView {
     }
 
     private func bakeMosaic(_ localRect: CGRect) {
-        let pixel = CropGeometry.cropRect(
-            localRect: localRect,
-            screenSize: bounds.size,
-            imageSize: CGSize(width: workingImage.width, height: workingImage.height)
-        )
+        let imageSize = CGSize(width: workingImage.width, height: workingImage.height)
+        let pixel: CGRect
+        if let windowCaptureRect {
+            pixel = CropGeometry.cropRectWithinWindow(
+                selection: localRect,
+                windowRect: windowCaptureRect,
+                screenSize: bounds.size,
+                imageSize: imageSize
+            )
+        } else {
+            pixel = CropGeometry.cropRect(
+                localRect: localRect,
+                screenSize: bounds.size,
+                imageSize: imageSize
+            )
+        }
         workingImage = ScreenshotMosaic.apply(to: workingImage, pixelRect: pixel)
         needsDisplay = true
+    }
+
+    private func commitSelection() {
+        committed = true
+        toolbar.isHidden = false
+        colorHUD.isHidden = true
+        layoutChrome()
+    }
+
+    private func applyWindowSnap(at viewPoint: CGPoint) {
+        if let window = ScreenshotGeometry.window(at: viewPoint, in: pickableWindows) {
+            selection = window.frame
+            return
+        }
+        selection = .zero
+    }
+
+    private func screenPoint(fromViewPoint viewPoint: CGPoint) -> CGPoint {
+        guard let window = self.window else { return .zero }
+        let windowPoint = convert(viewPoint, to: nil)
+        return window.convertToScreen(CGRect(origin: windowPoint, size: .zero)).origin
+    }
+
+    private func refreshColorHUDVisibility() {
+        colorHUD.isHidden = committed || isCustomDragging
     }
 
     private func handleToolbar(_ item: ScreenshotToolbar.Item) {
@@ -440,20 +622,41 @@ private final class ScreenshotOverlayView: NSView {
         }
         origin.x = min(max(8, origin.x), bounds.maxX - barSize.width - 8)
         toolbar.frame = CGRect(origin: origin, size: barSize)
-        placeColorHUD()
     }
 
     private func refreshColor() {
         sampled = PixelSampler.sample(image: frozen.image, viewPoint: hoverPoint, viewSize: bounds.size)
-        colorHUD.update(sampled)
-        placeColorHUD()
+        if !committed, !isCustomDragging {
+            let screenPoint = screenPoint(fromViewPoint: hoverPoint)
+            colorHUD.update(
+                sample: sampled,
+                screenPoint: screenPoint,
+                image: frozen.image,
+                viewPoint: hoverPoint,
+                viewSize: bounds.size
+            )
+            refreshColorHUDVisibility()
+            placeColorHUD()
+        }
     }
 
     private func placeColorHUD() {
         let size = colorHUD.fittingSize
-        var origin = CGPoint(x: hoverPoint.x + 16, y: hoverPoint.y - size.height - 16)
-        origin.x = min(max(8, origin.x), bounds.maxX - size.width - 8)
-        origin.y = min(max(8, origin.y), bounds.maxY - size.height - 8)
+        let margin: CGFloat = 12
+        let offset: CGFloat = 18
+        var origin = CGPoint(x: hoverPoint.x + offset, y: hoverPoint.y - size.height - offset)
+        if origin.y < margin {
+            origin.y = hoverPoint.y + offset
+        }
+        if origin.y + size.height > bounds.maxY - margin {
+            origin.y = bounds.maxY - size.height - margin
+        }
+        if origin.x + size.width > bounds.maxX - margin {
+            origin.x = hoverPoint.x - size.width - offset
+        }
+        if origin.x < margin {
+            origin.x = margin
+        }
         colorHUD.frame = CGRect(origin: origin, size: size)
     }
 
@@ -521,7 +724,7 @@ private final class ScreenshotOverlayView: NSView {
             rect.origin.x += dx
             rect.origin.y += dy
         }
-        rect = rect.standardized.intersection(bounds)
+        rect = ScreenshotGeometry.clamp(rect.standardized, to: bounds)
         if rect.width >= 8, rect.height >= 8 {
             selection = rect
         }
@@ -531,7 +734,7 @@ private final class ScreenshotOverlayView: NSView {
 private struct SampledColor {
     let hex: String
     let rgb: String
-    var pasteboard: String { "\(hex)  \(rgb)" }
+    var pasteboard: String { hex }
     let nsColor: NSColor
 }
 
@@ -613,47 +816,163 @@ private final class ScreenshotToolbar: NSView {
     }
 }
 
+private final class ScreenshotMagnifierView: NSView {
+    private var sampleImage: CGImage?
+
+    override func draw(_ dirtyRect: NSRect) {
+        guard let context = NSGraphicsContext.current?.cgContext else { return }
+        context.setFillColor(CGColor(gray: 1, alpha: 1))
+        context.fill(bounds)
+
+        if let sampleImage {
+            context.saveGState()
+            context.interpolationQuality = .none
+            context.draw(sampleImage, in: bounds)
+            context.restoreGState()
+        }
+
+        // Ring reticle: arms stop before the target pixel so the sample stays visible.
+        let center = CGPoint(x: bounds.midX, y: bounds.midY)
+        let pixelSize = CGSize(
+            width: bounds.width / CGFloat(max(sampleImage?.width ?? 11, 1)),
+            height: bounds.height / CGFloat(max(sampleImage?.height ?? 11, 1))
+        )
+        let ring = CGRect(
+            x: center.x - pixelSize.width / 2,
+            y: center.y - pixelSize.height / 2,
+            width: pixelSize.width,
+            height: pixelSize.height
+        ).insetBy(dx: -1, dy: -1)
+
+        let reticle = CGMutablePath()
+        reticle.addRect(ring)
+        let arms: [(CGPoint, CGPoint)] = [
+            (CGPoint(x: ring.midX, y: bounds.minY), CGPoint(x: ring.midX, y: ring.minY)),
+            (CGPoint(x: ring.midX, y: ring.maxY), CGPoint(x: ring.midX, y: bounds.maxY)),
+            (CGPoint(x: bounds.minX, y: ring.midY), CGPoint(x: ring.minX, y: ring.midY)),
+            (CGPoint(x: ring.maxX, y: ring.midY), CGPoint(x: bounds.maxX, y: ring.midY)),
+        ]
+        for (start, end) in arms where end.x > start.x || end.y > start.y {
+            reticle.move(to: start)
+            reticle.addLine(to: end)
+        }
+
+        context.saveGState()
+        context.addPath(reticle)
+        context.setStrokeColor(CGColor(gray: 0, alpha: 0.76))
+        context.setLineWidth(2)
+        context.strokePath()
+        context.addPath(reticle)
+        context.setStrokeColor(CGColor(gray: 1, alpha: 0.92))
+        context.setLineWidth(1)
+        context.strokePath()
+        context.restoreGState()
+    }
+
+    func update(image: CGImage, viewPoint: CGPoint, viewSize: CGSize) {
+        let sampleSize = 11
+        let half = CGFloat(sampleSize) / 2
+        let pixelRect = CropGeometry.cropRect(
+            localRect: CGRect(
+                x: viewPoint.x - half,
+                y: viewPoint.y - half,
+                width: CGFloat(sampleSize),
+                height: CGFloat(sampleSize)
+            ),
+            screenSize: viewSize,
+            imageSize: CGSize(width: image.width, height: image.height)
+        )
+        sampleImage = image.cropping(to: pixelRect)
+        needsDisplay = true
+    }
+}
+
 private final class ScreenshotColorHUD: NSView {
-    private let swatch = NSView(frame: .zero)
-    private let label = NSTextField(labelWithString: "")
+    private let magnifier = ScreenshotMagnifierView(frame: .zero)
+    private let coordTitle = NSTextField(labelWithString: "")
+    private let coordValue = NSTextField(labelWithString: "")
+    private let colorTitle = NSTextField(labelWithString: "")
+    private let colorValue = NSTextField(labelWithString: "")
+    private let hintLabel = NSTextField(labelWithString: "")
+
+    private static let magnifierSize: CGFloat = 88
+    private static let panelWidth: CGFloat = 196
+    private static let padding: CGFloat = 10
 
     override init(frame frameRect: NSRect) {
         super.init(frame: frameRect)
         wantsLayer = true
-        layer?.backgroundColor = NSColor(calibratedWhite: 0.12, alpha: 0.92).cgColor
-        layer?.cornerRadius = 8
+        layer?.backgroundColor = NSColor.white.cgColor
+        layer?.cornerRadius = 6
         layer?.borderWidth = 1
-        layer?.borderColor = NSColor.white.withAlphaComponent(0.12).cgColor
-        swatch.wantsLayer = true
-        swatch.layer?.cornerRadius = 4
-        swatch.layer?.borderWidth = 1
-        swatch.layer?.borderColor = NSColor.white.withAlphaComponent(0.2).cgColor
-        label.font = .monospacedSystemFont(ofSize: 11, weight: .medium)
-        label.textColor = NSColor(white: 0.9, alpha: 1)
-        label.backgroundColor = .clear
-        label.isBezeled = false
-        addSubview(swatch)
-        addSubview(label)
+        layer?.borderColor = NSColor(calibratedWhite: 0.78, alpha: 1).cgColor
+
+        coordTitle.stringValue = ScreenshotL10n.string("plugin.screenshot.color.coord")
+        colorTitle.stringValue = ScreenshotL10n.string("plugin.screenshot.color.value")
+        hintLabel.stringValue = ScreenshotL10n.string("plugin.screenshot.color.copyHint")
+
+        for field in [coordTitle, colorTitle] {
+            field.font = .systemFont(ofSize: 12)
+            field.textColor = NSColor(calibratedWhite: 0.45, alpha: 1)
+        }
+        for field in [coordValue, colorValue] {
+            field.font = .monospacedDigitSystemFont(ofSize: 12, weight: .regular)
+            field.textColor = NSColor(calibratedWhite: 0.15, alpha: 1)
+        }
+        hintLabel.font = .systemFont(ofSize: 11)
+        hintLabel.textColor = NSColor(calibratedWhite: 0.55, alpha: 1)
+
+        for field in [coordTitle, coordValue, colorTitle, colorValue, hintLabel] {
+            field.backgroundColor = .clear
+            field.isBezeled = false
+            addSubview(field)
+        }
+        magnifier.wantsLayer = true
+        magnifier.layer?.borderWidth = 1
+        magnifier.layer?.borderColor = NSColor(calibratedWhite: 0.85, alpha: 1).cgColor
+        addSubview(magnifier)
     }
 
     required init?(coder: NSCoder) { nil }
 
-    override var fittingSize: NSSize { NSSize(width: 168, height: 28) }
+    override var fittingSize: NSSize {
+        let infoHeight: CGFloat = 72
+        let height = Self.padding + Self.magnifierSize + 8 + infoHeight + Self.padding
+        return NSSize(width: Self.panelWidth, height: height)
+    }
 
-    func update(_ sample: SampledColor?) {
+    func update(
+        sample: SampledColor?,
+        screenPoint: CGPoint,
+        image: CGImage,
+        viewPoint: CGPoint,
+        viewSize: CGSize
+    ) {
         guard let sample else {
             isHidden = true
             return
         }
         isHidden = false
-        swatch.layer?.backgroundColor = sample.nsColor.cgColor
-        label.stringValue = sample.hex
+        magnifier.update(image: image, viewPoint: viewPoint, viewSize: viewSize)
+        coordValue.stringValue = "\(Int(screenPoint.x.rounded())), \(Int(screenPoint.y.rounded()))"
+        colorValue.stringValue = sample.hex
         needsLayout = true
     }
 
     override func layout() {
         super.layout()
-        swatch.frame = CGRect(x: 6, y: 6, width: 16, height: 16)
-        label.frame = CGRect(x: 28, y: 4, width: bounds.width - 34, height: 20)
+        let width = bounds.width
+        magnifier.frame = CGRect(
+            x: Self.padding,
+            y: bounds.height - Self.padding - Self.magnifierSize,
+            width: width - Self.padding * 2,
+            height: Self.magnifierSize
+        )
+        let rowY = Self.padding + 44
+        coordTitle.frame = CGRect(x: Self.padding, y: rowY, width: 44, height: 16)
+        coordValue.frame = CGRect(x: Self.padding + 48, y: rowY, width: width - Self.padding * 2 - 48, height: 16)
+        colorTitle.frame = CGRect(x: Self.padding, y: rowY - 20, width: 44, height: 16)
+        colorValue.frame = CGRect(x: Self.padding + 48, y: rowY - 20, width: width - Self.padding * 2 - 48, height: 16)
+        hintLabel.frame = CGRect(x: Self.padding, y: Self.padding, width: width - Self.padding * 2, height: 16)
     }
 }

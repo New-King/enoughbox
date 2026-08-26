@@ -86,19 +86,70 @@
         }
       }
     },
+    "plugin.screenshot.color.coord" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Coord"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "坐标"
+          }
+        }
+      }
+    },
+    "plugin.screenshot.color.copyHint" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Press ⌘C to copy color"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "按 ⌘C 复制色值"
+          }
+        }
+      }
+    },
+    "plugin.screenshot.color.value" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Color"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "色值"
+          }
+        }
+      }
+    },
     "plugin.screenshot.settings.colorHint" : {
       "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "While capturing, the pointer shows HEX/RGB. Press / to copy that color and leave capture."
+            "value" : "Move the pointer to sample color in the magnifier. Press ⌘C to copy the HEX value."
           }
         },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "截图过程中指针旁会显示 HEX/RGB。按 / 复制该颜色并结束本次截图。"
+            "value" : "移动指针可在放大镜中取色。按 ⌘C 复制色值。"
           }
         }
       }
@@ -109,13 +160,13 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Needs Screen Recording permission. After a region is selected you can resize it, mosaic, pin, save, copy, or cancel."
+            "value" : "Needs Screen Recording permission. Hover to snap to a window; click to select it, or drag for a custom region. Then resize, mosaic, pin, save, copy, or cancel."
           }
         },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "需要屏幕录制权限。框选后可再调大小，也可马赛克、钉图、保存、复制或取消。"
+            "value" : "需要屏幕录制权限。悬停可吸附窗口，单击选中；按住拖动可自定义区域。之后可调大小、马赛克、钉图、保存、复制或取消。"
           }
         }
       }
