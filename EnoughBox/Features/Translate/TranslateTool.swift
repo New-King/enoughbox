@@ -27,10 +27,6 @@ final class TranslateTool {
         panelController = nil
     }
 
-    func makeSettingsViewController() -> NSViewController {
-        TranslateSettingsHostingController(rootView: TranslateSettingsView())
-    }
-
     private func translateSelection() {
         captureTask?.cancel()
         captureTask = Task { @MainActor [weak self] in
@@ -52,22 +48,6 @@ final class TranslateTool {
     }
 }
 
-private final class TranslateSettingsHostingController: NSHostingController<TranslateSettingsView> {
-    private var didClearInitialFocus = false
-
-    override func viewDidAppear() {
-        super.viewDidAppear()
-        guard !didClearInitialFocus else { return }
-        didClearInitialFocus = true
-        DispatchQueue.main.async { [weak self] in
-            guard let self, let window = self.view.window else { return }
-            if window.firstResponder is NSTextView || window.firstResponder is NSTextField {
-                window.makeFirstResponder(self.view)
-            }
-        }
-    }
-}
-
 enum TranslateL10n {
     static let bundle = Bundle.main
     static let tableName = "TranslateLocalizable"
@@ -77,8 +57,9 @@ enum TranslateL10n {
     }
 }
 
-private struct TranslateSettingsView: View {
+struct TranslateSettingsView: View {
     @Environment(\.designTokens) private var tokens
+    @FocusState private var focusedField: String?
 
     @State private var targetLanguage = TranslateSettings.targetLanguage
     @State private var engine = TranslateSettings.engine
@@ -132,7 +113,7 @@ private struct TranslateSettingsView: View {
 
             hintText(engineFooterKey)
         }
-        .settingsCard(tokens: tokens)
+        .settingsCard(tokens: tokens, resignFocus: resignFocus)
     }
 
     @ViewBuilder
@@ -141,33 +122,33 @@ private struct TranslateSettingsView: View {
         case .youdao:
             VStack(alignment: .leading, spacing: 12) {
                 settingsHeader("plugin.translate.settings.credentials")
-                labeledField("plugin.translate.settings.appID", text: $youdaoAppID) {
+                labeledField("plugin.translate.settings.appID", field: "youdao.appID", text: $youdaoAppID) {
                     TranslateSettings.youdaoAppID = youdaoAppID
                 }
-                labeledField("plugin.translate.settings.appSecret", text: $youdaoAppSecret) {
+                labeledField("plugin.translate.settings.appSecret", field: "youdao.appSecret", text: $youdaoAppSecret) {
                     TranslateSettings.youdaoAppSecret = youdaoAppSecret
                 }
-                labeledField("plugin.translate.settings.apiKey", text: $youdaoAPIKey) {
+                labeledField("plugin.translate.settings.apiKey", field: "youdao.apiKey", text: $youdaoAPIKey) {
                     TranslateSettings.youdaoAPIKey = youdaoAPIKey
                 }
                 hintText("plugin.translate.settings.youdaoHint")
             }
-            .settingsCard(tokens: tokens)
+            .settingsCard(tokens: tokens, resignFocus: resignFocus)
         case .deepseek:
             VStack(alignment: .leading, spacing: 12) {
                 settingsHeader("plugin.translate.settings.credentials")
-                labeledField("plugin.translate.settings.apiKey", text: $deepSeekAPIKey) {
+                labeledField("plugin.translate.settings.apiKey", field: "deepseek.apiKey", text: $deepSeekAPIKey) {
                     TranslateSettings.deepSeekAPIKey = deepSeekAPIKey
                 }
-                labeledField("plugin.translate.settings.model", text: $deepSeekModel) {
+                labeledField("plugin.translate.settings.model", field: "deepseek.model", text: $deepSeekModel) {
                     TranslateSettings.deepSeekModel = deepSeekModel
                 }
-                labeledField("plugin.translate.settings.baseURL", text: $deepSeekBaseURL) {
+                labeledField("plugin.translate.settings.baseURL", field: "deepseek.baseURL", text: $deepSeekBaseURL) {
                     TranslateSettings.deepSeekBaseURL = deepSeekBaseURL
                 }
                 hintText("plugin.translate.settings.deepseekHint")
             }
-            .settingsCard(tokens: tokens)
+            .settingsCard(tokens: tokens, resignFocus: resignFocus)
         case .system:
             EmptyView()
         }
@@ -182,11 +163,16 @@ private struct TranslateSettingsView: View {
         }
     }
 
+    private func resignFocus() {
+        focusedField = nil
+    }
+
     private func hintText(_ key: String) -> some View {
         Text(verbatim: TranslateL10n.string(key))
             .font(.system(size: 11))
             .foregroundStyle(tokens.inkMuted)
             .fixedSize(horizontal: false, vertical: true)
+            .onTapGesture(perform: resignFocus)
     }
 
     private func settingsHeader(_ key: LocalizedStringKey) -> some View {
@@ -194,6 +180,7 @@ private struct TranslateSettingsView: View {
             .font(.system(size: 11, weight: .semibold))
             .foregroundStyle(tokens.inkMuted)
             .textCase(.uppercase)
+            .onTapGesture(perform: resignFocus)
     }
 
     private func settingsRow<Content: View>(_ key: LocalizedStringKey, @ViewBuilder content: () -> Content) -> some View {
@@ -201,18 +188,26 @@ private struct TranslateSettingsView: View {
             Text(key, tableName: TranslateL10n.tableName, bundle: TranslateL10n.bundle)
                 .font(.system(size: 13))
                 .foregroundStyle(tokens.ink)
+                .onTapGesture(perform: resignFocus)
             Spacer(minLength: 8)
             content()
         }
     }
 
-    private func labeledField(_ key: LocalizedStringKey, text: Binding<String>, save: @escaping () -> Void) -> some View {
+    private func labeledField(
+        _ key: LocalizedStringKey,
+        field: String,
+        text: Binding<String>,
+        save: @escaping () -> Void
+    ) -> some View {
         VStack(alignment: .leading, spacing: 6) {
             Text(key, tableName: TranslateL10n.tableName, bundle: TranslateL10n.bundle)
                 .font(.system(size: 12))
                 .foregroundStyle(tokens.inkSoft)
+                .onTapGesture(perform: resignFocus)
             TextField("", text: text)
                 .textFieldStyle(.roundedBorder)
+                .focused($focusedField, equals: field)
                 .onChange(of: text.wrappedValue) { _, _ in
                     save()
                 }
@@ -227,6 +222,7 @@ private struct TranslateSettingsView: View {
                 .font(.system(size: 11))
                 .foregroundStyle(tokens.inkMuted)
                 .fixedSize(horizontal: false, vertical: true)
+                .onTapGesture(perform: resignFocus)
 
             HStack {
                 Spacer()
@@ -249,7 +245,7 @@ private struct TranslateSettingsView: View {
                 }
             }
         }
-        .settingsCard(tokens: tokens)
+        .settingsCard(tokens: tokens, resignFocus: resignFocus)
     }
 
     private func openAccessibilitySettings() {
@@ -258,10 +254,15 @@ private struct TranslateSettingsView: View {
 }
 
 private extension View {
-    func settingsCard(tokens: DesignTokens) -> some View {
+    func settingsCard(tokens: DesignTokens, resignFocus: @escaping () -> Void) -> some View {
         frame(maxWidth: .infinity, alignment: .leading)
             .padding(12)
-            .background(tokens.card, in: RoundedRectangle(cornerRadius: 10, style: .continuous))
+            .background {
+                RoundedRectangle(cornerRadius: 10, style: .continuous)
+                    .fill(tokens.card)
+                    .contentShape(RoundedRectangle(cornerRadius: 10, style: .continuous))
+                    .onTapGesture(perform: resignFocus)
+            }
             .overlay(
                 RoundedRectangle(cornerRadius: 10, style: .continuous)
                     .strokeBorder(tokens.border, lineWidth: 1)

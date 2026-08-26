@@ -12,14 +12,15 @@ struct ToolDetailView: View {
         ScrollView {
             VStack(alignment: .leading, spacing: 16) {
                 header
+                    .onTapGesture(perform: resignFocus)
 
                 if tool.capabilities.contains(.hotkey),
                    let shortcutName = HotkeyCatalogHost.recorderName(forToolID: tool.id) {
                     shortcutCard(name: shortcutName, footerKey: shortcutFooterKey)
                 }
 
-                if let settings = appState.toolManager.settingsViewController(for: tool.id) {
-                    toolSettingsCard(settings, toolID: tool.id)
+                if tool.id == TranslateTool.id {
+                    TranslateSettingsView()
                 } else {
                     missingToolView
                 }
@@ -27,6 +28,12 @@ struct ToolDetailView: View {
             .padding(.horizontal, 28)
             .padding(.top, 20)
             .padding(.bottom, 24)
+            .frame(maxWidth: .infinity, alignment: .leading)
+            .background {
+                tokens.shell
+                    .contentShape(Rectangle())
+                    .onTapGesture(perform: resignFocus)
+            }
         }
         .defaultScrollAnchor(.top)
         .background(tokens.shell)
@@ -34,6 +41,10 @@ struct ToolDetailView: View {
         .onAppear {
             appState.toolManager.load(toolID: tool.id)
         }
+    }
+
+    private func resignFocus() {
+        NSApp.keyWindow?.makeFirstResponder(nil)
     }
 
     private var shortcutFooterKey: LocalizedStringKey {
@@ -49,17 +60,16 @@ struct ToolDetailView: View {
         ToolShortcutSettingsCard(shortcutName: name, footerKey: footerKey)
             .frame(maxWidth: .infinity, alignment: .leading)
             .padding(16)
-            .background(tokens.card, in: RoundedRectangle(cornerRadius: 11, style: .continuous))
+            .background {
+                RoundedRectangle(cornerRadius: 11, style: .continuous)
+                    .fill(tokens.card)
+                    .contentShape(RoundedRectangle(cornerRadius: 11, style: .continuous))
+                    .onTapGesture(perform: resignFocus)
+            }
             .overlay(
                 RoundedRectangle(cornerRadius: 11, style: .continuous)
                     .strokeBorder(tokens.border, lineWidth: 1)
             )
-    }
-
-    private func toolSettingsCard(_ viewController: NSViewController, toolID: String) -> some View {
-        ToolSettingsContainer(viewController: viewController)
-            .id(toolID)
-            .frame(maxWidth: .infinity, alignment: .leading)
     }
 
     private var header: some View {
@@ -111,28 +121,6 @@ struct ToolDetailView: View {
         }
         .frame(maxWidth: .infinity)
         .padding(.vertical, 24)
-    }
-}
-
-private struct ToolSettingsContainer: NSViewControllerRepresentable {
-    let viewController: NSViewController
-
-    func makeCoordinator() -> Coordinator {
-        Coordinator(viewController: viewController)
-    }
-
-    func makeNSViewController(context: Context) -> NSViewController {
-        context.coordinator.viewController
-    }
-
-    func updateNSViewController(_ nsViewController: NSViewController, context: Context) {}
-
-    final class Coordinator {
-        let viewController: NSViewController
-
-        init(viewController: NSViewController) {
-            self.viewController = viewController
-        }
     }
 }
 
