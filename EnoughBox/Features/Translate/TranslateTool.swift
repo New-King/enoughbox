@@ -1,57 +1,49 @@
 import AppKit
-import EnoughBoxPluginSDK
 import SwiftUI
 
-@objc(TranslatePluginPlugin)
-public final class TranslatePluginPlugin: NSObject, EnoughBoxPlugin {
-    private weak var host: HostServices?
+@MainActor
+final class TranslateTool {
+    static let id = "com.enoughbox.translate"
+
+    private let toastHandler: (String) -> Void
     private var panelController: TranslationPanelController?
+    private var captureTask: Task<Void, Never>?
 
-    public var id: String { "com.enoughbox.translate" }
-    public var iconName: String { "character.book.closed" }
-    public var version: String { "0.1.0" }
-
-    public func localizedName(for locale: Locale) -> String {
-        let language = locale.language.languageCode?.identifier ?? "en"
-        return language.hasPrefix("zh") ? "翻译" : "Translate"
+    init(toastHandler: @escaping (String) -> Void) {
+        self.toastHandler = toastHandler
     }
 
-    public func activate(host: HostServices) {
-        self.host = host
-        guard let hotkeys = host as? HostServicesHotkeys else { return }
-
-        hotkeys.registerHotkey(HotkeyCatalog.translateSelectionID) { [weak self] in
+    func activate() {
+        HotkeyCenter.shared.register(HotkeyCatalog.translateSelectionID) { [weak self] in
             self?.translateSelection()
         }
     }
 
-    public func deactivate() {
-        (host as? HostServicesHotkeys)?.unregisterHotkey(HotkeyCatalog.translateSelectionID)
-        Task { @MainActor [weak self] in
-            self?.panelController?.close()
-            self?.panelController = nil
-        }
-        host = nil
+    func deactivate() {
+        HotkeyCenter.shared.unregister(HotkeyCatalog.translateSelectionID)
+        captureTask?.cancel()
+        captureTask = nil
+        panelController?.close()
+        panelController = nil
     }
 
-    public func makeSettingsViewController(host: HostServices) -> NSViewController {
-        self.host = host
-        return NSHostingController(rootView: TranslateSettingsView(host: host))
+    func makeSettingsViewController() -> NSViewController {
+        NSHostingController(rootView: TranslateSettingsView())
     }
 
     private func translateSelection() {
-        let text = host?.textForTranslation() ?? ""
-        let host = self.host
-
-        Task { @MainActor [weak self] in
+        captureTask?.cancel()
+        captureTask = Task { @MainActor [weak self] in
+            guard let self else { return }
+            let text = await SelectionCapture.textForTranslation()
+            guard !Task.isCancelled else { return }
             if text.isEmpty {
-                host?.showToast(TranslateL10n.string("plugin.translate.toast.noSelection"))
+                toastHandler(TranslateL10n.string("plugin.translate.toast.noSelection"))
             }
-            self?.presentPanel(sourceText: text)
+            presentPanel(sourceText: text)
         }
     }
 
-    @MainActor
     private func presentPanel(sourceText: String) {
         if panelController == nil {
             panelController = TranslationPanelController()
@@ -61,10 +53,11 @@ public final class TranslatePluginPlugin: NSObject, EnoughBoxPlugin {
 }
 
 enum TranslateL10n {
-    static let bundle = Bundle(for: TranslatePluginPlugin.self)
+    static let bundle = Bundle.main
+    static let tableName = "TranslateLocalizable"
 
     static func string(_ key: String) -> String {
-        NSLocalizedString(key, bundle: bundle, comment: "")
+        NSLocalizedString(key, tableName: tableName, bundle: bundle, comment: "")
     }
 }
 
@@ -106,7 +99,6 @@ enum TranslateSettings {
 
 private struct TranslateSettingsView: View {
     @Environment(\.colorScheme) private var colorScheme
-    let host: HostServices
 
     @State private var targetLanguage = TranslateSettings.targetLanguage
 
@@ -121,13 +113,13 @@ private struct TranslateSettingsView: View {
 
     private var translationSection: some View {
         VStack(alignment: .leading, spacing: 12) {
-            Text("plugin.translate.settings.section", bundle: TranslateL10n.bundle)
+            Text("plugin.translate.settings.section", tableName: TranslateL10n.tableName, bundle: TranslateL10n.bundle)
                 .font(.system(size: 11, weight: .semibold))
                 .foregroundStyle(sectionHeaderColor)
                 .textCase(.uppercase)
 
             HStack {
-                Text("plugin.translate.settings.target", bundle: TranslateL10n.bundle)
+                Text("plugin.translate.settings.target", tableName: TranslateL10n.tableName, bundle: TranslateL10n.bundle)
                     .font(.system(size: 13))
                     .foregroundStyle(bodyColor)
                 Spacer(minLength: 8)
@@ -144,16 +136,16 @@ private struct TranslateSettingsView: View {
             }
 
             HStack {
-                Text("plugin.translate.settings.engine", bundle: TranslateL10n.bundle)
+                Text("plugin.translate.settings.engine", tableName: TranslateL10n.tableName, bundle: TranslateL10n.bundle)
                     .font(.system(size: 13))
                     .foregroundStyle(bodyColor)
                 Spacer(minLength: 8)
-                Text("plugin.translate.engine.mock", bundle: TranslateL10n.bundle)
+                Text("plugin.translate.engine.mock", tableName: TranslateL10n.tableName, bundle: TranslateL10n.bundle)
                     .font(.system(size: 13))
                     .foregroundStyle(mutedColor)
             }
 
-            Text("plugin.translate.settings.footer", bundle: TranslateL10n.bundle)
+            Text("plugin.translate.settings.footer", tableName: TranslateL10n.tableName, bundle: TranslateL10n.bundle)
                 .font(.system(size: 11))
                 .foregroundStyle(mutedColor)
                 .fixedSize(horizontal: false, vertical: true)
@@ -169,12 +161,12 @@ private struct TranslateSettingsView: View {
 
     private var accessibilitySection: some View {
         VStack(alignment: .leading, spacing: 10) {
-            Text("plugin.translate.settings.accessibility", bundle: TranslateL10n.bundle)
+            Text("plugin.translate.settings.accessibility", tableName: TranslateL10n.tableName, bundle: TranslateL10n.bundle)
                 .font(.system(size: 11, weight: .semibold))
                 .foregroundStyle(sectionHeaderColor)
                 .textCase(.uppercase)
 
-            Text("plugin.translate.settings.accessibilityHint", bundle: TranslateL10n.bundle)
+            Text("plugin.translate.settings.accessibilityHint", tableName: TranslateL10n.tableName, bundle: TranslateL10n.bundle)
                 .font(.system(size: 11))
                 .foregroundStyle(mutedColor)
                 .fixedSize(horizontal: false, vertical: true)
@@ -182,7 +174,7 @@ private struct TranslateSettingsView: View {
             HStack {
                 Spacer()
                 Button(action: openAccessibilitySettings) {
-                    Text("plugin.translate.settings.openAccessibility", bundle: TranslateL10n.bundle)
+                    Text("plugin.translate.settings.openAccessibility", tableName: TranslateL10n.tableName, bundle: TranslateL10n.bundle)
                         .font(.system(size: 12, weight: .medium))
                         .padding(.horizontal, 12)
                         .padding(.vertical, 7)
@@ -238,7 +230,7 @@ private struct TranslateSettingsView: View {
     }
 
     private func openAccessibilitySettings() {
-        host.requestAccessibilityTrust()
+        SelectionCapture.requestAccessibilityTrust()
         let urls = [
             "x-apple.systempreferences:com.apple.settings.PrivacySecurity.extension?Privacy_Accessibility",
             "x-apple.systempreferences:com.apple.preference.security?Privacy_Accessibility",

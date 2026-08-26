@@ -1,10 +1,8 @@
 {
   "sourceLanguage" : "en",
   "strings" : {
-    "" : {
-
-    },
     "plugin.translate.action" : {
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -21,6 +19,7 @@
       }
     },
     "plugin.translate.engine.mock" : {
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -121,7 +120,42 @@
         }
       }
     },
+    "plugin.translate.settings.accessibility" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Accessibility"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "辅助功能"
+          }
+        }
+      }
+    },
+    "plugin.translate.settings.accessibilityHint" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "If it does not work, remove EnoughBox.app in Accessibility, quit the app, reopen it, and enable it again."
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "如果没有效果，请在辅助功能中移除 EnoughBox.app，退出应用后，重新打开并勾选。"
+          }
+        }
+      }
+    },
     "plugin.translate.settings.engine" : {
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -138,6 +172,7 @@
       }
     },
     "plugin.translate.settings.footer" : {
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -153,39 +188,8 @@
         }
       }
     },
-    "plugin.translate.settings.accessibilityHint" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "If it does not work, remove EnoughBox.app in Accessibility, quit the app, reopen it, and enable it again."
-          }
-        },
-        "zh-Hans" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "如果没有效果，请在辅助功能中移除 EnoughBox.app，退出应用后，重新打开并勾选。"
-          }
-        }
-      }
-    },
-    "plugin.translate.settings.accessibility" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Accessibility"
-          }
-        },
-        "zh-Hans" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "辅助功能"
-          }
-        }
-      }
-    },
     "plugin.translate.settings.openAccessibility" : {
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -202,6 +206,7 @@
       }
     },
     "plugin.translate.settings.section" : {
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -218,6 +223,7 @@
       }
     },
     "plugin.translate.settings.target" : {
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -234,6 +240,7 @@
       }
     },
     "plugin.translate.source.auto" : {
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -262,40 +269,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "交换语言"
-          }
-        }
-      }
-    },
-    "plugin.translate.toast.keystrokeDenied" : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "macOS blocked keystrokes. Quit EnoughBox, add this running app in Accessibility, then open it from Finder (not Xcode Run)."
-          }
-        },
-        "zh-Hans" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "系统拦住了自动复制。请完全退出 EnoughBox，在辅助功能中打开开关，再用 Xcode 点一次运行（已改成不挂调试器）。"
-          }
-        }
-      }
-    },
-    "plugin.translate.toast.needAccessibility" : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Grant Accessibility so EnoughBox can read selected text"
-          }
-        },
-        "zh-Hans" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "请授予辅助功能权限，才能读取选中的文字"
           }
         }
       }

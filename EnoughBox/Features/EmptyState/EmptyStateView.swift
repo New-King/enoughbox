@@ -26,7 +26,7 @@ struct EmptyStateView: View {
                     .frame(maxWidth: 320)
 
                 Button {
-                    appState.openPluginStore()
+                appState.openToolCenter()
                 } label: {
                     Text("empty.action.openStore")
                         .font(.system(size: 14, weight: .medium))

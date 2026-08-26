@@ -1,33 +1,21 @@
-import EnoughBoxPluginSDK
 import Foundation
 import KeyboardShortcuts
 
 extension KeyboardShortcuts.Name {
-    static let sampleTrigger = Self("com.enoughbox.sample.trigger")
     static let translateSelection = Self("com.enoughbox.translate.selection")
+}
+
+enum HotkeyCatalog {
+    static let translateSelectionID = "com.enoughbox.translate.selection"
 }
 
 enum HotkeyCatalogHost {
     static func shortcutName(for identifier: String) -> KeyboardShortcuts.Name? {
-        switch identifier {
-        case EnoughBoxPluginSDK.HotkeyCatalog.sampleTriggerID:
-            return .sampleTrigger
-        case EnoughBoxPluginSDK.HotkeyCatalog.translateSelectionID:
-            return .translateSelection
-        default:
-            return nil
-        }
+        identifier == HotkeyCatalog.translateSelectionID ? .translateSelection : nil
     }
 
-    static func recorderName(forPluginID pluginID: String) -> KeyboardShortcuts.Name? {
-        switch pluginID {
-        case "com.enoughbox.sample":
-            return .sampleTrigger
-        case "com.enoughbox.translate":
-            return .translateSelection
-        default:
-            return nil
-        }
+    static func recorderName(forToolID toolID: String) -> KeyboardShortcuts.Name? {
+        toolID == "com.enoughbox.translate" ? .translateSelection : nil
     }
 }
 
@@ -58,12 +46,9 @@ final class HotkeyCenter {
         KeyboardShortcuts.disable(name)
     }
 
-    func debugDescription(forPluginID pluginID: String) -> String {
-        guard let name = HotkeyCatalogHost.recorderName(forPluginID: pluginID),
-              let shortcut = KeyboardShortcuts.getShortcut(for: name) else {
-            return "No shortcut saved for \(pluginID)"
-        }
-        return "Shortcut for \(pluginID): \(shortcut.description)"
+    func clearShortcut(forToolID toolID: String) {
+        guard let name = HotkeyCatalogHost.recorderName(forToolID: toolID) else { return }
+        KeyboardShortcuts.setShortcut(nil, for: name)
     }
 
     func hasShortcutConflict(
@@ -86,21 +71,6 @@ final class HotkeyCenter {
         hotkeysSuspendedForRecording = false
         guard !listeningNames.isEmpty else { return }
         KeyboardShortcuts.enable(Array(listeningNames))
-    }
-
-    /// Removes persisted shortcuts when a plugin is uninstalled so reinstall starts clean.
-    func clearSavedShortcuts(forPluginID pluginID: String) {
-        guard let name = HotkeyCatalogHost.recorderName(forPluginID: pluginID) else { return }
-
-        let identifiers = handlers.keys.filter {
-            HotkeyCatalogHost.shortcutName(for: $0) == name
-        }
-        for identifier in identifiers {
-            unregister(identifier)
-        }
-
-        name.shortcut = nil
-        listeningNames.remove(name)
     }
 
     private func installListenerIfNeeded(for name: KeyboardShortcuts.Name) {

@@ -1,6 +1,6 @@
 import SwiftUI
 
-struct PluginStoreView: View {
+struct ToolCenterView: View {
     @Environment(\.designTokens) private var tokens
     @Environment(\.dismiss) private var dismiss
     @EnvironmentObject private var appState: AppState
@@ -11,8 +11,8 @@ struct PluginStoreView: View {
 
             ScrollView {
                 LazyVStack(spacing: 12) {
-                    ForEach(StorePlugin.catalog) { plugin in
-                        storeRow(plugin)
+                    ForEach(BuiltInTool.catalog) { tool in
+                        toolRow(tool)
                     }
                 }
                 .padding(20)
@@ -52,11 +52,11 @@ struct PluginStoreView: View {
     }
 
     @ViewBuilder
-    private func storeRow(_ plugin: StorePlugin) -> some View {
+    private func toolRow(_ tool: BuiltInTool) -> some View {
         HStack(alignment: .center, spacing: 14) {
-            Image(systemName: plugin.iconName)
+            Image(systemName: tool.iconName)
                 .font(.system(size: 18, weight: .medium))
-                .foregroundStyle(plugin.comingSoon ? tokens.inkFaint : tokens.ink)
+                .foregroundStyle(tokens.ink)
                 .frame(width: 40, height: 40)
                 .background(tokens.card, in: RoundedRectangle(cornerRadius: 10, style: .continuous))
                 .overlay(
@@ -66,36 +66,25 @@ struct PluginStoreView: View {
 
             VStack(alignment: .leading, spacing: 4) {
                 HStack(spacing: 8) {
-                    Text(plugin.nameKey)
+                    Text(tool.nameKey)
                         .font(.system(size: 15, weight: .semibold))
-                        .foregroundStyle(plugin.comingSoon ? tokens.inkFaint : tokens.ink)
-
-                    if plugin.comingSoon {
-                        Text("pluginStore.comingSoon")
-                            .font(.system(size: 10, weight: .semibold))
-                            .foregroundStyle(tokens.inkFaint)
-                            .padding(.horizontal, 8)
-                            .padding(.vertical, 3)
-                            .background(tokens.accentSoft, in: Capsule())
-                    }
+                        .foregroundStyle(tokens.ink)
                 }
 
-                Text(plugin.descriptionKey)
+                Text(tool.descriptionKey)
                     .font(.system(size: 13))
                     .foregroundStyle(tokens.inkMuted)
                     .fixedSize(horizontal: false, vertical: true)
 
-                if !plugin.comingSoon {
-                    Text("v\(plugin.version)")
-                        .font(.system(size: 11, design: .monospaced))
-                        .foregroundStyle(tokens.inkFaint)
-                        .padding(.top, 2)
-                }
+                Text("v\(tool.version)")
+                    .font(.system(size: 11, design: .monospaced))
+                    .foregroundStyle(tokens.inkFaint)
+                    .padding(.top, 2)
             }
 
             Spacer(minLength: 8)
 
-            PluginInstallButton(plugin: plugin)
+            ToolToggleButton(tool: tool)
         }
         .padding(16)
         .background(tokens.card, in: RoundedRectangle(cornerRadius: 11, style: .continuous))
@@ -104,12 +93,11 @@ struct PluginStoreView: View {
                 .strokeBorder(tokens.border, lineWidth: 1)
         )
         .appleShadow(tokens)
-        .opacity(plugin.comingSoon ? 0.72 : 1)
     }
 }
 
 #Preview {
-    PluginStoreView()
+            ToolCenterView()
         .environmentObject(AppState())
         .designTokensProvider()
 }

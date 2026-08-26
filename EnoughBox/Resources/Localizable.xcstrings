@@ -1,6 +1,9 @@
 {
   "sourceLanguage" : "en",
   "strings" : {
+    "" : {
+
+    },
     "app.name" : {
       "extractionState" : "stale",
       "localizations" : {
@@ -90,13 +93,13 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Open Plugin Store"
+            "value" : "Open Built-in Tools"
           }
         },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "打开插件中心"
+            "value" : "打开内置工具"
           }
         }
       }
@@ -123,13 +126,13 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "No tools installed"
+            "value" : "No tools enabled"
           }
         },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "尚未安装工具"
+            "value" : "尚未启用工具"
           }
         }
       }
@@ -139,13 +142,13 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Install what you need from the Plugin Store"
+            "value" : "Enable the tools you need"
           }
         },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "从插件中心安装需要的功能"
+            "value" : "启用你需要的工具"
           }
         }
       }
@@ -155,18 +158,19 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Nothing installed yet"
+            "value" : "Nothing enabled yet"
           }
         },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "还没有安装工具"
+            "value" : "还没有启用工具"
           }
         }
       }
     },
     "plugin.comingSoon.screenshot.description" : {
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -183,6 +187,7 @@
       }
     },
     "plugin.comingSoon.screenshot.name" : {
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -237,13 +242,13 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Plugin files are missing. Reinstall from the Plugin Store."
+            "value" : "This tool is unavailable. Enable it again from Built-in Tools."
           }
         },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "插件文件缺失，请从插件中心重新安装。"
+            "value" : "工具不可用，请从内置工具中重新启用。"
           }
         }
       }
@@ -253,13 +258,13 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Open Plugin Store"
+            "value" : "Open Built-in Tools"
           }
         },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "打开插件中心"
+            "value" : "打开内置工具"
           }
         }
       }
@@ -269,13 +274,13 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "After rebuilding in Xcode, uninstall and reinstall the plugin to refresh its bundle."
+            "value" : "Enable or remove built-in tools from the tool center."
           }
         },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "若在 Xcode 里改了代码，需先卸载再安装，才会更新插件文件。"
+            "value" : "在工具中心启用或移除内置工具。"
           }
         }
       }
@@ -298,6 +303,7 @@
       }
     },
     "plugin.sample.description" : {
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -524,6 +530,9 @@
         }
       }
     },
+    "plugin.translate.action" : {
+
+    },
     "plugin.translate.description" : {
       "localizations" : {
         "en" : {
@@ -539,6 +548,9 @@
           }
         }
       }
+    },
+    "plugin.translate.engine.mock" : {
+
     },
     "plugin.translate.name" : {
       "localizations" : {
@@ -556,6 +568,27 @@
         }
       }
     },
+    "plugin.translate.settings.accessibility" : {
+
+    },
+    "plugin.translate.settings.accessibilityHint" : {
+
+    },
+    "plugin.translate.settings.engine" : {
+
+    },
+    "plugin.translate.settings.footer" : {
+
+    },
+    "plugin.translate.settings.openAccessibility" : {
+
+    },
+    "plugin.translate.settings.section" : {
+
+    },
+    "plugin.translate.settings.target" : {
+
+    },
     "plugin.translate.shortcut.footer.active" : {
       "localizations" : {
         "en" : {
@@ -572,7 +605,11 @@
         }
       }
     },
+    "plugin.translate.source.auto" : {
+
+    },
     "pluginStore.comingSoon" : {
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -589,6 +626,7 @@
       }
     },
     "pluginStore.downloading" : {
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -643,34 +681,36 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Install"
+            "value" : "Enable"
           }
         },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "安装"
+            "value" : "启用"
           }
         }
       }
     },
     "pluginStore.installing" : {
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Installing…"
+            "value" : "Enabling…"
           }
         },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "安装中…"
+            "value" : "启用中…"
           }
         }
       }
     },
     "pluginStore.retry" : {
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -691,13 +731,13 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Plugin Store"
+            "value" : "Built-in Tools"
           }
         },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "插件中心"
+            "value" : "内置工具"
           }
         }
       }
@@ -707,29 +747,30 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Uninstall"
+            "value" : "Remove"
           }
         },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "卸载"
+            "value" : "移除"
           }
         }
       }
     },
     "pluginStore.uninstalling" : {
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Uninstalling…"
+            "value" : "Removing…"
           }
         },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "卸载中…"
+            "value" : "移除中…"
           }
         }
       }
@@ -819,13 +860,13 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Plugin Store"
+            "value" : "Built-in Tools"
           }
         },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "插件中心"
+            "value" : "内置工具"
           }
         }
       }

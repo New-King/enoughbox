@@ -2,7 +2,7 @@ import KeyboardShortcuts
 import SwiftUI
 
 /// Host-managed shortcut row. Kept outside `ScrollView` so the recorder receives clicks.
-struct PluginShortcutSettingsCard: View {
+struct ToolShortcutSettingsCard: View {
     @Environment(\.designTokens) private var tokens
     @EnvironmentObject private var appState: AppState
 

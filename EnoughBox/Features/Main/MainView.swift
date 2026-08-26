@@ -16,8 +16,8 @@ struct MainView: View {
         .toolbarBackground(tokens.nav, for: .windowToolbar)
         .toolbarBackground(.visible, for: .windowToolbar)
         .toolbar { toolbarContent }
-        .sheet(isPresented: $appState.isPluginStorePresented) {
-            PluginStoreView()
+        .sheet(isPresented: $appState.isToolCenterPresented) {
+            ToolCenterView()
                 .designTokensProvider()
         }
         .overlay(alignment: .top) {
@@ -32,22 +32,22 @@ struct MainView: View {
 
     @ViewBuilder
     private var sidebar: some View {
-        List(selection: $appState.selectedPluginID) {
+        List(selection: $appState.selectedToolID) {
             Section {
-                if appState.installedPlugins.isEmpty {
+                if appState.enabledTools.isEmpty {
                     Text("empty.sidebar.hint")
                         .font(.system(size: 12))
                         .foregroundStyle(tokens.inkFaint)
                         .padding(.vertical, 4)
                         .listRowBackground(Color.clear)
                 } else {
-                    ForEach(appState.installedPlugins) { plugin in
+                    ForEach(appState.enabledTools) { tool in
                         Label {
-                            Text(appState.displayName(for: plugin))
+                            Text(appState.displayName(for: tool))
                         } icon: {
-                            Image(systemName: plugin.iconName)
+                            Image(systemName: tool.iconName)
                         }
-                        .tag(plugin.id)
+                        .tag(tool.id)
                     }
                 }
             } header: {
@@ -64,8 +64,8 @@ struct MainView: View {
     @ViewBuilder
     private var detail: some View {
         Group {
-            if let plugin = appState.selectedPlugin {
-                PluginDetailView(plugin: plugin)
+            if let tool = appState.selectedTool {
+                ToolDetailView(tool: tool)
             } else {
                 EmptyStateView()
             }
@@ -77,7 +77,7 @@ struct MainView: View {
     private var toolbarContent: some ToolbarContent {
         ToolbarItemGroup(placement: .automatic) {
             Button {
-                appState.openPluginStore()
+                appState.openToolCenter()
             } label: {
                 Image(systemName: "square.grid.2x2")
             }
@@ -103,22 +103,6 @@ struct MainView: View {
             .toolbarIconStyle(tokens)
             .help(String(localized: "topbar.appearance"))
 
-            #if DEBUG
-            Menu {
-                Button(String(localized: "debug.openAppSupport")) {
-                    NSWorkspace.shared.open(AppPaths.applicationSupport)
-                }
-                Button(String(localized: "debug.logSampleShortcut")) {
-                    let message = HotkeyCenter.shared.debugDescription(forPluginID: "com.enoughbox.sample")
-                    NSLog("EnoughBox DEBUG: \(message)")
-                    appState.showToast(message)
-                }
-            } label: {
-                Image(systemName: "ladybug")
-            }
-            .toolbarIconStyle(tokens)
-            .help(String(localized: "debug.menu.help"))
-            #endif
         }
     }
 

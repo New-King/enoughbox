@@ -206,7 +206,7 @@ private struct TranslationPanelView: View {
                 Button(action: session.translate) {
                     HStack(spacing: 4) {
                         Image(systemName: "character.book.closed")
-                        Text("plugin.translate.action", bundle: TranslateL10n.bundle)
+                        Text("plugin.translate.action", tableName: TranslateL10n.tableName, bundle: TranslateL10n.bundle)
                     }
                     .font(.system(size: 12, weight: .semibold))
                     .foregroundStyle(Color.white)
@@ -224,7 +224,7 @@ private struct TranslationPanelView: View {
 
     private var languageBar: some View {
         HStack {
-            Text("plugin.translate.source.auto", bundle: TranslateL10n.bundle)
+            Text("plugin.translate.source.auto", tableName: TranslateL10n.tableName, bundle: TranslateL10n.bundle)
                 .font(.system(size: 12))
                 .foregroundStyle(tokens.inkSoft)
             Spacer()
@@ -258,7 +258,7 @@ private struct TranslationPanelView: View {
                 Image(systemName: "character.book.closed.fill")
                     .font(.system(size: 12))
                     .foregroundStyle(tokens.ink)
-                Text("plugin.translate.engine.mock", bundle: TranslateL10n.bundle)
+                Text("plugin.translate.engine.mock", tableName: TranslateL10n.tableName, bundle: TranslateL10n.bundle)
                     .font(.system(size: 12, weight: .medium))
                     .foregroundStyle(tokens.ink)
                 Spacer()

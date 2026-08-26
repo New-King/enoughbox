@@ -2,26 +2,26 @@ import AppKit
 import KeyboardShortcuts
 import SwiftUI
 
-struct PluginDetailView: View {
+struct ToolDetailView: View {
     @Environment(\.designTokens) private var tokens
     @EnvironmentObject private var appState: AppState
 
-    let plugin: InstalledPlugin
+    let tool: EnabledTool
 
     var body: some View {
         ScrollView {
             VStack(alignment: .leading, spacing: 16) {
                 header
 
-                if plugin.capabilities.contains(.hotkey),
-                   let shortcutName = HotkeyCatalogHost.recorderName(forPluginID: plugin.id) {
+                if tool.capabilities.contains(.hotkey),
+                   let shortcutName = HotkeyCatalogHost.recorderName(forToolID: tool.id) {
                     shortcutCard(name: shortcutName, footerKey: shortcutFooterKey)
                 }
 
-                if let settings = appState.pluginManager.settingsViewController(for: plugin.id) {
-                    pluginSettingsCard(settings, pluginID: plugin.id)
+                if let settings = appState.toolManager.settingsViewController(for: tool.id) {
+                    toolSettingsCard(settings, toolID: tool.id)
                 } else {
-                    missingPluginView
+                    missingToolView
                 }
             }
             .padding(.horizontal, 28)
@@ -30,14 +30,14 @@ struct PluginDetailView: View {
         }
         .defaultScrollAnchor(.top)
         .background(tokens.shell)
-        .navigationTitle(Text(appState.displayName(for: plugin)))
+        .navigationTitle(Text(appState.displayName(for: tool)))
         .onAppear {
-            appState.pluginManager.load(pluginID: plugin.id)
+            appState.toolManager.load(toolID: tool.id)
         }
     }
 
     private var shortcutFooterKey: LocalizedStringKey {
-        switch plugin.id {
+        switch tool.id {
         case "com.enoughbox.translate":
             "plugin.translate.shortcut.footer.active"
         default:
@@ -46,7 +46,7 @@ struct PluginDetailView: View {
     }
 
     private func shortcutCard(name: KeyboardShortcuts.Name, footerKey: LocalizedStringKey) -> some View {
-        PluginShortcutSettingsCard(shortcutName: name, footerKey: footerKey)
+        ToolShortcutSettingsCard(shortcutName: name, footerKey: footerKey)
             .frame(maxWidth: .infinity, alignment: .leading)
             .padding(16)
             .background(tokens.card, in: RoundedRectangle(cornerRadius: 11, style: .continuous))
@@ -56,15 +56,15 @@ struct PluginDetailView: View {
             )
     }
 
-    private func pluginSettingsCard(_ viewController: NSViewController, pluginID: String) -> some View {
-        PluginSettingsContainer(viewController: viewController)
-            .id(pluginID)
+    private func toolSettingsCard(_ viewController: NSViewController, toolID: String) -> some View {
+        ToolSettingsContainer(viewController: viewController)
+            .id(toolID)
             .frame(maxWidth: .infinity, alignment: .leading)
     }
 
     private var header: some View {
         HStack(spacing: 14) {
-            Image(systemName: plugin.iconName)
+            Image(systemName: tool.iconName)
                 .font(.system(size: 22, weight: .medium))
                 .foregroundStyle(tokens.ink)
                 .frame(width: 44, height: 44)
@@ -75,11 +75,11 @@ struct PluginDetailView: View {
                 )
 
             VStack(alignment: .leading, spacing: 4) {
-                Text(appState.displayName(for: plugin))
+                Text(appState.displayName(for: tool))
                     .font(.system(size: 20, weight: .semibold))
                     .foregroundStyle(tokens.ink)
 
-                Text("v\(plugin.version)")
+                Text("v\(tool.version)")
                     .font(.system(size: 12, design: .monospaced))
                     .foregroundStyle(tokens.inkMuted)
             }
@@ -88,7 +88,7 @@ struct PluginDetailView: View {
         }
     }
 
-    private var missingPluginView: some View {
+    private var missingToolView: some View {
         VStack(spacing: 12) {
             Text("plugin.detail.missingBundle")
                 .font(.system(size: 14))
@@ -103,7 +103,7 @@ struct PluginDetailView: View {
                 .frame(maxWidth: 320)
 
             Button {
-                appState.openPluginStore()
+                appState.openToolCenter()
             } label: {
                 Text("plugin.detail.reinstall")
             }
@@ -114,7 +114,7 @@ struct PluginDetailView: View {
     }
 }
 
-private struct PluginSettingsContainer: NSViewControllerRepresentable {
+private struct ToolSettingsContainer: NSViewControllerRepresentable {
     let viewController: NSViewController
 
     func makeCoordinator() -> Coordinator {
@@ -137,11 +137,11 @@ private struct PluginSettingsContainer: NSViewControllerRepresentable {
 }
 
 #Preview {
-    PluginDetailView(plugin: InstalledPlugin(
-        id: "com.enoughbox.sample",
-        iconName: "puzzlepiece.extension",
+    ToolDetailView(tool: EnabledTool(
+        id: "com.enoughbox.translate",
+        iconName: "character.book.closed",
         version: "0.1.0",
-        capabilities: [.hotkey, .clipboard]
+        capabilities: [.hotkey, .accessibility]
     ))
     .environmentObject(AppState.previewPopulated)
     .designTokensProvider()

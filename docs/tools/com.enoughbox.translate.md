@@ -1,15 +1,14 @@
-# `com.enoughbox.translate` 翻译插件
+# `com.enoughbox.translate` 内置翻译工具
 
 ## 基本信息
 
-- 源码：`Plugins/TranslatePlugin/`
-- 构建目标：`TranslatePlugin`
-- 运行时插件：`com.enoughbox.translate.plugin`
-- 运行时目录：`~/Library/Application Support/EnoughBox/Plugins/`
+- 源码：`EnoughBox/Features/Translate/`
+- 运行时：`EnoughBox.app` 内置工具
+- 启用状态：`~/Library/Application Support/EnoughBox/registry.json`
 - 当前翻译引擎：Mock，仅用于验证界面和流程
 - 快捷键：`com.enoughbox.translate.selection`
 
-宿主负责读取选区和提供浮窗能力，翻译插件负责快捷键、翻译流程和面板 UI。不要把翻译业务逻辑写回宿主。
+内置翻译工具负责快捷键、翻译流程和面板 UI；选区读取由宿主服务提供。
 
 ## 正常开发流程
 
@@ -17,17 +16,15 @@
 2. 确认左侧 `Package Dependencies` 中的 `KeyboardShortcuts` 已完成解析。
 3. 用 `Cmd+B` 编译。
 4. 用 `Cmd+R` 运行宿主。
-5. 插件安装后，源码再次变化时，先在插件中心卸载再安装，确保 Application Support 里的 `.plugin` 是最新构建产物。
+5. 源码再次变化时直接 `Cmd+R`；工具代码随宿主一起更新。
 6. 在其他 App（例如备忘录、Chrome）选中文字，再按翻译快捷键验证。
 
-插件是和宿主同进程加载的动态 bundle。宿主或 SDK 接口变化后，不能只编译宿主而继续加载旧插件；否则可能出现插件无法载入、动态符号不匹配，甚至宿主在 SwiftUI 布局时崩溃。
+翻译工具是宿主内置代码，修改后随宿主一起编译。
 
 ## 刚才这类问题的处理顺序
 
 ### 1. 先看 Xcode 是否真的在编译
 
-- `No such module 'EnoughBoxPluginSDK'`
-- `Missing package product 'EnoughBoxPluginSDK'`
 - `Missing package product 'KeyboardShortcuts'`
 
 这些不是普通警告，不能忽略。
@@ -48,10 +45,10 @@ git rev-parse HEAD
 - `~/Library/Developer/Xcode/DerivedData/`
 - 项目里的 `xcuserdata`
 - Swift Package 下载缓存
-- Application Support 里的已安装插件
+- Application Support 里的工具启用状态
 - macOS 辅助功能/自动化权限
 
-因此，源码已经回到某个提交，不代表 Xcode 或已安装插件也回到了那个版本。
+因此，源码已经回到某个提交，不代表 Xcode 的缓存也已经同步。
 
 ### 3. Package 解析失败时
 
@@ -73,29 +70,15 @@ Resolving Package Graph Failed
 
 如果需要清理，只清当前项目的 DerivedData 和项目级 `xcuserdata`，并在删除前确认路径确实属于 EnoughBox。清理后要关闭并重新打开 Xcode。
 
-### 4. 插件加载失败时
+### 4. 工具状态异常时
 
-如果出现：
-
-```text
-Failed to load com.enoughbox.translate.plugin
-```
-
-先检查 Application Support 中的插件是不是旧副本：
+如果侧栏状态与预期不一致，先检查 registry：
 
 ```sh
-ls -l "$HOME/Library/Application Support/EnoughBox/Plugins/com.enoughbox.translate.plugin"
+cat "$HOME/Library/Application Support/EnoughBox/registry.json"
 ```
 
-最安全的修复是退出 EnoughBox，在插件中心卸载翻译插件，再重新编译并安装。不要直接删除整个 Application Support；那会同时影响插件安装记录。
-
-如果宿主启动即崩，无法进入插件中心，才删除**明确对应的**：
-
-```text
-~/Library/Application Support/EnoughBox/Plugins/com.enoughbox.translate.plugin
-```
-
-然后把 registry 中对应的翻译插件记录移除或通过宿主重新安装。删除前先备份或至少读取 registry，不能把其他插件一起清掉。
+在工具中心点击“移除”再“启用”即可。不要删除整个 Application Support。
 
 ### 5. 辅助功能失败时
 
@@ -115,7 +98,7 @@ ls -l "$HOME/Library/Application Support/EnoughBox/Plugins/com.enoughbox.transla
 - [ ] Xcode 包依赖已解析，没有 `Missing package product`
 - [ ] `Cmd+B` 成功
 - [ ] EnoughBox 能启动
-- [ ] 翻译插件能加载
+- [ ] 翻译工具能正常打开
 - [ ] 翻译浮窗内输入文字可以得到 Mock 译文
 - [ ] 在外部 App 选中文字后按快捷键可以翻译
 - [ ] 没有选区且剪贴板为空时显示无选区提示

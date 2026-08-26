@@ -2,7 +2,7 @@
 
 **I don't need much.**
 
-macOS 超轻量工具箱：**空壳宿主 + 插件中心按需安装**。
+macOS 超轻量工具箱：**内置工具 + 按需启用**。
 
 ## 状态
 
@@ -38,8 +38,8 @@ xcodegen generate
 ### 3. 当前可体验
 
 - 系统设置式 **NavigationSplitView**（侧栏 + 详情）
-- 空状态 → **插件中心** 安装「示例」→ 侧栏出现项 → 右侧设置
-- 翻译 / 截图为「即将推出」占位（不可安装）
+- 空状态 → **内置工具中心** 启用工具 → 侧栏出现项 → 右侧设置
+- 翻译已作为内置工具随 App 发布
 - **浅色 / 深色 / 跟随系统**（工具栏菜单）
 - **zh-Hans + en**（跟随系统语言）
 
@@ -47,21 +47,21 @@ xcodegen generate
 
 | 文档 | 说明 |
 |------|------|
+| [docs/开发前必读.md](docs/开发前必读.md) | 修改代码前的架构与验证约定 |
 | [docs/MVP.md](docs/MVP.md) | MVP 范围与里程碑 |
-| [docs/架构.md](docs/架构.md) | 架构与插件加载 |
+| [docs/架构.md](docs/架构.md) | 内置工具架构 |
 | [docs/设计规范.md](docs/设计规范.md) | UI 令牌 |
-| [docs/插件发布.md](docs/插件发布.md) | 官方插件审核政策 |
+| [docs/tools/README.md](docs/tools/README.md) | 内置工具说明与排障 |
 
 ## 工程结构
 
 ```
-EnoughBox/              # 宿主 SwiftUI 源码
-Packages/EnoughBoxPluginSDK/
+EnoughBox/              # 宿主 SwiftUI 源码与内置工具
 EnoughBox.xcodeproj     # xcodegen 生成
 project.yml             # XcodeGen 配置
-plugin-registry/        # 官方 manifest
+EnoughBox/Features/Translate/ # 内置翻译工具源码
 ```
 
 ## 技术栈
 
-Swift + SwiftUI · macOS 14+ · String Catalog · EnoughBoxPluginSDK
+Swift + SwiftUI · macOS 14+ · String Catalog · KeyboardShortcuts

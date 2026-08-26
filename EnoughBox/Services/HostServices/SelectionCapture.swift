@@ -3,21 +3,19 @@ import AppKit
 import Foundation
 
 enum SelectionCapture {
-    static func isAccessibilityTrusted() -> Bool {
-        AXIsProcessTrusted()
-    }
-
     static func requestAccessibilityTrust() {
         let key = kAXTrustedCheckOptionPrompt.takeUnretainedValue() as String
         let options = [key: true] as CFDictionary
         _ = AXIsProcessTrustedWithOptions(options)
     }
 
-    static func clipboardText() -> String {
-        pasteboardPlainText()
+    static func textForTranslation() async -> String {
+        await Task.detached(priority: .userInitiated) {
+            captureTextForTranslation()
+        }.value
     }
 
-    static func textForTranslation() -> String {
+    private static func captureTextForTranslation() -> String {
         if let ax = axFocusedSelectedText() {
             return ax
         }
@@ -28,18 +26,8 @@ enum SelectionCapture {
         case .denied:
             return ""
         case .failed:
-            return clipboardText()
+            return pasteboardPlainText()
         }
-    }
-
-    static func currentSelectedText() -> String {
-        if let ax = axFocusedSelectedText(), !ax.isEmpty {
-            return ax
-        }
-        if case .copied(let copied) = copySelectedText() {
-            return copied
-        }
-        return ""
     }
 
     private enum CopyResult {
