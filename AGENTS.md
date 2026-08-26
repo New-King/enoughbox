@@ -1,7 +1,9 @@
 # EnoughBox — Agent 约定
 
-## 项目是什么
+## 最高守则
+- **不要一遇到问题就乱打补丁，要从考虑到可维护/高性能/通用性，从根源解决问题，不要改了一个bug引出另一个bug，一定要做好验证，如果遇到拿不准没把握的请立即停止并询问**
 
+## 项目是什么
 macOS 轻量工具箱 + 内置工具中心。Slogan：**I don't need much.** MVP 方案见 `docs/MVP.md`，架构见 `docs/架构.md`，UI 见 `docs/设计规范.md`（对齐 newking 深灰极简令牌）。
 
 ## 分派
@@ -13,7 +15,6 @@ macOS 轻量工具箱 + 内置工具中心。Slogan：**I don't need much.** MVP
 - **改范围 / 里程碑** → 先读 `docs/MVP.md`，重大 scope 变更先与用户确认。
 
 ## 守则
-
 - 轻量工具直接写在宿主的 `Features/` 中；不要为轻量功能新增动态插件。
 - 不引入 Electron；优先 Swift 原生 + 已选 SPM 依赖。
 - 禁止彩色 UI 强调；只用设计令牌灰阶。
