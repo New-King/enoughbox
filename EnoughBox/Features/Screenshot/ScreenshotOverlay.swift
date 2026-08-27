@@ -652,7 +652,7 @@ private final class ScreenshotOverlayView: NSView {
             selection = window.frame
             return
         }
-        selection = .zero
+        selection = bounds
     }
 
     private func screenPoint(fromViewPoint viewPoint: CGPoint) -> CGPoint {
