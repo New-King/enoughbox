@@ -5,15 +5,18 @@ struct MainView: View {
     @EnvironmentObject private var appState: AppState
     @EnvironmentObject private var appearance: AppearanceManager
 
-    private let sidebarWidth: CGFloat = 220
+    /// 220pt − 25% ≈ 165pt
+    private let sidebarWidth: CGFloat = 165
 
     var body: some View {
-        HStack(spacing: 12) {
+        HStack(spacing: 0) {
             sidebar
+            shellDivider
             detail
         }
-        .padding(12)
-        .background(tokens.page)
+        .background(tokens.shell)
+        .toolbarBackground(tokens.shell, for: .windowToolbar)
+        .toolbarBackground(.visible, for: .windowToolbar)
         .toolbar { toolbarContent }
         .sheet(isPresented: $appState.isToolCenterPresented) {
             ToolCenterView()
@@ -31,6 +34,13 @@ struct MainView: View {
         .onChange(of: appState.selectedToolID) { _, _ in
             clearWindowFocus()
         }
+    }
+
+    private var shellDivider: some View {
+        Rectangle()
+            .fill(tokens.border)
+            .frame(width: 1)
+            .frame(maxHeight: .infinity)
     }
 
     private func clearWindowFocus() {
@@ -52,12 +62,7 @@ struct MainView: View {
                         .listRowBackground(Color.clear)
                 } else {
                     ForEach(appState.enabledTools) { tool in
-                        Label {
-                            Text(appState.displayName(for: tool))
-                        } icon: {
-                            Image(systemName: tool.iconName)
-                        }
-                        .tag(tool.id)
+                        toolRow(tool)
                     }
                 }
             } header: {
@@ -65,12 +70,35 @@ struct MainView: View {
             }
         }
         .listStyle(.sidebar)
-        .contentMargins(.top, 4, for: .scrollContent)
-        .contentMargins(.bottom, 4, for: .scrollContent)
+        .listRowSeparator(.hidden, edges: .all)
+        .contentMargins(.top, 8, for: .scrollContent)
+        .contentMargins(.bottom, 8, for: .scrollContent)
         .scrollContentBackground(.hidden)
-        .background(tokens.nav)
-        .clipShape(RoundedRectangle(cornerRadius: 11, style: .continuous))
+        .background(tokens.shell)
         .frame(width: sidebarWidth)
+    }
+
+    private func toolRow(_ tool: EnabledTool) -> some View {
+        let isSelected = appState.selectedToolID == tool.id
+        return Label {
+            Text(appState.displayName(for: tool))
+        } icon: {
+            Image(systemName: tool.iconName)
+        }
+        .tag(tool.id)
+        .foregroundStyle(
+            isSelected
+                ? Color(nsColor: .alternateSelectedControlTextColor)
+                : tokens.ink
+        )
+        .listRowBackground(
+            RoundedRectangle(cornerRadius: 6, style: .continuous)
+                .fill(
+                    isSelected
+                        ? Color(nsColor: .selectedContentBackgroundColor)
+                        : Color.clear
+                )
+        )
     }
 
     @ViewBuilder
@@ -84,7 +112,6 @@ struct MainView: View {
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)
         .background(tokens.shell)
-        .clipShape(RoundedRectangle(cornerRadius: 11, style: .continuous))
     }
 
     @ToolbarContentBuilder
