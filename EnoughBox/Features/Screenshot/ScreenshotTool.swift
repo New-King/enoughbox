@@ -15,11 +15,11 @@ final class ScreenshotTool {
         }
         overlay.onSaved = { [weak self] name in
             self?.toastHandler(
-                String(format: ScreenshotL10n.string("plugin.screenshot.toast.saved"), name)
+                String(format: UIStrings.Screenshot.toastSavedFormat, name)
             )
         }
         overlay.onFailed = { [weak self] in
-            self?.toastHandler(ScreenshotL10n.string("plugin.screenshot.toast.failed"))
+            self?.toastHandler(UIStrings.Screenshot.toastFailed)
         }
     }
 
@@ -44,31 +44,22 @@ final class ScreenshotTool {
     }
 }
 
-enum ScreenshotL10n {
-    static let bundle = Bundle.main
-    static let tableName = "ScreenshotLocalizable"
-
-    static func string(_ key: String) -> String {
-        NSLocalizedString(key, tableName: tableName, bundle: bundle, comment: "")
-    }
-}
-
 struct ScreenshotSettingsView: View {
     @Environment(\.designTokens) private var tokens
 
     var body: some View {
         VStack(alignment: .leading, spacing: 12) {
-            Text("plugin.screenshot.settings.section", tableName: ScreenshotL10n.tableName, bundle: ScreenshotL10n.bundle)
+            Text(UIStrings.Screenshot.settingsSection)
                 .font(.system(size: 11, weight: .semibold))
                 .foregroundStyle(tokens.inkMuted)
                 .textCase(.uppercase)
 
-            Text("plugin.screenshot.settings.hint", tableName: ScreenshotL10n.tableName, bundle: ScreenshotL10n.bundle)
+            Text(UIStrings.Screenshot.settingsHint)
                 .font(.system(size: 13))
                 .foregroundStyle(tokens.inkSoft)
                 .fixedSize(horizontal: false, vertical: true)
 
-            Text("plugin.screenshot.settings.colorHint", tableName: ScreenshotL10n.tableName, bundle: ScreenshotL10n.bundle)
+            Text(UIStrings.Screenshot.colorHint)
                 .font(.system(size: 11))
                 .foregroundStyle(tokens.inkMuted)
                 .fixedSize(horizontal: false, vertical: true)
@@ -76,7 +67,7 @@ struct ScreenshotSettingsView: View {
             HStack {
                 Spacer()
                 Button(action: openScreenRecordingPermission) {
-                    Text("plugin.screenshot.settings.openPermission", tableName: ScreenshotL10n.tableName, bundle: ScreenshotL10n.bundle)
+                    Text(UIStrings.Screenshot.openScreenRecording)
                         .font(.system(size: 12, weight: .medium))
                         .padding(.horizontal, 12)
                         .padding(.vertical, 7)

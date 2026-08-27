@@ -143,7 +143,7 @@ private final class TranslationNSPanel: NSPanel {
 @MainActor
 final class TranslationPanelController: NSWindowController {
     private let session = TranslationPanelModel()
-    private var hostingController: NSHostingController<TranslationPanelView>!
+    private var hostingController: NSHostingController<TranslationPanelRootView>!
     private var lastFittedSize: CGSize = .zero
 
     convenience init() {
@@ -165,7 +165,7 @@ final class TranslationPanelController: NSWindowController {
 
         self.init(window: panel)
         let hosting = NSHostingController(
-            rootView: TranslationPanelView(
+            rootView: TranslationPanelRootView(
                 session: session,
                 onClose: { [weak self] in
                     self?.close()
@@ -275,9 +275,20 @@ final class TranslationPanelController: NSWindowController {
     }
 }
 
+private struct TranslationPanelRootView: View {
+    @ObservedObject var session: TranslationPanelModel
+    let onClose: () -> Void
+
+    var body: some View {
+        TranslationPanelView(session: session, onClose: onClose)
+            .preferredColorScheme(AppearanceMode.stored.effectiveColorScheme)
+            .designTokensProvider()
+    }
+}
+
 private struct TranslationPanelView: View {
     @ObservedObject var session: TranslationPanelModel
-    @Environment(\.colorScheme) private var colorScheme
+    @Environment(\.designTokens) private var tokens
     let onClose: () -> Void
 
     var body: some View {
@@ -330,7 +341,7 @@ private struct TranslationPanelView: View {
                 }
                 panelIconButton("plus.viewfinder") {}
                     .disabled(true)
-                    .help(TranslateL10n.string("plugin.translate.ocr.later"))
+                    .help(UIStrings.Translate.ocrLater)
                 panelIconButton("xmark.square") {
                     session.clearSource()
                 }
@@ -342,7 +353,7 @@ private struct TranslationPanelView: View {
                 Button(action: session.translate) {
                     HStack(spacing: 4) {
                         Image(systemName: "character.book.closed")
-                        Text("plugin.translate.action", tableName: TranslateL10n.tableName, bundle: TranslateL10n.bundle)
+                        Text(UIStrings.Translate.action)
                     }
                     .font(.system(size: 12, weight: .semibold))
                     .foregroundStyle(Color.white)
@@ -360,7 +371,7 @@ private struct TranslationPanelView: View {
 
     private var languageBar: some View {
         HStack {
-            Text("plugin.translate.source.auto", tableName: TranslateL10n.tableName, bundle: TranslateL10n.bundle)
+            Text(UIStrings.Translate.sourceAuto)
                 .font(.system(size: 12))
                 .foregroundStyle(tokens.inkSoft)
             Spacer()
@@ -370,7 +381,7 @@ private struct TranslationPanelView: View {
                     .foregroundStyle(tokens.inkMuted)
             }
             .buttonStyle(.plain)
-            .help(TranslateL10n.string("plugin.translate.swap"))
+            .help(UIStrings.Translate.swap)
             Spacer()
             Picker("", selection: $session.targetLanguage) {
                 ForEach(TranslateLanguage.allCases) { language in
@@ -403,8 +414,8 @@ private struct TranslationPanelView: View {
                         .foregroundStyle(tokens.inkMuted)
                 }
                 .buttonStyle(.plain)
-                .help(TranslateL10n.string("plugin.translate.cycleEngine"))
-                .accessibilityLabel(TranslateL10n.string("plugin.translate.cycleEngine"))
+                .help(UIStrings.Translate.cycleEngine)
+                .accessibilityLabel(UIStrings.Translate.cycleEngine)
                 Spacer()
             }
             .padding(.horizontal, 10)
@@ -419,7 +430,7 @@ private struct TranslationPanelView: View {
                 } else {
                     GrowingResultText(
                         text: session.translatedText.isEmpty
-                            ? TranslateL10n.string("plugin.translate.result.empty")
+                            ? UIStrings.Translate.resultEmpty
                             : session.translatedText,
                         isPlaceholder: session.translatedText.isEmpty,
                         ink: tokens.ink,
@@ -474,10 +485,6 @@ private struct TranslationPanelView: View {
                 .frame(width: 22, height: 22)
         }
         .buttonStyle(.plain)
-    }
-
-    private var tokens: PanelTokens {
-        PanelTokens.tokens(for: colorScheme)
     }
 }
 
@@ -546,47 +553,6 @@ private final class WindowDragView: NSView {
     override func resetCursorRects() {
         addCursorRect(bounds, cursor: .arrow)
     }
-}
-
-/// Matches host `DesignTokens` so the floating panel stays grayscale.
-private struct PanelTokens {
-    let page: Color
-    let card: Color
-    let ink: Color
-    let inkSoft: Color
-    let inkMuted: Color
-    let inkFaint: Color
-    let accent: Color
-    let accentSoft: Color
-    let border: Color
-
-    static func tokens(for colorScheme: ColorScheme) -> PanelTokens {
-        colorScheme == .dark ? .dark : .light
-    }
-
-    static let light = PanelTokens(
-        page: Color(red: 245 / 255, green: 245 / 255, blue: 247 / 255),
-        card: Color.white,
-        ink: Color(red: 29 / 255, green: 29 / 255, blue: 31 / 255),
-        inkSoft: Color(red: 58 / 255, green: 58 / 255, blue: 60 / 255),
-        inkMuted: Color(red: 110 / 255, green: 110 / 255, blue: 115 / 255),
-        inkFaint: Color(red: 134 / 255, green: 134 / 255, blue: 139 / 255),
-        accent: Color(red: 23 / 255, green: 23 / 255, blue: 23 / 255),
-        accentSoft: Color(red: 245 / 255, green: 245 / 255, blue: 247 / 255),
-        border: Color.black.opacity(0.08)
-    )
-
-    static let dark = PanelTokens(
-        page: Color(red: 36 / 255, green: 36 / 255, blue: 38 / 255),
-        card: Color(red: 48 / 255, green: 48 / 255, blue: 50 / 255),
-        ink: Color(red: 224 / 255, green: 224 / 255, blue: 224 / 255),
-        inkSoft: Color(red: 198 / 255, green: 198 / 255, blue: 201 / 255),
-        inkMuted: Color(red: 176 / 255, green: 176 / 255, blue: 179 / 255),
-        inkFaint: Color(red: 148 / 255, green: 148 / 255, blue: 151 / 255),
-        accent: Color(red: 72 / 255, green: 72 / 255, blue: 73 / 255),
-        accentSoft: Color(red: 42 / 255, green: 42 / 255, blue: 44 / 255),
-        border: Color.white.opacity(0.12)
-    )
 }
 
 private struct AppleTranslationBridge: ViewModifier {

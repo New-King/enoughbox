@@ -4,7 +4,7 @@
 
 1. 重大范围变更先讨论。
 2. UI 遵循 [docs/设计规范.md](docs/设计规范.md)。
-3. 用户可见文案使用 String Catalog。
+3. 用户可见文案只改 `EnoughBox/UIStrings.swift`，见 [docs/设计规范.md](docs/设计规范.md) §6。
 4. 轻量功能直接加入 `EnoughBox/Features/`，不新增动态插件。
 5. 提交前使用完整 Xcode 执行一次 Build。
 

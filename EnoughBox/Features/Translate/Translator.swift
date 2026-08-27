@@ -12,7 +12,11 @@ enum TranslationEngine: String, CaseIterable, Identifiable {
     var id: String { rawValue }
 
     var localizedName: String {
-        TranslateL10n.string("plugin.translate.engine.\(rawValue)")
+        switch self {
+        case .youdao: UIStrings.Translate.engineYoudao
+        case .deepseek: UIStrings.Translate.engineDeepSeek
+        case .system: UIStrings.Translate.engineSystem
+        }
     }
 
     /// Session-only cycle: Youdao → DeepSeek → System → Youdao.
@@ -38,23 +42,23 @@ enum TranslatorError: LocalizedError {
     var errorDescription: String? {
         switch self {
         case .emptyInput:
-            return TranslateL10n.string("plugin.translate.error.empty")
+            return UIStrings.Translate.errorEmpty
         case .missingYoudaoCredentials:
-            return TranslateL10n.string("plugin.translate.error.missingYoudao")
+            return UIStrings.Translate.errorMissingYoudao
         case .missingDeepSeekKey:
-            return TranslateL10n.string("plugin.translate.error.missingDeepSeek")
+            return UIStrings.Translate.errorMissingDeepSeek
         case .invalidURL:
-            return TranslateL10n.string("plugin.translate.error.invalidURL")
+            return UIStrings.Translate.errorInvalidURL
         case .network:
-            return TranslateL10n.string("plugin.translate.error.network")
+            return UIStrings.Translate.errorNetwork
         case .timeout:
-            return TranslateL10n.string("plugin.translate.error.timeout")
+            return UIStrings.Translate.errorTimeout
         case .cancelled:
-            return TranslateL10n.string("plugin.translate.error.cancelled")
+            return UIStrings.Translate.errorCancelled
         case .systemUnavailable:
-            return TranslateL10n.string("plugin.translate.error.systemUnavailable")
+            return UIStrings.Translate.errorSystemUnavailable
         case .systemFailed:
-            return TranslateL10n.string("plugin.translate.error.systemFailed")
+            return UIStrings.Translate.errorSystemFailed
         case .provider(let message):
             return message
         }
@@ -70,9 +74,9 @@ enum TranslateLanguage: String, CaseIterable, Identifiable {
     var localizedName: String {
         switch self {
         case .zhHans:
-            return TranslateL10n.string("plugin.translate.language.zhHans")
+            return UIStrings.Translate.languageZhHans
         case .en:
-            return TranslateL10n.string("plugin.translate.language.en")
+            return UIStrings.Translate.languageEn
         }
     }
 

@@ -52,7 +52,7 @@ struct DeepSeekTranslator: Translator {
                 throw TranslatorError.provider(message)
             }
             throw TranslatorError.provider(
-                String(format: TranslateL10n.string("plugin.translate.error.http"), http.statusCode)
+                String(format: UIStrings.Translate.errorHTTPFormat, http.statusCode)
             )
         }
 

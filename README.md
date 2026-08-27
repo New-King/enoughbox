@@ -41,7 +41,7 @@ xcodegen generate
 - 空状态 → **内置工具中心** 启用工具 → 侧栏出现项 → 右侧设置
 - 翻译已作为内置工具随 App 发布
 - **浅色 / 深色 / 跟随系统**（工具栏菜单）
-- **zh-Hans + en**（跟随系统语言）
+- 文案集中在 `UIStrings.swift`
 
 ## 文档
 
@@ -64,4 +64,4 @@ EnoughBox/Features/Translate/ # 内置翻译工具源码
 
 ## 技术栈
 
-Swift + SwiftUI · macOS 14+ · String Catalog · KeyboardShortcuts
+Swift + SwiftUI · macOS 14+ · KeyboardShortcuts

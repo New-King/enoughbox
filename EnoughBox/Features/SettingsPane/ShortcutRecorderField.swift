@@ -177,11 +177,11 @@ final class ShortcutRecorderButton: NSButton {
 
     func refreshTitle() {
         if isRecording {
-            title = previewTitle ?? String(localized: "plugin.shortcut.press")
+            title = previewTitle ?? UIStrings.Shortcut.press
         } else {
             title = KeyboardShortcuts.getShortcut(for: shortcutName)
                 .map(String.init(describing:))
-                ?? String(localized: "plugin.shortcut.set")
+                ?? UIStrings.Shortcut.set
         }
     }
 
@@ -311,14 +311,11 @@ enum ShortcutConflict {
     var localizedMessage: String {
         switch self {
         case .duplicate:
-            String(localized: "plugin.shortcut.conflict.duplicate")
+            UIStrings.Shortcut.conflictDuplicate
         case .system:
-            String(localized: "plugin.shortcut.conflict.system")
+            UIStrings.Shortcut.conflictSystem
         case let .menuItem(title):
-            String(
-                format: String(localized: "plugin.shortcut.conflict.menu.format"),
-                title
-            )
+            String(format: UIStrings.Shortcut.conflictMenuFormat, title)
         }
     }
 }

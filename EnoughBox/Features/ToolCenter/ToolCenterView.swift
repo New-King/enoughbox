@@ -25,7 +25,7 @@ struct ToolCenterView: View {
 
     private var header: some View {
         HStack {
-            Text("pluginStore.title")
+            Text(UIStrings.ToolStore.title)
                 .font(.system(size: 17, weight: .semibold))
                 .foregroundStyle(tokens.ink)
 
@@ -66,12 +66,12 @@ struct ToolCenterView: View {
 
             VStack(alignment: .leading, spacing: 4) {
                 HStack(spacing: 8) {
-                    Text(tool.nameKey)
+                    Text(tool.name)
                         .font(.system(size: 15, weight: .semibold))
                         .foregroundStyle(tokens.ink)
                 }
 
-                Text(tool.descriptionKey)
+                Text(tool.description)
                     .font(.system(size: 13))
                     .foregroundStyle(tokens.inkMuted)
                     .fixedSize(horizontal: false, vertical: true)

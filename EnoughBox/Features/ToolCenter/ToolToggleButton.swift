@@ -19,7 +19,7 @@ struct ToolToggleButton: View {
     }
 
     private var enableControl: some View {
-        pillButton(title: "pluginStore.install") {
+        pillButton(title: UIStrings.ToolStore.install) {
             appState.enable(tool)
         }
     }
@@ -30,14 +30,14 @@ struct ToolToggleButton: View {
                 appState.remove(enabled)
             }
         } label: {
-            Text("pluginStore.uninstall")
+            Text(UIStrings.ToolStore.uninstall)
                 .font(.system(size: 13, weight: .medium))
                 .foregroundStyle(tokens.inkMuted)
         }
         .buttonStyle(.plain)
     }
 
-    private func pillButton(title: LocalizedStringKey, action: @escaping () -> Void) -> some View {
+    private func pillButton(title: String, action: @escaping () -> Void) -> some View {
         Button(action: action) {
             Text(title)
                 .font(.system(size: 13, weight: .semibold))

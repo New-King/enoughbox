@@ -53,9 +53,9 @@ final class AppState: ObservableObject {
     func displayName(for tool: EnabledTool) -> String {
         switch tool.id {
         case "com.enoughbox.translate":
-            return String(localized: "plugin.translate.name")
+            return UIStrings.Tool.translateName
         case "com.enoughbox.screenshot":
-            return String(localized: "plugin.screenshot.name")
+            return UIStrings.Tool.screenshotName
         default:
             return tool.id
         }

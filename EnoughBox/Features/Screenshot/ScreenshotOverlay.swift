@@ -1,5 +1,6 @@
 import AppKit
 import CoreGraphics
+import SwiftUI
 import UniformTypeIdentifiers
 
 private func isPlainKey(_ event: NSEvent, character: String) -> Bool {
@@ -171,7 +172,7 @@ final class ScreenshotOverlayController {
             NSPasteboard.general.clearContents()
             NSPasteboard.general.setString(text, forType: .string)
             dismiss(copyColor: true)
-            ScreenshotCenterToast.show(ScreenshotL10n.string("plugin.screenshot.toast.colorCopied"))
+            ScreenshotCenterToast.show(UIStrings.Screenshot.toastColorCopied)
         case .confirm:
             guard let image = view.croppedImage() else {
                 dismiss(copyColor: false)
@@ -179,7 +180,7 @@ final class ScreenshotOverlayController {
             }
             writePasteboard(image)
             dismiss(copyColor: false)
-            let message = ScreenshotL10n.string("plugin.screenshot.toast.copied")
+            let message = UIStrings.Screenshot.toastCopied
             DispatchQueue.main.async { [weak self] in
                 self?.onCopied?(message)
             }
@@ -346,6 +347,19 @@ private final class ScreenshotOverlayView: NSView {
 
     required init?(coder: NSCoder) { nil }
 
+    override func viewDidMoveToWindow() {
+        super.viewDidMoveToWindow()
+        if window != nil {
+            applyChromeTheme()
+        }
+    }
+
+    private func applyChromeTheme() {
+        let tokens = DesignTokens.current
+        toolbar.applyTheme(tokens)
+        colorHUD.applyTheme(tokens)
+    }
+
     func bootstrap(atScreenPoint screenPoint: CGPoint) {
         let local = CGPoint(
             x: screenPoint.x - frozen.screen.frame.origin.x,
@@ -507,6 +521,9 @@ private final class ScreenshotOverlayView: NSView {
             } else if ScreenshotGeometry.isClick(from: start, to: point),
                       let target = ScreenshotGeometry.window(at: point, in: pickableWindows) {
                 onAction?(.captureWindow(target.windowID, target.frame))
+            } else if ScreenshotGeometry.isClick(from: start, to: point) {
+                selection = bounds
+                commitSelection()
             } else {
                 applyWindowSnap(at: point)
                 if selection.width >= 8, selection.height >= 8 {
@@ -574,15 +591,11 @@ private final class ScreenshotOverlayView: NSView {
             dim.windingRule = .evenOdd
             NSColor.black.withAlphaComponent(dimAlpha).setFill()
             dim.fill()
-            NSColor.white.setStroke()
-            let border = NSBezierPath(rect: selection.insetBy(dx: 0.5, dy: 0.5))
-            border.lineWidth = committed ? 1 : 2
-            border.stroke()
+            let borderRect = selection.insetBy(dx: 0.5, dy: 0.5)
+            SelectionChrome.strokeAlternatingBorder(in: borderRect, lineWidth: committed ? 1 : 2)
             if committed {
-                NSColor.white.setFill()
-                for edge in [ResizeEdge.n, .s, .e, .w, .ne, .nw, .se, .sw] {
-                    NSBezierPath(rect: handleRect(edge)).fill()
-                }
+                let edges: [ResizeEdge] = [.n, .s, .e, .w, .ne, .nw, .se, .sw]
+                SelectionChrome.fillHandles(edges.map { handleRect($0) })
             }
             drawSizeBadge()
         }
@@ -685,9 +698,10 @@ private final class ScreenshotOverlayView: NSView {
         let height = Int(selection.height.rounded())
         guard width > 0, height > 0 else { return }
         let text = "\(width) × \(height) pt"
+        let tokens = DesignTokens.current
         let attributes: [NSAttributedString.Key: Any] = [
             .font: NSFont.monospacedDigitSystemFont(ofSize: 11, weight: .semibold),
-            .foregroundColor: NSColor.white,
+            .foregroundColor: tokens.ink.nsColor,
         ]
         let size = (text as NSString).size(withAttributes: attributes)
         var rect = CGRect(
@@ -699,8 +713,11 @@ private final class ScreenshotOverlayView: NSView {
         rect.origin.x = max(6, min(rect.origin.x, bounds.maxX - rect.width - 6))
         rect.origin.y = min(rect.origin.y, bounds.maxY - rect.height - 6)
         let path = NSBezierPath(roundedRect: rect, xRadius: rect.height / 2, yRadius: rect.height / 2)
-        NSColor(white: 0.08, alpha: 0.82).setFill()
+        tokens.card.nsColor.withAlphaComponent(0.92).setFill()
         path.fill()
+        tokens.border.nsColor.setStroke()
+        path.lineWidth = 1
+        path.stroke()
         text.draw(
             at: CGPoint(x: rect.minX + 8, y: rect.minY + 4),
             withAttributes: attributes
@@ -883,6 +900,33 @@ private enum PixelSampler {
     }
 }
 
+private enum SelectionChrome {
+    private static let dash: [CGFloat] = [4, 4]
+
+    static func strokeAlternatingBorder(in rect: CGRect, lineWidth: CGFloat) {
+        let path = NSBezierPath(rect: rect)
+        path.lineWidth = lineWidth
+        let dash: [CGFloat] = [4, 4]
+        NSColor.black.setStroke()
+        path.setLineDash(dash, count: 2, phase: 0)
+        path.stroke()
+        NSColor.white.setStroke()
+        path.setLineDash(dash, count: 2, phase: 4)
+        path.stroke()
+    }
+
+    static func fillHandles(_ rects: [CGRect]) {
+        for rect in rects {
+            NSColor.black.setFill()
+            NSBezierPath(rect: rect).fill()
+            NSColor.white.setStroke()
+            let outline = NSBezierPath(rect: rect.insetBy(dx: 0.5, dy: 0.5))
+            outline.lineWidth = 1
+            outline.stroke()
+        }
+    }
+}
+
 private final class ScreenshotToolbar: NSView {
     enum Item: Int, CaseIterable {
         case pin, mosaic, save, cancel, confirm
@@ -908,14 +952,14 @@ private final class ScreenshotToolbar: NSView {
 
         let symbolConfig = NSImage.SymbolConfiguration(pointSize: 14, weight: .semibold)
         let items: [(Item, String, String)] = [
-            (.pin, "pin.fill", "plugin.screenshot.action.pin"),
-            (.mosaic, "square.grid.3x3.fill", "plugin.screenshot.action.mosaic"),
-            (.save, "square.and.arrow.down.fill", "plugin.screenshot.action.save"),
-            (.cancel, "xmark", "plugin.screenshot.action.cancel"),
-            (.confirm, "checkmark", "plugin.screenshot.action.confirm"),
+            (.pin, "pin.fill", UIStrings.Screenshot.pin),
+            (.mosaic, "square.grid.3x3.fill", UIStrings.Screenshot.mosaic),
+            (.save, "square.and.arrow.down.fill", UIStrings.Screenshot.save),
+            (.cancel, "xmark", UIStrings.Screenshot.cancel),
+            (.confirm, "checkmark", UIStrings.Screenshot.confirm),
         ]
 
-        for (item, symbol, key) in items {
+        for (item, symbol, tooltip) in items {
             let button = NSButton(frame: .zero)
             button.image = NSImage(systemSymbolName: symbol, accessibilityDescription: nil)?
                 .withSymbolConfiguration(symbolConfig)
@@ -923,7 +967,7 @@ private final class ScreenshotToolbar: NSView {
             button.imageScaling = .scaleProportionallyDown
             button.isBordered = false
             button.contentTintColor = NSColor(white: 0.96, alpha: 1)
-            button.toolTip = ScreenshotL10n.string(key)
+            button.toolTip = tooltip
             button.target = self
             button.tag = item.rawValue
             button.sendAction(on: .leftMouseUp)
@@ -954,10 +998,22 @@ private final class ScreenshotToolbar: NSView {
         }
     }
 
+    func applyTheme(_ tokens: DesignTokens) {
+        layer?.backgroundColor = tokens.card.nsColor.withAlphaComponent(0.94).cgColor
+        layer?.borderColor = tokens.border.nsColor.cgColor
+        for button in buttons {
+            button.contentTintColor = tokens.controlTint.nsColor
+        }
+        if mosaicButton?.layer?.backgroundColor != nil {
+            mosaicButton?.contentTintColor = tokens.ink.nsColor
+        }
+    }
+
     func setMosaicArmed(_ armed: Bool) {
-        mosaicButton?.contentTintColor = armed ? NSColor(white: 0.98, alpha: 1) : NSColor(white: 0.96, alpha: 1)
+        let tokens = DesignTokens.current
+        mosaicButton?.contentTintColor = armed ? tokens.ink.nsColor : tokens.controlTint.nsColor
         mosaicButton?.layer?.backgroundColor = armed
-            ? NSColor.white.withAlphaComponent(0.2).cgColor
+            ? tokens.border.nsColor.cgColor
             : nil
     }
 
@@ -969,13 +1025,23 @@ private final class ScreenshotToolbar: NSView {
 
 private final class ScreenshotMagnifierView: NSView {
     private var sampleImage: CGImage?
+    private var surfaceColor: NSColor = .white
+    private var gridColor: NSColor = NSColor(white: 0.55, alpha: 0.22)
+    private var focusStrokeColor: NSColor = NSColor(white: 0.12, alpha: 0.92)
     private let gridColumns = 11
     private let gridRows = 11
+
+    func applyTheme(_ tokens: DesignTokens) {
+        surfaceColor = tokens.card.nsColor
+        gridColor = tokens.border.nsColor
+        focusStrokeColor = tokens.ink.nsColor.withAlphaComponent(0.92)
+        needsDisplay = true
+    }
 
     override func draw(_ dirtyRect: NSRect) {
         guard let context = NSGraphicsContext.current?.cgContext else { return }
 
-        context.setFillColor(CGColor(gray: 0.97, alpha: 0.98))
+        context.setFillColor(surfaceColor.cgColor)
         context.fill(bounds)
 
         guard let sampleImage else { return }
@@ -989,7 +1055,7 @@ private final class ScreenshotMagnifierView: NSView {
         let cellH = bounds.height / CGFloat(gridRows)
 
         context.saveGState()
-        context.setStrokeColor(CGColor(gray: 0.55, alpha: 0.22))
+        context.setStrokeColor(gridColor.cgColor)
         context.setLineWidth(0.5)
         for column in 0...gridColumns {
             let x = CGFloat(column) * cellW
@@ -1012,7 +1078,7 @@ private final class ScreenshotMagnifierView: NSView {
             width: cellW - 1,
             height: cellH - 1
         )
-        context.setStrokeColor(CGColor(gray: 0.12, alpha: 0.92))
+        context.setStrokeColor(focusStrokeColor.cgColor)
         context.setLineWidth(1.5)
         context.stroke(focus)
     }
@@ -1080,7 +1146,7 @@ private final class ScreenshotColorHUD: NSView {
         hintLabel.font = .systemFont(ofSize: 9, weight: .regular)
         hintLabel.textColor = NSColor(calibratedWhite: 0.55, alpha: 1)
         hintLabel.alignment = .center
-        hintLabel.stringValue = ScreenshotL10n.string("plugin.screenshot.color.hints")
+        hintLabel.stringValue = UIStrings.Screenshot.colorHints
 
         for field in [coordLabel, colorLabel, hintLabel] {
             field.backgroundColor = .clear
@@ -1096,6 +1162,16 @@ private final class ScreenshotColorHUD: NSView {
     }
 
     required init?(coder: NSCoder) { nil }
+
+    func applyTheme(_ tokens: DesignTokens) {
+        clipContainer.layer?.backgroundColor = tokens.card.nsColor.cgColor
+        clipContainer.layer?.borderColor = tokens.border.nsColor.cgColor
+        footerBar.layer?.backgroundColor = tokens.nav.nsColor.cgColor
+        coordLabel.textColor = tokens.inkSoft.nsColor
+        colorLabel.textColor = tokens.ink.nsColor
+        hintLabel.textColor = tokens.inkMuted.nsColor
+        magnifier.applyTheme(tokens)
+    }
 
     override var fittingSize: NSSize {
         NSSize(

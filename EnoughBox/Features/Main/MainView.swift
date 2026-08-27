@@ -46,7 +46,7 @@ struct MainView: View {
         List(selection: $appState.selectedToolID) {
             Section {
                 if appState.enabledTools.isEmpty {
-                    Text("empty.sidebar.hint")
+                    Text(UIStrings.Shell.noToolsEnabled)
                         .font(.system(size: 12))
                         .foregroundStyle(tokens.inkFaint)
                         .padding(.vertical, 4)
@@ -62,7 +62,7 @@ struct MainView: View {
                     }
                 }
             } header: {
-                Text("sidebar.section.tools")
+                Text(UIStrings.Shell.toolsSection)
             }
         }
         .listStyle(.sidebar)
@@ -93,7 +93,7 @@ struct MainView: View {
                 Image(systemName: "square.grid.2x2")
             }
             .toolbarIconStyle(tokens)
-            .help(String(localized: "topbar.pluginStore"))
+            .help(UIStrings.Shell.builtInTools)
 
             Menu {
                 ForEach(AppearanceMode.allCases) { mode in
@@ -104,7 +104,7 @@ struct MainView: View {
                             if appearance.mode == mode {
                                 Image(systemName: "checkmark")
                             }
-                            Text(mode.labelKey)
+                            Text(mode.label)
                         }
                     }
                 }
@@ -112,7 +112,7 @@ struct MainView: View {
                 Image(systemName: appearance.mode.iconName)
             }
             .toolbarIconStyle(tokens)
-            .help(String(localized: "topbar.appearance"))
+            .help(UIStrings.Shell.appearance)
 
         }
     }

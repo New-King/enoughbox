@@ -39,7 +39,7 @@ struct YoudaoTranslator: Translator {
         let (data, http) = try await TranslationHTTP.data(for: request)
         guard (200...299).contains(http.statusCode) else {
             throw TranslatorError.provider(
-                String(format: TranslateL10n.string("plugin.translate.error.http"), http.statusCode)
+                String(format: UIStrings.Translate.errorHTTPFormat, http.statusCode)
             )
         }
 
@@ -70,11 +70,11 @@ struct YoudaoTranslator: Translator {
     private func youdaoMessage(for code: String) -> String {
         switch code {
         case "102", "202":
-            return TranslateL10n.string("plugin.translate.error.youdaoSign")
+            return UIStrings.Translate.errorYoudaoSign
         case "401", "411", "412":
-            return TranslateL10n.string("plugin.translate.error.youdaoQuota")
+            return UIStrings.Translate.errorYoudaoQuota
         default:
-            return String(format: TranslateL10n.string("plugin.translate.error.youdaoCode"), code)
+            return String(format: UIStrings.Translate.errorYoudaoCodeFormat, code)
         }
     }
 }

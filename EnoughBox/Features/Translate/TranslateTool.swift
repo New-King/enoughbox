@@ -34,7 +34,7 @@ final class TranslateTool {
             let text = await SelectionCapture.textForTranslation()
             guard !Task.isCancelled else { return }
             if text.isEmpty {
-                toastHandler(TranslateL10n.string("plugin.translate.toast.noSelection"))
+                toastHandler(UIStrings.Translate.noSelection)
             }
             presentPanel(sourceText: text)
         }
@@ -53,15 +53,6 @@ final class TranslateTool {
             panelController = TranslationPanelController()
         }
         panelController?.present(sourceText: sourceText)
-    }
-}
-
-enum TranslateL10n {
-    static let bundle = Bundle.main
-    static let tableName = "TranslateLocalizable"
-
-    static func string(_ key: String) -> String {
-        NSLocalizedString(key, tableName: tableName, bundle: bundle, comment: "")
     }
 }
 
@@ -92,9 +83,9 @@ struct TranslateSettingsView: View {
 
     private var translationSection: some View {
         VStack(alignment: .leading, spacing: 12) {
-            settingsHeader("plugin.translate.settings.section")
+            settingsHeader(UIStrings.Translate.settingsSection)
 
-            settingsRow("plugin.translate.settings.target") {
+            settingsRow(UIStrings.Translate.targetLanguage) {
                 Picker("", selection: $targetLanguage) {
                     ForEach(TranslateLanguage.allCases) { language in
                         Text(language.localizedName).tag(language)
@@ -107,7 +98,7 @@ struct TranslateSettingsView: View {
                 }
             }
 
-            settingsRow("plugin.translate.settings.engine") {
+            settingsRow(UIStrings.Translate.engine) {
                 Picker("", selection: $engine) {
                     ForEach(TranslationEngine.allCases) { item in
                         Text(item.localizedName).tag(item)
@@ -120,7 +111,7 @@ struct TranslateSettingsView: View {
                 }
             }
 
-            hintText(engineFooterKey)
+            hintText(engineFooterText)
         }
         .settingsCard(tokens: tokens, resignFocus: resignFocus)
     }
@@ -130,32 +121,32 @@ struct TranslateSettingsView: View {
         switch engine {
         case .youdao:
             VStack(alignment: .leading, spacing: 12) {
-                settingsHeader("plugin.translate.settings.credentials")
-                labeledField("plugin.translate.settings.appID", field: "youdao.appID", text: $youdaoAppID) {
+                settingsHeader(UIStrings.Translate.credentials)
+                labeledField(UIStrings.Translate.appID, field: "youdao.appID", text: $youdaoAppID) {
                     TranslateSettings.youdaoAppID = youdaoAppID
                 }
-                labeledField("plugin.translate.settings.appSecret", field: "youdao.appSecret", text: $youdaoAppSecret) {
+                labeledField(UIStrings.Translate.appSecret, field: "youdao.appSecret", text: $youdaoAppSecret) {
                     TranslateSettings.youdaoAppSecret = youdaoAppSecret
                 }
-                labeledField("plugin.translate.settings.apiKey", field: "youdao.apiKey", text: $youdaoAPIKey) {
+                labeledField(UIStrings.Translate.apiKey, field: "youdao.apiKey", text: $youdaoAPIKey) {
                     TranslateSettings.youdaoAPIKey = youdaoAPIKey
                 }
-                hintText("plugin.translate.settings.youdaoHint")
+                hintText(UIStrings.Translate.youdaoHint)
             }
             .settingsCard(tokens: tokens, resignFocus: resignFocus)
         case .deepseek:
             VStack(alignment: .leading, spacing: 12) {
-                settingsHeader("plugin.translate.settings.credentials")
-                labeledField("plugin.translate.settings.apiKey", field: "deepseek.apiKey", text: $deepSeekAPIKey) {
+                settingsHeader(UIStrings.Translate.credentials)
+                labeledField(UIStrings.Translate.apiKey, field: "deepseek.apiKey", text: $deepSeekAPIKey) {
                     TranslateSettings.deepSeekAPIKey = deepSeekAPIKey
                 }
-                labeledField("plugin.translate.settings.model", field: "deepseek.model", text: $deepSeekModel) {
+                labeledField(UIStrings.Translate.model, field: "deepseek.model", text: $deepSeekModel) {
                     TranslateSettings.deepSeekModel = deepSeekModel
                 }
-                labeledField("plugin.translate.settings.baseURL", field: "deepseek.baseURL", text: $deepSeekBaseURL) {
+                labeledField(UIStrings.Translate.baseURL, field: "deepseek.baseURL", text: $deepSeekBaseURL) {
                     TranslateSettings.deepSeekBaseURL = deepSeekBaseURL
                 }
-                hintText("plugin.translate.settings.deepseekHint")
+                hintText(UIStrings.Translate.deepseekHint)
             }
             .settingsCard(tokens: tokens, resignFocus: resignFocus)
         case .system:
@@ -163,12 +154,12 @@ struct TranslateSettingsView: View {
         }
     }
 
-    private var engineFooterKey: String {
+    private var engineFooterText: String {
         switch engine {
         case .system:
-            return "plugin.translate.settings.systemHint"
+            UIStrings.Translate.systemHint
         case .youdao, .deepseek:
-            return "plugin.translate.settings.footer"
+            UIStrings.Translate.footer
         }
     }
 
@@ -177,25 +168,25 @@ struct TranslateSettingsView: View {
         focusedField = nil
     }
 
-    private func hintText(_ key: String) -> some View {
-        Text(verbatim: TranslateL10n.string(key))
+    private func hintText(_ text: String) -> some View {
+        Text(text)
             .font(.system(size: 11))
             .foregroundStyle(tokens.inkMuted)
             .fixedSize(horizontal: false, vertical: true)
             .onTapGesture(perform: resignFocus)
     }
 
-    private func settingsHeader(_ key: LocalizedStringKey) -> some View {
-        Text(key, tableName: TranslateL10n.tableName, bundle: TranslateL10n.bundle)
+    private func settingsHeader(_ title: String) -> some View {
+        Text(title)
             .font(.system(size: 11, weight: .semibold))
             .foregroundStyle(tokens.inkMuted)
             .textCase(.uppercase)
             .onTapGesture(perform: resignFocus)
     }
 
-    private func settingsRow<Content: View>(_ key: LocalizedStringKey, @ViewBuilder content: () -> Content) -> some View {
+    private func settingsRow<Content: View>(_ title: String, @ViewBuilder content: () -> Content) -> some View {
         HStack {
-            Text(key, tableName: TranslateL10n.tableName, bundle: TranslateL10n.bundle)
+            Text(title)
                 .font(.system(size: 13))
                 .foregroundStyle(tokens.ink)
                 .onTapGesture(perform: resignFocus)
@@ -205,13 +196,13 @@ struct TranslateSettingsView: View {
     }
 
     private func labeledField(
-        _ key: LocalizedStringKey,
+        _ title: String,
         field: String,
         text: Binding<String>,
         save: @escaping () -> Void
     ) -> some View {
         VStack(alignment: .leading, spacing: 6) {
-            Text(key, tableName: TranslateL10n.tableName, bundle: TranslateL10n.bundle)
+            Text(title)
                 .font(.system(size: 12))
                 .foregroundStyle(tokens.inkSoft)
                 .onTapGesture(perform: resignFocus)
@@ -226,9 +217,9 @@ struct TranslateSettingsView: View {
 
     private var accessibilitySection: some View {
         VStack(alignment: .leading, spacing: 10) {
-            settingsHeader("plugin.translate.settings.accessibility")
+            settingsHeader(UIStrings.Translate.accessibility)
 
-            Text("plugin.translate.settings.accessibilityHint", tableName: TranslateL10n.tableName, bundle: TranslateL10n.bundle)
+            Text(UIStrings.Translate.accessibilityHint)
                 .font(.system(size: 11))
                 .foregroundStyle(tokens.inkMuted)
                 .fixedSize(horizontal: false, vertical: true)
@@ -237,7 +228,7 @@ struct TranslateSettingsView: View {
             HStack {
                 Spacer()
                 Button(action: openAccessibilityPermission) {
-                    Text("plugin.translate.settings.openAccessibility", tableName: TranslateL10n.tableName, bundle: TranslateL10n.bundle)
+                    Text(UIStrings.Translate.openAccessibility)
                         .font(.system(size: 12, weight: .medium))
                         .padding(.horizontal, 12)
                         .padding(.vertical, 7)

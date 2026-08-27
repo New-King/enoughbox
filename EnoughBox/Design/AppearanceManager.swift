@@ -8,11 +8,11 @@ enum AppearanceMode: String, CaseIterable, Identifiable {
 
     var id: String { rawValue }
 
-    var labelKey: LocalizedStringKey {
+    var label: String {
         switch self {
-        case .system: "theme.system"
-        case .light: "theme.light"
-        case .dark: "theme.dark"
+        case .system: UIStrings.Theme.system
+        case .light: UIStrings.Theme.light
+        case .dark: UIStrings.Theme.dark
         }
     }
 

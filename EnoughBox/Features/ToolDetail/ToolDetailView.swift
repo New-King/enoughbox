@@ -16,7 +16,7 @@ struct ToolDetailView: View {
 
                 if tool.capabilities.contains(.hotkey),
                    let shortcutName = HotkeyCatalogHost.recorderName(forToolID: tool.id) {
-                    shortcutCard(name: shortcutName, footerKey: shortcutFooterKey)
+                    shortcutCard(name: shortcutName, footer: shortcutFooter)
                 }
 
                 if tool.id == TranslateTool.id {
@@ -50,19 +50,19 @@ struct ToolDetailView: View {
         NSApp.keyWindow?.makeFirstResponder(nil)
     }
 
-    private var shortcutFooterKey: LocalizedStringKey {
+    private var shortcutFooter: String {
         switch tool.id {
         case "com.enoughbox.translate":
-            "plugin.translate.shortcut.footer.active"
+            UIStrings.Tool.translateShortcutFooter
         case "com.enoughbox.screenshot":
-            "plugin.screenshot.shortcut.footer.active"
+            UIStrings.Tool.screenshotShortcutFooter
         default:
-            "plugin.sample.shortcut.footer.active"
+            UIStrings.Shortcut.section
         }
     }
 
-    private func shortcutCard(name: KeyboardShortcuts.Name, footerKey: LocalizedStringKey) -> some View {
-        ToolShortcutSettingsCard(shortcutName: name, footerKey: footerKey)
+    private func shortcutCard(name: KeyboardShortcuts.Name, footer: String) -> some View {
+        ToolShortcutSettingsCard(shortcutName: name, footer: footer)
             .frame(maxWidth: .infinity, alignment: .leading)
             .padding(16)
             .background {
@@ -105,13 +105,13 @@ struct ToolDetailView: View {
 
     private var missingToolView: some View {
         VStack(spacing: 12) {
-            Text("plugin.detail.missingBundle")
+            Text(UIStrings.Tool.missingBundle)
                 .font(.system(size: 14))
                 .foregroundStyle(tokens.inkMuted)
                 .multilineTextAlignment(.center)
                 .frame(maxWidth: 320)
 
-            Text("plugin.detail.reinstallHint")
+            Text(UIStrings.Tool.reinstallHint)
                 .font(.system(size: 12))
                 .foregroundStyle(tokens.inkMuted)
                 .multilineTextAlignment(.center)
@@ -120,7 +120,7 @@ struct ToolDetailView: View {
             Button {
                 appState.openToolCenter()
             } label: {
-                Text("plugin.detail.reinstall")
+                Text(UIStrings.Tool.reinstall)
             }
             .buttonStyle(.borderless)
         }

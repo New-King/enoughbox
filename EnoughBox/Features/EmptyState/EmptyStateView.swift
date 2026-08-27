@@ -9,26 +9,26 @@ struct EmptyStateView: View {
             Spacer(minLength: 0)
 
             VStack(spacing: 12) {
-                Text("app.slogan")
+                Text(UIStrings.App.slogan)
                     .font(.system(size: 14, weight: .regular))
                     .foregroundStyle(tokens.inkFaint)
                     .italic()
 
-                Text("empty.title")
+                Text(UIStrings.Shell.emptyTitle)
                     .font(.system(size: 22, weight: .semibold))
                     .foregroundStyle(tokens.ink)
                     .padding(.top, 4)
 
-                Text("empty.subtitle")
+                Text(UIStrings.Shell.emptySubtitle)
                     .font(.system(size: 14))
                     .foregroundStyle(tokens.inkMuted)
                     .multilineTextAlignment(.center)
                     .frame(maxWidth: 320)
 
                 Button {
-                appState.openToolCenter()
+                    appState.openToolCenter()
                 } label: {
-                    Text("empty.action.openStore")
+                    Text(UIStrings.Shell.openBuiltInTools)
                         .font(.system(size: 14, weight: .medium))
                         .foregroundStyle(.white)
                         .padding(.horizontal, 22)
@@ -44,21 +44,4 @@ struct EmptyStateView: View {
         .frame(maxWidth: .infinity, maxHeight: .infinity)
         .background(tokens.shell)
     }
-}
-
-struct PressScaleButtonStyle: ButtonStyle {
-    @Environment(\.accessibilityReduceMotion) private var reduceMotion
-
-    func makeBody(configuration: Configuration) -> some View {
-        configuration.label
-            .scaleEffect(configuration.isPressed && !reduceMotion ? 0.95 : 1)
-            .animation(reduceMotion ? nil : .easeOut(duration: 0.15), value: configuration.isPressed)
-    }
-}
-
-#Preview {
-    EmptyStateView()
-        .environmentObject(AppState())
-        .designTokensProvider()
-        .frame(width: 520, height: 480)
 }

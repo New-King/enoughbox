@@ -1,0 +1,121 @@
+import Foundation
+
+/// 用户可见文案。
+enum UIStrings {
+  enum App {
+    static let slogan = "I don't need much"
+  }
+
+  enum Shell {
+    static let toolsSection = "工具"
+    static let noToolsEnabled = "尚未启用工具"
+    static let emptyTitle = "还没有启用工具"
+    static let emptySubtitle = "启用你需要的工具"
+    static let openBuiltInTools = "打开内置工具"
+    static let builtInTools = "内置工具"
+    static let appearance = "外观"
+  }
+
+  enum Theme {
+    static let system = "跟随系统"
+    static let light = "浅色"
+    static let dark = "深色"
+  }
+
+  enum ToolStore {
+    static let title = "内置工具"
+    static let install = "启用"
+    static let uninstall = "移除"
+  }
+
+  enum Tool {
+    static let translateName = "翻译"
+    static let translateDescription = "在任意 App 里划词翻译"
+    static let screenshotName = "截图"
+    static let screenshotDescription = "区域截图、钉图、马赛克与取色"
+    static let missingBundle = "工具不可用，请从内置工具中重新启用。"
+    static let reinstallHint = "在工具中心启用或移除内置工具。"
+    static let reinstall = "打开内置工具"
+    static let translateShortcutFooter =
+      "优先翻译选中文字；没有划词则翻译剪贴板。只有划词需要辅助功能权限。"
+    static let screenshotShortcutFooter =
+      "悬停吸附窗口、单击选中；拖动可自定义区域。C 复制颜色并结束；/ 切换 HEX、RGB、HSL。"
+  }
+
+  enum Shortcut {
+    static let section = "快捷键"
+    static let placeholder = "全局快捷键"
+    static let press = "按下快捷键"
+    static let set = "设置快捷键"
+    static let savedFormat = "快捷键已设为 %@"
+    static let conflictDuplicate = "此快捷键已被 EnoughBox 的其他功能使用"
+    static let conflictSystem = "此快捷键已被 macOS 使用"
+    static let conflictMenuFormat = "此快捷键已被菜单“%@”使用"
+  }
+
+  enum Screenshot {
+    static let settingsSection = "截图"
+    static let settingsHint =
+      "需要屏幕录制权限。悬停可吸附窗口，单击选中；按住拖动可自定义区域。之后可调大小、马赛克、钉图、保存、复制或取消。"
+    static let colorHint = "移动指针可取色。按 C 复制；按 / 在 HEX、RGB、HSL 间切换。"
+    static let openScreenRecording = "打开屏幕录制设置"
+    static let pin = "钉在桌面"
+    static let mosaic = "马赛克"
+    static let save = "保存"
+    static let cancel = "取消"
+    static let confirm = "复制到剪贴板"
+    static let colorHints = "C 复制 · / 切换"
+    static let toastCopied = "已复制到剪贴板"
+    static let toastColorCopied = "已复制颜色信息"
+    static let toastFailed = "无法截取屏幕"
+    static let toastSavedFormat = "已保存 %@"
+  }
+
+  enum Translate {
+    static let action = "翻译"
+    static let sourceAuto = "自动检测"
+    static let swap = "交换语言"
+    static let cycleEngine = "切换下一个翻译平台"
+    static let resultEmpty = "译文会显示在这里"
+    static let ocrLater = "OCR 稍后接入"
+    static let noSelection = "没有选中文字，剪贴板里也没有文本"
+    static let settingsSection = "翻译"
+    static let targetLanguage = "目标语言"
+    static let engine = "引擎"
+    static let credentials = "密钥"
+    static let appID = "应用 ID"
+    static let appSecret = "应用密钥"
+    static let apiKey = "API Key"
+    static let model = "模型 ID"
+    static let baseURL = "接口 URL"
+    static let accessibility = "辅助功能"
+    static let accessibilityHint =
+      "如果没有效果，请在辅助功能中移除 EnoughBox.app，退出应用后，重新打开并勾选。"
+    static let openAccessibility = "打开辅助功能设置"
+    static let footer = "优先翻译划词；没有选中则用剪贴板。"
+    static let systemHint =
+      "使用 macOS 15 及以上的系统翻译。首次使用时系统可能会下载语言包。优先划词，没有选中则用剪贴板。"
+    static let youdaoHint =
+      "使用有道文本翻译（NMT）。应用 ID 和应用密钥必填；若控制台把应用 ID 标成 API Key，填其中一个即可。"
+    static let deepseekHint =
+      "请填写完整接口 URL，例如 https://api.deepseek.com/chat/completions。默认模型为 deepseek-v4-flash。"
+    static let engineYoudao = "有道翻译"
+    static let engineDeepSeek = "DeepSeek"
+    static let engineSystem = "系统翻译"
+    static let languageZhHans = "简体中文"
+    static let languageEn = "英语"
+    static let errorEmpty = "请输入要翻译的文本"
+    static let errorMissingYoudao = "请先在工具设置里填写有道应用 ID 和应用密钥"
+    static let errorMissingDeepSeek = "请先在工具设置里填写 DeepSeek API Key"
+    static let errorInvalidURL = "接口 URL 无效"
+    static let errorNetwork = "网络请求失败"
+    static let errorTimeout = "翻译超时"
+    static let errorCancelled = "已取消翻译"
+    static let errorSystemUnavailable = "系统翻译需要 macOS 15 或更高版本"
+    static let errorSystemFailed = "翻译失败"
+    static let errorHTTPFormat = "HTTP %d"
+    static let errorYoudaoSign = "有道签名失败，请检查应用 ID 和应用密钥"
+    static let errorYoudaoQuota = "有道额度不足或请求过于频繁"
+    static let errorYoudaoCodeFormat = "有道错误 %@"
+  }
+}

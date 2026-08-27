@@ -8,7 +8,6 @@
 
 /* Begin PBXBuildFile section */
 		124297EB6B78D57A58888F0C /* ScreenCapture.swift in Sources */ = {isa = PBXBuildFile; fileRef = F930C8715715A653D3E948A9 /* ScreenCapture.swift */; };
-		17C806E4613DC1A954704A6E /* TranslateLocalizable.xcstrings in Resources */ = {isa = PBXBuildFile; fileRef = 0FA66E929DCC86DFF4633E2F /* TranslateLocalizable.xcstrings */; };
 		1E41C82CF85A823406D6C8D6 /* ScreenshotOverlay.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4C546E38CE8EADA9BC2B946E /* ScreenshotOverlay.swift */; };
 		1F4EFADC3E075EAE45A6EF43 /* CropGeometry.swift in Sources */ = {isa = PBXBuildFile; fileRef = A34E64A5251DC7C7464EA77F /* CropGeometry.swift */; };
 		260AE1B0C08B0E1327D2DF25 /* Translator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4EE514A1DB319ECEECBD11D6 /* Translator.swift */; };
@@ -22,7 +21,7 @@
 		4A7454D68468C9573AA34C73 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = C8789202810DA85768E64FA7 /* Assets.xcassets */; };
 		4B6D64409B89CD73E5D69CE6 /* ToolModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = 01C5758E291DD9B1841DCA2A /* ToolModels.swift */; };
 		4EC05B0EBE4900CC66185019 /* ToolCenterView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37D14F070EAC7A8DB9468625 /* ToolCenterView.swift */; };
-		5A5223A70C27C30C265F752F /* ScreenshotLocalizable.xcstrings in Resources */ = {isa = PBXBuildFile; fileRef = F85857FDB7859547CB2F6489 /* ScreenshotLocalizable.xcstrings */; };
+		59C02E12DF1EEC71052AD777 /* DesignTokens+AppKit.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7A9719AB838FCF7C96F308B9 /* DesignTokens+AppKit.swift */; };
 		5E20D467C067D519F30321D0 /* ToolRegistry.swift in Sources */ = {isa = PBXBuildFile; fileRef = FECBD5A1083E8656811A832F /* ToolRegistry.swift */; };
 		5F64E41DAACABAC2220533DB /* FloatingBanner.swift in Sources */ = {isa = PBXBuildFile; fileRef = E64C21170554FB94B7A3BFD4 /* FloatingBanner.swift */; };
 		604D8B097BC90CC42490EE6A /* KeyboardShortcuts in Frameworks */ = {isa = PBXBuildFile; productRef = 13A24B873FA65BCCB6E801C3 /* KeyboardShortcuts */; };
@@ -35,7 +34,7 @@
 		91AF53F228F579881F28BB2B /* DesignTokens.swift in Sources */ = {isa = PBXBuildFile; fileRef = 11F132A4E6E47759F5683FA8 /* DesignTokens.swift */; };
 		9D39EB8ACCB0A1F606CF387C /* DeepSeekTranslator.swift in Sources */ = {isa = PBXBuildFile; fileRef = E2ED94DCA5F2CE554FDF5E07 /* DeepSeekTranslator.swift */; };
 		9D61841BFBE1CFC6C59525DE /* ToolToggleButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = 14C269FA1FD0194F652CAABB /* ToolToggleButton.swift */; };
-		A0DF783B67CC5106A4745D92 /* Localizable.xcstrings in Resources */ = {isa = PBXBuildFile; fileRef = C30F8231CB2E4E4C304C65A9 /* Localizable.xcstrings */; };
+		9F589EB4AFC0ECFCCDCDD1B7 /* PressScaleButtonStyle.swift in Sources */ = {isa = PBXBuildFile; fileRef = B4E754D388D917256B2452D4 /* PressScaleButtonStyle.swift */; };
 		A578552C79CDB7774F38AAA0 /* ScreenshotCenterToast.swift in Sources */ = {isa = PBXBuildFile; fileRef = 86E1B05429EF4CCD61A9F25E /* ScreenshotCenterToast.swift */; };
 		ACCADF8A7DB3AA3508940D25 /* ScreenshotGeometry.swift in Sources */ = {isa = PBXBuildFile; fileRef = 96DEEDEE73F1E1A55828F09F /* ScreenshotGeometry.swift */; };
 		B4570B6FEF37DE9A2E92487A /* AppState.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2E798AA90D4ECE990344C323 /* AppState.swift */; };
@@ -43,6 +42,7 @@
 		BA3C78584A708ACE7F43C773 /* ScreenshotCapturePolicy.swift in Sources */ = {isa = PBXBuildFile; fileRef = AE131292BBC87EB9A4ACE293 /* ScreenshotCapturePolicy.swift */; };
 		BA6F1A0D0DA29688E644415E /* SelectionCapture.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7134855C14460D4F364127DF /* SelectionCapture.swift */; };
 		BD0C7CEA6BDCFFA52B7E941C /* YoudaoTranslator.swift in Sources */ = {isa = PBXBuildFile; fileRef = E87D5AA12725A1A39F4C3729 /* YoudaoTranslator.swift */; };
+		C7AC25CD4296F376687F0FBC /* UIStrings.swift in Sources */ = {isa = PBXBuildFile; fileRef = 73BC34BD0610838C32FA4A4D /* UIStrings.swift */; };
 		CDF06785774E0298440C8CA9 /* AppPaths.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1E332521763E4DEB27F1F241 /* AppPaths.swift */; };
 		DCB529BC069B942C9AD53E1C /* ShortcutSettingsViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = B4AACB91BDE6536D0F957C13 /* ShortcutSettingsViewController.swift */; };
 		F388ADD80A9428352261C67E /* ShortcutRecorderField.swift in Sources */ = {isa = PBXBuildFile; fileRef = B0842B672B213124ACF3D0C9 /* ShortcutRecorderField.swift */; };
@@ -51,7 +51,6 @@
 /* Begin PBXFileReference section */
 		01C5758E291DD9B1841DCA2A /* ToolModels.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ToolModels.swift; sourceTree = "<group>"; };
 		01FE46A40A388AD246F749C5 /* InputRecovery.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InputRecovery.swift; sourceTree = "<group>"; };
-		0FA66E929DCC86DFF4633E2F /* TranslateLocalizable.xcstrings */ = {isa = PBXFileReference; lastKnownFileType = text.json.xcstrings; path = TranslateLocalizable.xcstrings; sourceTree = "<group>"; };
 		11F132A4E6E47759F5683FA8 /* DesignTokens.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DesignTokens.swift; sourceTree = "<group>"; };
 		14C269FA1FD0194F652CAABB /* ToolToggleButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ToolToggleButton.swift; sourceTree = "<group>"; };
 		1E332521763E4DEB27F1F241 /* AppPaths.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppPaths.swift; sourceTree = "<group>"; };
@@ -65,8 +64,10 @@
 		4EE514A1DB319ECEECBD11D6 /* Translator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Translator.swift; sourceTree = "<group>"; };
 		6E505AD4E4312D4C01B58E38 /* HotkeyCenter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HotkeyCenter.swift; sourceTree = "<group>"; };
 		7134855C14460D4F364127DF /* SelectionCapture.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SelectionCapture.swift; sourceTree = "<group>"; };
+		73BC34BD0610838C32FA4A4D /* UIStrings.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UIStrings.swift; sourceTree = "<group>"; };
 		73E3DEEA794027A64CD6CBE8 /* ToolManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ToolManager.swift; sourceTree = "<group>"; };
 		76FE9361E1B6C73CD9FF0C4E /* TranslateTool.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TranslateTool.swift; sourceTree = "<group>"; };
+		7A9719AB838FCF7C96F308B9 /* DesignTokens+AppKit.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "DesignTokens+AppKit.swift"; sourceTree = "<group>"; };
 		7BF25D8EFD48AABA211A16FA /* TranslationPanel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TranslationPanel.swift; sourceTree = "<group>"; };
 		86E1B05429EF4CCD61A9F25E /* ScreenshotCenterToast.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScreenshotCenterToast.swift; sourceTree = "<group>"; };
 		8F36E3F1DF931390FA757F3A /* EnoughBoxApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EnoughBoxApp.swift; sourceTree = "<group>"; };
@@ -78,15 +79,14 @@
 		B0842B672B213124ACF3D0C9 /* ShortcutRecorderField.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShortcutRecorderField.swift; sourceTree = "<group>"; };
 		B3414FF930E6A99F676C21DB /* EnoughBox.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = EnoughBox.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		B4AACB91BDE6536D0F957C13 /* ShortcutSettingsViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShortcutSettingsViewController.swift; sourceTree = "<group>"; };
+		B4E754D388D917256B2452D4 /* PressScaleButtonStyle.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PressScaleButtonStyle.swift; sourceTree = "<group>"; };
 		B8370BBAD0FEEF3FFC391DA3 /* ScreenshotTool.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScreenshotTool.swift; sourceTree = "<group>"; };
-		C30F8231CB2E4E4C304C65A9 /* Localizable.xcstrings */ = {isa = PBXFileReference; lastKnownFileType = text.json.xcstrings; path = Localizable.xcstrings; sourceTree = "<group>"; };
 		C8789202810DA85768E64FA7 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		CEF495582C9BFB2CA05DC64B /* ToolDetailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ToolDetailView.swift; sourceTree = "<group>"; };
 		E2ED94DCA5F2CE554FDF5E07 /* DeepSeekTranslator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeepSeekTranslator.swift; sourceTree = "<group>"; };
 		E64C21170554FB94B7A3BFD4 /* FloatingBanner.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FloatingBanner.swift; sourceTree = "<group>"; };
 		E87D5AA12725A1A39F4C3729 /* YoudaoTranslator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = YoudaoTranslator.swift; sourceTree = "<group>"; };
 		EDDC78515BD7BABFC248986C /* ScreenshotPin.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScreenshotPin.swift; sourceTree = "<group>"; };
-		F85857FDB7859547CB2F6489 /* ScreenshotLocalizable.xcstrings */ = {isa = PBXFileReference; lastKnownFileType = text.json.xcstrings; path = ScreenshotLocalizable.xcstrings; sourceTree = "<group>"; };
 		F930C8715715A653D3E948A9 /* ScreenCapture.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScreenCapture.swift; sourceTree = "<group>"; };
 		FECBD5A1083E8656811A832F /* ToolRegistry.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ToolRegistry.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -238,7 +238,9 @@
 			children = (
 				9310CF80D6394B6335D68306 /* AppearanceManager.swift */,
 				11F132A4E6E47759F5683FA8 /* DesignTokens.swift */,
+				7A9719AB838FCF7C96F308B9 /* DesignTokens+AppKit.swift */,
 				E64C21170554FB94B7A3BFD4 /* FloatingBanner.swift */,
+				B4E754D388D917256B2452D4 /* PressScaleButtonStyle.swift */,
 			);
 			path = Design;
 			sourceTree = "<group>";
@@ -247,9 +249,6 @@
 			isa = PBXGroup;
 			children = (
 				C8789202810DA85768E64FA7 /* Assets.xcassets */,
-				C30F8231CB2E4E4C304C65A9 /* Localizable.xcstrings */,
-				F85857FDB7859547CB2F6489 /* ScreenshotLocalizable.xcstrings */,
-				0FA66E929DCC86DFF4633E2F /* TranslateLocalizable.xcstrings */,
 			);
 			path = Resources;
 			sourceTree = "<group>";
@@ -259,6 +258,7 @@
 			children = (
 				2ACA6E86E67229F1AB53A0DE /* EnoughBox.entitlements */,
 				8F36E3F1DF931390FA757F3A /* EnoughBoxApp.swift */,
+				73BC34BD0610838C32FA4A4D /* UIStrings.swift */,
 				6557732E3A40E61B614D10DF /* App */,
 				BB19F94EA5E00F6D40BB9E87 /* Design */,
 				742D4E826DE74962654C9B62 /* Features */,
@@ -331,11 +331,10 @@
 				};
 			};
 			buildConfigurationList = 47F243947EE141DACE55A8BD /* Build configuration list for PBXProject "EnoughBox" */;
-			developmentRegion = en;
+			developmentRegion = "zh-Hans";
 			hasScannedForEncodings = 0;
 			knownRegions = (
 				Base,
-				en,
 				"zh-Hans",
 			);
 			mainGroup = FBA80E53B8010B18211476F6;
@@ -359,9 +358,6 @@
 			buildActionMask = 2147483647;
 			files = (
 				4A7454D68468C9573AA34C73 /* Assets.xcassets in Resources */,
-				A0DF783B67CC5106A4745D92 /* Localizable.xcstrings in Resources */,
-				5A5223A70C27C30C265F752F /* ScreenshotLocalizable.xcstrings in Resources */,
-				17C806E4613DC1A954704A6E /* TranslateLocalizable.xcstrings in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -377,6 +373,7 @@
 				621E8609D681721BE09E1CA8 /* AppearanceManager.swift in Sources */,
 				1F4EFADC3E075EAE45A6EF43 /* CropGeometry.swift in Sources */,
 				9D39EB8ACCB0A1F606CF387C /* DeepSeekTranslator.swift in Sources */,
+				59C02E12DF1EEC71052AD777 /* DesignTokens+AppKit.swift in Sources */,
 				91AF53F228F579881F28BB2B /* DesignTokens.swift in Sources */,
 				83D841C043F334BACE14CA9B /* EmptyStateView.swift in Sources */,
 				28C9F2ED69BE3EE4308D1A1D /* EnoughBoxApp.swift in Sources */,
@@ -385,6 +382,7 @@
 				33E5765256D3B926DA23D4D0 /* HotkeyCenter.swift in Sources */,
 				3103A71F8E0AA548034A28B4 /* InputRecovery.swift in Sources */,
 				380BC38145D7A1851ABEB894 /* MainView.swift in Sources */,
+				9F589EB4AFC0ECFCCDCDD1B7 /* PressScaleButtonStyle.swift in Sources */,
 				124297EB6B78D57A58888F0C /* ScreenCapture.swift in Sources */,
 				BA3C78584A708ACE7F43C773 /* ScreenshotCapturePolicy.swift in Sources */,
 				A578552C79CDB7774F38AAA0 /* ScreenshotCenterToast.swift in Sources */,
@@ -405,6 +403,7 @@
 				3B252953FA4637D5832036B6 /* TranslateTool.swift in Sources */,
 				B695927C48B9EB1ED80AF2FB /* TranslationPanel.swift in Sources */,
 				260AE1B0C08B0E1327D2DF25 /* Translator.swift in Sources */,
+				C7AC25CD4296F376687F0FBC /* UIStrings.swift in Sources */,
 				BD0C7CEA6BDCFFA52B7E941C /* YoudaoTranslator.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -437,7 +436,7 @@
 				PRODUCT_BUNDLE_IDENTIFIER = com.enoughbox.app;
 				PRODUCT_NAME = EnoughBox;
 				SDKROOT = macosx;
-				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_EMIT_LOC_STRINGS = NO;
 				SWIFT_VERSION = 5.9;
 			};
 			name = Debug;
@@ -467,7 +466,7 @@
 				PRODUCT_BUNDLE_IDENTIFIER = com.enoughbox.app;
 				PRODUCT_NAME = EnoughBox;
 				SDKROOT = macosx;
-				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_EMIT_LOC_STRINGS = NO;
 				SWIFT_VERSION = 5.9;
 			};
 			name = Release;
