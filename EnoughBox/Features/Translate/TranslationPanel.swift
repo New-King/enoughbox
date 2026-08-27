@@ -100,15 +100,12 @@ final class TranslationPanelModel: ObservableObject {
         appleRequestID = nil
     }
 
-    func swapLanguages() {
-        sourceText = translatedText
-        let previousTarget = targetLanguage
-        targetLanguage = detectedLanguage
-        detectedLanguage = previousTarget
+    func toggleTargetLanguage() {
+        targetLanguage = targetLanguage == .en ? .zhHans : .en
         TranslateSettings.targetLanguage = targetLanguage
-        if !sourceText.isEmpty {
-            translate()
-        }
+        let text = sourceText.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard !text.isEmpty else { return }
+        translate()
     }
 
     func clearSource() {
@@ -141,10 +138,11 @@ private final class TranslationNSPanel: NSPanel {
 }
 
 @MainActor
-final class TranslationPanelController: NSWindowController {
+final class TranslationPanelController: NSWindowController, NSWindowDelegate {
     private let session = TranslationPanelModel()
     private var hostingController: NSHostingController<TranslationPanelRootView>!
     private var lastFittedSize: CGSize = .zero
+    private var clickOutsideMonitor: Any?
 
     convenience init() {
         let panel = TranslationNSPanel(
@@ -174,6 +172,7 @@ final class TranslationPanelController: NSWindowController {
         )
         hostingController = hosting
         panel.contentViewController = hosting
+        panel.delegate = self
         session.$isPinned
             .receive(on: RunLoop.main)
             .sink { [weak panel] pinned in
@@ -195,18 +194,49 @@ final class TranslationPanelController: NSWindowController {
 
     func present(sourceText: String) {
         lastFittedSize = .zero
+        session.isPinned = false
         session.present(sourceText: sourceText)
         guard let window else { return }
         positionNearMouse(window)
         window.orderFrontRegardless()
         window.makeKey()
+        installClickOutsideMonitor()
         scheduleFit()
     }
 
     override func close() {
+        removeClickOutsideMonitor()
         window?.makeFirstResponder(nil)
         window?.orderOut(nil)
         HostWindowFocus.returnToMainWindow()
+    }
+
+    func windowDidResignKey(_ notification: Notification) {
+        dismissIfClickOutside()
+    }
+
+    private func installClickOutsideMonitor() {
+        removeClickOutsideMonitor()
+        clickOutsideMonitor = NSEvent.addGlobalMonitorForEvents(matching: [.leftMouseDown, .rightMouseDown]) { [weak self] _ in
+            Task { @MainActor in
+                self?.dismissIfClickOutside()
+            }
+        }
+    }
+
+    private func removeClickOutsideMonitor() {
+        if let clickOutsideMonitor {
+            NSEvent.removeMonitor(clickOutsideMonitor)
+            self.clickOutsideMonitor = nil
+        }
+    }
+
+    private func dismissIfClickOutside() {
+        guard let window, window.isVisible, !session.isPinned else { return }
+        let click = NSEvent.mouseLocation
+        if !window.frame.contains(click) {
+            close()
+        }
     }
 
     private func installCloseKeyMonitor() {
@@ -375,7 +405,7 @@ private struct TranslationPanelView: View {
                 .font(.system(size: 12))
                 .foregroundStyle(tokens.inkSoft)
             Spacer()
-            Button(action: session.swapLanguages) {
+            Button(action: session.toggleTargetLanguage) {
                 Image(systemName: "arrow.left.arrow.right")
                     .font(.system(size: 11, weight: .medium))
                     .foregroundStyle(tokens.inkMuted)
@@ -409,11 +439,11 @@ private struct TranslationPanelView: View {
                     .font(.system(size: 12, weight: .medium))
                     .foregroundStyle(tokens.ink)
                 Button(action: session.cycleEngine) {
-                    Image(systemName: "arrow.triangle.2.circlepath")
+                    Image(systemName: "chevron.right")
                         .font(.system(size: 11, weight: .semibold))
                         .foregroundStyle(tokens.inkMuted)
                 }
-                .buttonStyle(.plain)
+                .buttonStyle(TranslationPanelIconButtonStyle(hoverFill: tokens.ink.opacity(0.1)))
                 .help(UIStrings.Translate.cycleEngine)
                 .accessibilityLabel(UIStrings.Translate.cycleEngine)
                 Spacer()
@@ -482,9 +512,33 @@ private struct TranslationPanelView: View {
             Image(systemName: systemName)
                 .font(.system(size: 12, weight: .medium))
                 .foregroundStyle(tokens.inkMuted)
-                .frame(width: 22, height: 22)
         }
-        .buttonStyle(.plain)
+        .buttonStyle(TranslationPanelIconButtonStyle(hoverFill: tokens.ink.opacity(0.1)))
+    }
+}
+
+private struct TranslationPanelIconButtonStyle: ButtonStyle {
+    let hoverFill: Color
+
+    func makeBody(configuration: Configuration) -> some View {
+        TranslationPanelIconButtonLabel(configuration: configuration, hoverFill: hoverFill)
+    }
+}
+
+private struct TranslationPanelIconButtonLabel: View {
+    let configuration: ButtonStyle.Configuration
+    let hoverFill: Color
+    @State private var isHovered = false
+
+    var body: some View {
+        configuration.label
+            .frame(width: 28, height: 28)
+            .background(
+                RoundedRectangle(cornerRadius: 7, style: .continuous)
+                    .fill(isHovered || configuration.isPressed ? hoverFill : Color.clear)
+            )
+            .contentShape(RoundedRectangle(cornerRadius: 7, style: .continuous))
+            .onHover { isHovered = $0 }
     }
 }
 

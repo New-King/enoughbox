@@ -74,7 +74,7 @@ enum UIStrings {
   enum Translate {
     static let action = "翻译"
     static let sourceAuto = "自动检测"
-    static let swap = "交换语言"
+    static let swap = "切换目标语言（中/英）"
     static let cycleEngine = "切换下一个翻译平台"
     static let resultEmpty = "译文会显示在这里"
     static let ocrLater = "OCR 稍后接入"
