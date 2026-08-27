@@ -74,7 +74,6 @@ struct DesignTokensProvider: ViewModifier {
         let tokens = DesignTokens.tokens(for: colorScheme)
         content
             .environment(\.designTokens, tokens)
-            .tint(tokens.controlTint)
     }
 }
 

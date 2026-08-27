@@ -8,6 +8,8 @@ struct MainView: View {
     /// 220pt − 25% ≈ 165pt
     private let sidebarWidth: CGFloat = 165
 
+    private let sidebarRowInsets = EdgeInsets(top: 2, leading: 10, bottom: 2, trailing: 10)
+
     var body: some View {
         HStack(spacing: 0) {
             sidebar
@@ -59,10 +61,16 @@ struct MainView: View {
                         .font(.system(size: 12))
                         .foregroundStyle(tokens.inkFaint)
                         .padding(.vertical, 4)
-                        .listRowBackground(Color.clear)
+                        .listRowInsets(sidebarRowInsets)
                 } else {
                     ForEach(appState.enabledTools) { tool in
-                        toolRow(tool)
+                        Label {
+                            Text(appState.displayName(for: tool))
+                        } icon: {
+                            Image(systemName: tool.iconName)
+                        }
+                        .tag(tool.id)
+                        .listRowInsets(sidebarRowInsets)
                     }
                 }
             } header: {
@@ -70,35 +78,12 @@ struct MainView: View {
             }
         }
         .listStyle(.sidebar)
-        .listRowSeparator(.hidden, edges: .all)
         .contentMargins(.top, 8, for: .scrollContent)
         .contentMargins(.bottom, 8, for: .scrollContent)
+        .contentMargins(.horizontal, 4, for: .scrollContent)
         .scrollContentBackground(.hidden)
         .background(tokens.shell)
         .frame(width: sidebarWidth)
-    }
-
-    private func toolRow(_ tool: EnabledTool) -> some View {
-        let isSelected = appState.selectedToolID == tool.id
-        return Label {
-            Text(appState.displayName(for: tool))
-        } icon: {
-            Image(systemName: tool.iconName)
-        }
-        .tag(tool.id)
-        .foregroundStyle(
-            isSelected
-                ? Color(nsColor: .alternateSelectedControlTextColor)
-                : tokens.ink
-        )
-        .listRowBackground(
-            RoundedRectangle(cornerRadius: 6, style: .continuous)
-                .fill(
-                    isSelected
-                        ? Color(nsColor: .selectedContentBackgroundColor)
-                        : Color.clear
-                )
-        )
     }
 
     @ViewBuilder
