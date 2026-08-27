@@ -29,7 +29,7 @@ struct ToolShortcutSettingsCard: View {
                 } onConflict: { conflict in
                     appState.showToast(conflict.localizedMessage, style: .error)
                 }
-                .frame(width: 140, height: 24)
+                .frame(width: 160, height: 24)
             }
 
             Text(footer)

@@ -54,12 +54,7 @@ struct ScreenshotSettingsView: View {
                 .foregroundStyle(tokens.inkMuted)
                 .textCase(.uppercase)
 
-            Text(UIStrings.Screenshot.settingsHint)
-                .font(.system(size: 13))
-                .foregroundStyle(tokens.inkSoft)
-                .fixedSize(horizontal: false, vertical: true)
-
-            Text(UIStrings.Screenshot.colorHint)
+            Text(UIStrings.Screenshot.permissionHint)
                 .font(.system(size: 11))
                 .foregroundStyle(tokens.inkMuted)
                 .fixedSize(horizontal: false, vertical: true)

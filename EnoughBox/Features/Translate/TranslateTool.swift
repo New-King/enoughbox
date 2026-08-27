@@ -60,6 +60,11 @@ struct TranslateSettingsView: View {
     @Environment(\.designTokens) private var tokens
     @FocusState private var focusedField: String?
 
+    private let settingsControlWidth: CGFloat = 160
+
+    private static let youdaoApplyURL = URL(string: "https://ai.youdao.com/console/#/")!
+    private static let deepSeekApplyURL = URL(string: "https://platform.deepseek.com/")!
+
     @State private var targetLanguage = TranslateSettings.targetLanguage
     @State private var engine = TranslateSettings.engine
     @State private var youdaoAppID = TranslateSettings.youdaoAppID
@@ -78,7 +83,6 @@ struct TranslateSettingsView: View {
         .defaultFocus($focusedField, nil)
         .frame(maxWidth: .infinity, alignment: .leading)
         .padding(.vertical, 4)
-        .environment(\.openURL, OpenURLAction { _ in .discarded })
     }
 
     private var translationSection: some View {
@@ -92,7 +96,7 @@ struct TranslateSettingsView: View {
                     }
                 }
                 .labelsHidden()
-                .frame(width: 140)
+                .frame(width: settingsControlWidth)
                 .onChange(of: targetLanguage) { _, newValue in
                     TranslateSettings.targetLanguage = newValue
                 }
@@ -105,7 +109,7 @@ struct TranslateSettingsView: View {
                     }
                 }
                 .labelsHidden()
-                .frame(width: 160)
+                .frame(width: settingsControlWidth)
                 .onChange(of: engine) { _, newValue in
                     TranslateSettings.engine = newValue
                 }
@@ -131,7 +135,7 @@ struct TranslateSettingsView: View {
                 labeledField(UIStrings.Translate.apiKey, field: "youdao.apiKey", text: $youdaoAPIKey) {
                     TranslateSettings.youdaoAPIKey = youdaoAPIKey
                 }
-                hintText(UIStrings.Translate.youdaoHint)
+                hintText(UIStrings.Translate.youdaoHint, applyURL: Self.youdaoApplyURL)
             }
             .settingsCard(tokens: tokens, resignFocus: resignFocus)
         case .deepseek:
@@ -146,7 +150,7 @@ struct TranslateSettingsView: View {
                 labeledField(UIStrings.Translate.baseURL, field: "deepseek.baseURL", text: $deepSeekBaseURL) {
                     TranslateSettings.deepSeekBaseURL = deepSeekBaseURL
                 }
-                hintText(UIStrings.Translate.deepseekHint)
+                hintText(UIStrings.Translate.deepseekHint, applyURL: Self.deepSeekApplyURL)
             }
             .settingsCard(tokens: tokens, resignFocus: resignFocus)
         case .system:
@@ -168,12 +172,38 @@ struct TranslateSettingsView: View {
         focusedField = nil
     }
 
-    private func hintText(_ text: String) -> some View {
-        Text(text)
-            .font(.system(size: 11))
-            .foregroundStyle(tokens.inkMuted)
-            .fixedSize(horizontal: false, vertical: true)
-            .onTapGesture(perform: resignFocus)
+    private func hintText(_ text: String, applyURL: URL? = nil) -> some View {
+        HStack(alignment: .firstTextBaseline, spacing: 12) {
+            Text(text)
+                .font(.system(size: 11))
+                .foregroundStyle(tokens.inkMuted)
+                .fixedSize(horizontal: false, vertical: true)
+                .frame(maxWidth: .infinity, alignment: .leading)
+                .onTapGesture(perform: resignFocus)
+
+            if let applyURL {
+                applyLink(applyURL)
+            }
+        }
+    }
+
+    private func applyLink(_ url: URL) -> some View {
+        Button {
+            NSWorkspace.shared.open(url)
+        } label: {
+            Text(UIStrings.Translate.apply)
+                .font(.system(size: 11))
+                .underline()
+        }
+        .buttonStyle(.plain)
+        .foregroundStyle(tokens.controlTint)
+        .onHover { isHovered in
+            if isHovered {
+                NSCursor.pointingHand.push()
+            } else {
+                NSCursor.pop()
+            }
+        }
     }
 
     private func settingsHeader(_ title: String) -> some View {
