@@ -369,9 +369,6 @@ private struct TranslationPanelView: View {
                 panelIconButton("square.on.square") {
                     session.copy(session.sourceText)
                 }
-                panelIconButton("plus.viewfinder") {}
-                    .disabled(true)
-                    .help(UIStrings.Translate.ocrLater)
                 panelIconButton("xmark.square") {
                     session.clearSource()
                 }

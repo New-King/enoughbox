@@ -211,13 +211,19 @@ final class ScreenshotOverlayController {
     }
 
     private func save(_ image: CGImage) {
+        guard let host = panels.first(where: { $0.isKeyWindow }) ?? panels.first else { return }
         let panel = NSSavePanel()
         panel.allowedContentTypes = [.png]
         panel.canCreateDirectories = true
+        panel.showsTagField = true
+        panel.isExtensionHidden = false
         panel.nameFieldStringValue = defaultFileName()
-        let overlays = panels
-        for overlay in overlays { overlay.orderOut(nil) }
-        panel.begin { [weak self] response in
+        panel.title = UIStrings.Screenshot.save
+        panel.prompt = UIStrings.Screenshot.save
+
+        NSApp.activate(ignoringOtherApps: true)
+        host.makeKeyAndOrderFront(nil)
+        panel.beginSheetModal(for: host) { [weak self] response in
             guard let self else { return }
             if response == .OK, let url = panel.url, let data = pngData(image) {
                 try? data.write(to: url)
@@ -226,8 +232,6 @@ final class ScreenshotOverlayController {
                 DispatchQueue.main.async { [weak self] in
                     self?.onSaved?(name)
                 }
-            } else {
-                for overlay in overlays { overlay.orderFrontRegardless() }
             }
         }
     }
@@ -251,8 +255,8 @@ final class ScreenshotOverlayController {
 
     private func defaultFileName() -> String {
         let formatter = DateFormatter()
-        formatter.dateFormat = "yyyy-MM-dd-HHmmss"
-        return "EnoughBox-\(formatter.string(from: Date())).png"
+        formatter.dateFormat = "yyyy-MM-dd_HHmmss"
+        return "ScreenShot_\(formatter.string(from: Date())).png"
     }
 
     private func dismiss(copyColor: Bool) {
@@ -306,9 +310,11 @@ private final class ScreenshotOverlayView: NSView {
     private var selection = CGRect.zero
     private var committed = false
     private var mosaicArmed = false
+    private var mosaicPainting = false
+    private var mosaicBrushDiameter: CGFloat = 24
+    private var lastMosaicPoint: CGPoint?
     private var dragStart: CGPoint?
     private var dragEdge: ResizeEdge?
-    private var mosaicStart: CGPoint?
     private var isCustomDragging = false
     private var hoverPoint: CGPoint = .zero
     private var sampled: SampledColor?
@@ -343,6 +349,12 @@ private final class ScreenshotOverlayView: NSView {
         toolbar.onPick = { [weak self] item in
             self?.handleToolbar(item)
         }
+        toolbar.onMosaicBrushDiameterChange = { [weak self] diameter in
+            guard let self else { return }
+            self.mosaicBrushDiameter = diameter
+            MosaicBrushCursor.update(diameter: diameter)
+        }
+        MosaicBrushCursor.update(diameter: mosaicBrushDiameter)
     }
 
     required init?(coder: NSCoder) { nil }
@@ -404,17 +416,20 @@ private final class ScreenshotOverlayView: NSView {
         if !committed, !isCustomDragging {
             applyWindowSnap(at: hoverPoint)
         }
-        if committed, !mosaicArmed {
+        if mosaicArmed {
+            if selection.contains(hoverPoint) {
+                MosaicBrushCursor.set()
+            } else {
+                NSCursor.arrow.set()
+            }
+        } else if committed, !isCustomDragging {
             window?.invalidateCursorRects(for: self)
         }
         needsDisplay = true
     }
 
     override func resetCursorRects() {
-        if mosaicArmed {
-            addCursorRect(bounds, cursor: .crosshair)
-            return
-        }
+        if mosaicArmed { return }
         if committed {
             addCursorRect(selection, cursor: .openHand)
             for edge in [ResizeEdge.n, .s, .e, .w, .ne, .nw, .se, .sw] {
@@ -435,7 +450,9 @@ private final class ScreenshotOverlayView: NSView {
                 return
             }
             if mosaicArmed, selection.contains(point) {
-                mosaicStart = point
+                lastMosaicPoint = nil
+                paintMosaicStroke(to: point)
+                mosaicPainting = true
                 return
             }
             if selection.contains(point) {
@@ -454,8 +471,8 @@ private final class ScreenshotOverlayView: NSView {
         let point = convert(event.locationInWindow, from: nil)
         hoverPoint = point
         refreshColor()
-        if let mosaicStart, mosaicArmed {
-            currentMosaicEnd = point
+        if mosaicPainting, mosaicArmed {
+            paintMosaicStroke(to: point)
             needsDisplay = true
             return
         }
@@ -485,23 +502,12 @@ private final class ScreenshotOverlayView: NSView {
         needsDisplay = true
     }
 
-    private var currentMosaicEnd: CGPoint?
-
     override func mouseUp(with event: NSEvent) {
         guard acceptsPointerInput else { return }
         let point = convert(event.locationInWindow, from: nil)
-        if let mosaicStart, mosaicArmed {
-            let rect = CGRect(
-                x: min(mosaicStart.x, point.x),
-                y: min(mosaicStart.y, point.y),
-                width: abs(point.x - mosaicStart.x),
-                height: abs(point.y - mosaicStart.y)
-            ).intersection(selection)
-            if rect.width >= 4, rect.height >= 4 {
-                bakeMosaic(rect)
-            }
-            self.mosaicStart = nil
-            currentMosaicEnd = nil
+        if mosaicPainting {
+            mosaicPainting = false
+            lastMosaicPoint = nil
             needsDisplay = true
             return
         }
@@ -591,6 +597,9 @@ private final class ScreenshotOverlayView: NSView {
             dim.windingRule = .evenOdd
             NSColor.black.withAlphaComponent(dimAlpha).setFill()
             dim.fill()
+            if committed {
+                drawWorkingImage(in: selection)
+            }
             let borderRect = selection.insetBy(dx: 0.5, dy: 0.5)
             SelectionChrome.strokeAlternatingBorder(in: borderRect, lineWidth: committed ? 1 : 2)
             if committed {
@@ -599,7 +608,6 @@ private final class ScreenshotOverlayView: NSView {
             }
             drawSizeBadge()
         }
-        drawMosaicPreviewIfNeeded()
     }
 
     override func layout() {
@@ -607,37 +615,90 @@ private final class ScreenshotOverlayView: NSView {
         layoutChrome()
     }
 
-    private func drawMosaicPreviewIfNeeded() {
-        guard let mosaicStart, let currentMosaicEnd else { return }
-        let rect = CGRect(
-            x: min(mosaicStart.x, currentMosaicEnd.x),
-            y: min(mosaicStart.y, currentMosaicEnd.y),
-            width: abs(currentMosaicEnd.x - mosaicStart.x),
-            height: abs(currentMosaicEnd.y - mosaicStart.y)
-        ).intersection(selection)
-        NSColor.white.withAlphaComponent(0.2).setFill()
-        rect.fill()
+    private func paintMosaicStroke(to point: CGPoint) {
+        guard mosaicArmed, selection.contains(point) else { return }
+        if let last = lastMosaicPoint {
+            let distance = hypot(point.x - last.x, point.y - last.y)
+            let step = max(mosaicBrushDiameter / 4, 2)
+            if distance > step {
+                let steps = Int(ceil(distance / step))
+                for index in 1...steps {
+                    let t = CGFloat(index) / CGFloat(steps)
+                    let interpolated = CGPoint(
+                        x: last.x + (point.x - last.x) * t,
+                        y: last.y + (point.y - last.y) * t
+                    )
+                    stampMosaic(at: interpolated)
+                }
+            } else if distance > 0.5 {
+                stampMosaic(at: point)
+            }
+        } else {
+            stampMosaic(at: point)
+        }
+        lastMosaicPoint = point
     }
 
-    private func bakeMosaic(_ localRect: CGRect) {
+    private func stampMosaic(at viewPoint: CGPoint) {
+        guard selection.contains(viewPoint) else { return }
         let imageSize = CGSize(width: workingImage.width, height: workingImage.height)
-        let pixel: CGRect
+        let brushRect = CGRect(
+            x: viewPoint.x - mosaicBrushDiameter / 2,
+            y: viewPoint.y - mosaicBrushDiameter / 2,
+            width: mosaicBrushDiameter,
+            height: mosaicBrushDiameter
+        )
+        let pixelRect: CGRect
         if let windowCaptureRect {
-            pixel = CropGeometry.cropRectWithinWindow(
-                selection: localRect,
+            pixelRect = CropGeometry.cropRectWithinWindow(
+                selection: brushRect,
                 windowRect: windowCaptureRect,
                 screenSize: bounds.size,
                 imageSize: imageSize
             )
         } else {
-            pixel = CropGeometry.cropRect(
-                localRect: localRect,
+            pixelRect = CropGeometry.cropRect(
+                localRect: brushRect,
                 screenSize: bounds.size,
                 imageSize: imageSize
             )
         }
-        workingImage = ScreenshotMosaic.apply(to: workingImage, pixelRect: pixel)
+        guard pixelRect.width >= 2, pixelRect.height >= 2 else { return }
+        let pixelCenter = CGPoint(x: pixelRect.midX, y: pixelRect.midY)
+        let pixelDiameter = max(pixelRect.width, pixelRect.height)
+        workingImage = ScreenshotMosaic.applyBrush(
+            to: workingImage,
+            pixelCenter: pixelCenter,
+            pixelDiameter: pixelDiameter
+        )
         needsDisplay = true
+    }
+
+    private func drawWorkingImage(in localRect: CGRect) {
+        let drawRect = localRect.intersection(selection)
+        guard !drawRect.isEmpty else { return }
+        let imageSize = CGSize(width: workingImage.width, height: workingImage.height)
+        let pixelRect: CGRect
+        if let windowCaptureRect {
+            pixelRect = CropGeometry.cropRectWithinWindow(
+                selection: drawRect,
+                windowRect: windowCaptureRect,
+                screenSize: bounds.size,
+                imageSize: imageSize
+            )
+        } else {
+            pixelRect = CropGeometry.cropRect(
+                localRect: drawRect,
+                screenSize: bounds.size,
+                imageSize: imageSize
+            )
+        }
+        guard let piece = workingImage.cropping(to: pixelRect.integral) else { return }
+        guard let context = NSGraphicsContext.current?.cgContext else { return }
+        context.saveGState()
+        context.interpolationQuality = .none
+        context.draw(piece, in: drawRect)
+        context.restoreGState()
     }
 
     private func commitSelection() {
@@ -669,8 +730,18 @@ private final class ScreenshotOverlayView: NSView {
         switch item {
         case .mosaic:
             mosaicArmed.toggle()
-            toolbar.setMosaicArmed(mosaicArmed)
-            window?.invalidateCursorRects(for: self)
+            toolbar.setMosaicArmed(mosaicArmed, brushDiameter: mosaicBrushDiameter)
+            if mosaicArmed {
+                MosaicBrushCursor.update(diameter: mosaicBrushDiameter)
+                if selection.contains(hoverPoint) {
+                    MosaicBrushCursor.set()
+                }
+            } else {
+                mosaicPainting = false
+                lastMosaicPoint = nil
+                window?.invalidateCursorRects(for: self)
+            }
+            layoutChrome()
         case .pin:
             onAction?(.pin)
         case .save:
@@ -927,6 +998,93 @@ private enum SelectionChrome {
     }
 }
 
+private enum MosaicBrushCursor {
+    private static var cachedDiameter: CGFloat = 24
+    private static var cursor: NSCursor?
+
+    static func update(diameter: CGFloat) {
+        cachedDiameter = diameter
+        cursor = makeCursor(diameter: diameter)
+    }
+
+    static func set() {
+        (cursor ?? makeCursor(diameter: cachedDiameter)).set()
+    }
+
+    private static func makeCursor(diameter: CGFloat) -> NSCursor {
+        let padding: CGFloat = 4
+        let size = CGSize(width: diameter + padding * 2, height: diameter + padding * 2)
+        let image = NSImage(size: size, flipped: false) { rect in
+            let circle = CGRect(
+                x: padding,
+                y: padding,
+                width: diameter,
+                height: diameter
+            )
+            let path = NSBezierPath(ovalIn: circle)
+            NSColor.white.withAlphaComponent(0.9).setStroke()
+            path.lineWidth = 1.5
+            path.stroke()
+            NSColor.black.withAlphaComponent(0.45).setStroke()
+            path.lineWidth = 1
+            path.setLineDash([2, 2], count: 2, phase: 0)
+            path.stroke()
+            return true
+        }
+        return NSCursor(image: image, hotSpot: CGPoint(x: size.width / 2, y: size.height / 2))
+    }
+}
+
+private final class ScreenshotMosaicSizePanel: NSView {
+    var onChange: ((CGFloat) -> Void)?
+
+    private let slider = NSSlider(value: 24, minValue: 8, maxValue: 64, target: nil, action: nil)
+    private let label = NSTextField(labelWithString: UIStrings.Screenshot.mosaicBrushSize)
+
+    override init(frame frameRect: NSRect) {
+        super.init(frame: frameRect)
+        wantsLayer = true
+        layer?.cornerRadius = 8
+        layer?.backgroundColor = NSColor(white: 0.14, alpha: 0.96).cgColor
+
+        label.font = .systemFont(ofSize: 10, weight: .medium)
+        label.textColor = NSColor(white: 0.82, alpha: 1)
+
+        slider.target = self
+        slider.action = #selector(sliderChanged)
+        slider.isContinuous = true
+
+        addSubview(label)
+        addSubview(slider)
+    }
+
+    required init?(coder: NSCoder) { nil }
+
+    var brushDiameter: CGFloat {
+        CGFloat(slider.doubleValue)
+    }
+
+    func setBrushDiameter(_ diameter: CGFloat) {
+        slider.doubleValue = Double(diameter)
+    }
+
+    func applyTheme(_ tokens: DesignTokens) {
+        layer?.backgroundColor = tokens.nav.nsColor.withAlphaComponent(0.96).cgColor
+        label.textColor = tokens.inkSoft.nsColor
+    }
+
+    override func layout() {
+        super.layout()
+        let inset: CGFloat = 8
+        label.frame = CGRect(x: inset, y: bounds.height - 18, width: bounds.width - inset * 2, height: 14)
+        slider.frame = CGRect(x: inset, y: inset, width: bounds.width - inset * 2, height: 16)
+    }
+
+    @objc private func sliderChanged() {
+        onChange?(brushDiameter)
+    }
+}
+
 private enum ScreenshotToolbarIcons {
     static func mosaic(size: CGFloat, tint: NSColor) -> NSImage {
         let dimension = size
@@ -1027,12 +1185,16 @@ private final class ScreenshotToolbar: NSView {
     }
 
     var onPick: ((Item) -> Void)?
+    var onMosaicBrushDiameterChange: ((CGFloat) -> Void)?
     private var mosaicButton: ScreenshotToolbarButton?
     private var buttons: [ScreenshotToolbarButton] = []
+    private let mosaicSizePanel = ScreenshotMosaicSizePanel()
 
     private let buttonSide: CGFloat = 32
     private let buttonSpacing: CGFloat = 2
     private let horizontalPadding: CGFloat = 8
+    private let mosaicPanelHeight: CGFloat = 44
+    private let mosaicPanelWidth: CGFloat = 132
 
     override var intrinsicContentSize: NSSize { fittingSize }
 
@@ -1043,6 +1205,12 @@ private final class ScreenshotToolbar: NSView {
         layer?.cornerRadius = 12
         layer?.borderWidth = 1
         layer?.borderColor = NSColor.white.withAlphaComponent(0.14).cgColor
+
+        mosaicSizePanel.isHidden = true
+        mosaicSizePanel.onChange = { [weak self] diameter in
+            self?.onMosaicBrushDiameterChange?(diameter)
+        }
+        addSubview(mosaicSizePanel)
 
         let symbolConfig = NSImage.SymbolConfiguration(pointSize: 14, weight: .semibold)
         let items: [(Item, String?, String)] = [
@@ -1074,22 +1242,35 @@ private final class ScreenshotToolbar: NSView {
     override var fittingSize: NSSize {
         let count = CGFloat(Item.allCases.count)
         let width = horizontalPadding * 2 + count * buttonSide + (count - 1) * buttonSpacing
-        return NSSize(width: width, height: 40)
+        let height = mosaicSizePanel.isHidden ? 40 : 40 + mosaicPanelHeight + 6
+        return NSSize(width: width, height: height)
     }
 
     override func layout() {
         super.layout()
+        let y = mosaicSizePanel.isHidden
+            ? (bounds.height - buttonSide) / 2
+            : bounds.height - buttonSide - 2
         var x = horizontalPadding
-        let y = (bounds.height - buttonSide) / 2
         for button in buttons {
             button.frame = CGRect(x: x, y: y, width: buttonSide, height: buttonSide)
             x += buttonSide + buttonSpacing
+        }
+        if !mosaicSizePanel.isHidden, let mosaicButton {
+            let panelX = mosaicButton.frame.midX - mosaicPanelWidth / 2
+            mosaicSizePanel.frame = CGRect(
+                x: min(max(4, panelX), bounds.width - mosaicPanelWidth - 4),
+                y: 4,
+                width: mosaicPanelWidth,
+                height: mosaicPanelHeight
+            )
         }
     }
 
     func applyTheme(_ tokens: DesignTokens) {
         layer?.backgroundColor = tokens.card.nsColor.withAlphaComponent(0.94).cgColor
         layer?.borderColor = tokens.border.nsColor.cgColor
+        mosaicSizePanel.applyTheme(tokens)
         let hover = tokens.ink.nsColor.withAlphaComponent(0.1)
         let armed = tokens.border.nsColor
         let mosaicImage = ScreenshotToolbarIcons.mosaic(size: 14, tint: tokens.controlTint.nsColor)
@@ -1105,8 +1286,19 @@ private final class ScreenshotToolbar: NSView {
         }
     }
 
-    func setMosaicArmed(_ armed: Bool) {
+    func setMosaicArmed(_ armed: Bool, brushDiameter: CGFloat) {
         mosaicButton?.setArmed(armed)
+        mosaicSizePanel.isHidden = !armed
+        if armed {
+            mosaicSizePanel.setBrushDiameter(brushDiameter)
+        }
+        invalidateIntrinsicContentSize()
+        needsLayout = true
+        superview?.needsLayout = true
+    }
+
+    var mosaicBrushDiameter: CGFloat {
+        mosaicSizePanel.brushDiameter
     }
 
     @objc private func tap(_ sender: ScreenshotToolbarButton) {

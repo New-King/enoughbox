@@ -5,16 +5,15 @@ struct MainView: View {
     @EnvironmentObject private var appState: AppState
     @EnvironmentObject private var appearance: AppearanceManager
 
+    private let sidebarWidth: CGFloat = 220
+
     var body: some View {
-        NavigationSplitView {
+        HStack(spacing: 12) {
             sidebar
-        } detail: {
             detail
         }
-        .navigationSplitViewStyle(.balanced)
+        .padding(12)
         .background(tokens.page)
-        .toolbarBackground(tokens.nav, for: .windowToolbar)
-        .toolbarBackground(.visible, for: .windowToolbar)
         .toolbar { toolbarContent }
         .sheet(isPresented: $appState.isToolCenterPresented) {
             ToolCenterView()
@@ -66,10 +65,12 @@ struct MainView: View {
             }
         }
         .listStyle(.sidebar)
-        .contentMargins(.top, 8, for: .scrollContent)
+        .contentMargins(.top, 4, for: .scrollContent)
+        .contentMargins(.bottom, 4, for: .scrollContent)
         .scrollContentBackground(.hidden)
-        .background(tokens.page)
-        .navigationSplitViewColumnWidth(min: 200, ideal: 220, max: 260)
+        .background(tokens.nav)
+        .clipShape(RoundedRectangle(cornerRadius: 11, style: .continuous))
+        .frame(width: sidebarWidth)
     }
 
     @ViewBuilder
@@ -82,6 +83,8 @@ struct MainView: View {
             }
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)
+        .background(tokens.shell)
+        .clipShape(RoundedRectangle(cornerRadius: 11, style: .continuous))
     }
 
     @ToolbarContentBuilder
