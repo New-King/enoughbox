@@ -927,14 +927,108 @@ private enum SelectionChrome {
     }
 }
 
+private enum ScreenshotToolbarIcons {
+    static func mosaic(size: CGFloat, tint: NSColor) -> NSImage {
+        let dimension = size
+        return NSImage(size: NSSize(width: dimension, height: dimension), flipped: false) { rect in
+            let inset: CGFloat = 0.5
+            let outer = rect.insetBy(dx: inset, dy: inset)
+            let frame = NSBezierPath(roundedRect: outer, xRadius: 3.2, yRadius: 3.2)
+            tint.setStroke()
+            frame.lineWidth = 1.2
+            frame.stroke()
+
+            let inner = outer.insetBy(dx: 2.2, dy: 2.2)
+            let halfW = inner.width / 2
+            let halfH = inner.height / 2
+            let topLeft = CGRect(x: inner.minX, y: inner.minY + halfH, width: halfW, height: halfH)
+            let topRight = CGRect(x: inner.maxX - halfW, y: inner.minY + halfH, width: halfW, height: halfH)
+            let bottomLeft = CGRect(x: inner.minX, y: inner.minY, width: halfW, height: halfH)
+            let bottomRight = CGRect(x: inner.maxX - halfW, y: inner.minY, width: halfW, height: halfH)
+
+            let light = tint
+            let dark = tint.withAlphaComponent(0.28)
+            light.setFill()
+            NSBezierPath(rect: topLeft).fill()
+            NSBezierPath(rect: bottomRight).fill()
+            dark.setFill()
+            NSBezierPath(rect: topRight).fill()
+            NSBezierPath(rect: bottomLeft).fill()
+            return true
+        }
+    }
+}
+
+private final class ScreenshotToolbarButton: NSButton {
+    var isArmed = false
+    private var isHovering = false
+    private var hoverColor: NSColor?
+    private var armedColor: NSColor?
+
+    override init(frame frameRect: NSRect) {
+        super.init(frame: frameRect)
+        wantsLayer = true
+        layer?.cornerRadius = 7
+        isBordered = false
+        imagePosition = .imageOnly
+        imageScaling = .scaleProportionallyDown
+        sendAction(on: .leftMouseUp)
+    }
+
+    required init?(coder: NSCoder) { nil }
+
+    func applyChrome(tint: NSColor, hover: NSColor, armed: NSColor) {
+        contentTintColor = tint
+        hoverColor = hover
+        armedColor = armed
+        refreshChrome()
+    }
+
+    func setArmed(_ armed: Bool) {
+        isArmed = armed
+        refreshChrome()
+    }
+
+    private func refreshChrome() {
+        if isArmed, let armedColor {
+            layer?.backgroundColor = armedColor.cgColor
+        } else if isHovering, let hoverColor {
+            layer?.backgroundColor = hoverColor.cgColor
+        } else {
+            layer?.backgroundColor = nil
+        }
+    }
+
+    override func updateTrackingAreas() {
+        super.updateTrackingAreas()
+        trackingAreas.forEach(removeTrackingArea)
+        addTrackingArea(NSTrackingArea(
+            rect: bounds,
+            options: [.mouseEnteredAndExited, .activeInKeyWindow, .inVisibleRect],
+            owner: self,
+            userInfo: nil
+        ))
+    }
+
+    override func mouseEntered(with event: NSEvent) {
+        isHovering = true
+        refreshChrome()
+    }
+
+    override func mouseExited(with event: NSEvent) {
+        isHovering = false
+        refreshChrome()
+    }
+}
+
 private final class ScreenshotToolbar: NSView {
     enum Item: Int, CaseIterable {
         case pin, mosaic, save, cancel, confirm
     }
 
     var onPick: ((Item) -> Void)?
-    private var mosaicButton: NSButton?
-    private var buttons: [NSButton] = []
+    private var mosaicButton: ScreenshotToolbarButton?
+    private var buttons: [ScreenshotToolbarButton] = []
 
     private let buttonSide: CGFloat = 32
     private let buttonSpacing: CGFloat = 2
@@ -951,29 +1045,24 @@ private final class ScreenshotToolbar: NSView {
         layer?.borderColor = NSColor.white.withAlphaComponent(0.14).cgColor
 
         let symbolConfig = NSImage.SymbolConfiguration(pointSize: 14, weight: .semibold)
-        let items: [(Item, String, String)] = [
+        let items: [(Item, String?, String)] = [
             (.pin, "pin.fill", UIStrings.Screenshot.pin),
-            (.mosaic, "square.grid.3x3.fill", UIStrings.Screenshot.mosaic),
+            (.mosaic, nil, UIStrings.Screenshot.mosaic),
             (.save, "square.and.arrow.down.fill", UIStrings.Screenshot.save),
             (.cancel, "xmark", UIStrings.Screenshot.cancel),
             (.confirm, "checkmark", UIStrings.Screenshot.confirm),
         ]
 
         for (item, symbol, tooltip) in items {
-            let button = NSButton(frame: .zero)
-            button.image = NSImage(systemSymbolName: symbol, accessibilityDescription: nil)?
-                .withSymbolConfiguration(symbolConfig)
-            button.imagePosition = .imageOnly
-            button.imageScaling = .scaleProportionallyDown
-            button.isBordered = false
-            button.contentTintColor = NSColor(white: 0.96, alpha: 1)
+            let button = ScreenshotToolbarButton(frame: .zero)
+            if let symbol {
+                button.image = NSImage(systemSymbolName: symbol, accessibilityDescription: nil)?
+                    .withSymbolConfiguration(symbolConfig)
+            }
             button.toolTip = tooltip
             button.target = self
             button.tag = item.rawValue
-            button.sendAction(on: .leftMouseUp)
             button.action = #selector(tap(_:))
-            button.wantsLayer = true
-            button.layer?.cornerRadius = 7
             addSubview(button)
             buttons.append(button)
             if item == .mosaic { mosaicButton = button }
@@ -1001,23 +1090,26 @@ private final class ScreenshotToolbar: NSView {
     func applyTheme(_ tokens: DesignTokens) {
         layer?.backgroundColor = tokens.card.nsColor.withAlphaComponent(0.94).cgColor
         layer?.borderColor = tokens.border.nsColor.cgColor
+        let hover = tokens.ink.nsColor.withAlphaComponent(0.1)
+        let armed = tokens.border.nsColor
+        let mosaicImage = ScreenshotToolbarIcons.mosaic(size: 14, tint: tokens.controlTint.nsColor)
         for button in buttons {
-            button.contentTintColor = tokens.controlTint.nsColor
-        }
-        if mosaicButton?.layer?.backgroundColor != nil {
-            mosaicButton?.contentTintColor = tokens.ink.nsColor
+            if button === mosaicButton {
+                button.image = mosaicImage
+            }
+            button.applyChrome(
+                tint: tokens.controlTint.nsColor,
+                hover: hover,
+                armed: armed
+            )
         }
     }
 
     func setMosaicArmed(_ armed: Bool) {
-        let tokens = DesignTokens.current
-        mosaicButton?.contentTintColor = armed ? tokens.ink.nsColor : tokens.controlTint.nsColor
-        mosaicButton?.layer?.backgroundColor = armed
-            ? tokens.border.nsColor.cgColor
-            : nil
+        mosaicButton?.setArmed(armed)
     }
 
-    @objc private func tap(_ sender: NSButton) {
+    @objc private func tap(_ sender: ScreenshotToolbarButton) {
         guard let item = Item(rawValue: sender.tag) else { return }
         onPick?(item)
     }
