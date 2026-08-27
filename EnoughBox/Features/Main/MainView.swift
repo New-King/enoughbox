@@ -8,8 +8,6 @@ struct MainView: View {
     /// 220pt − 25% ≈ 165pt
     private let sidebarWidth: CGFloat = 165
 
-    private let sidebarRowInsets = EdgeInsets(top: 2, leading: 10, bottom: 2, trailing: 10)
-
     var body: some View {
         HStack(spacing: 0) {
             sidebar
@@ -54,34 +52,36 @@ struct MainView: View {
 
     @ViewBuilder
     private var sidebar: some View {
-        List(selection: $appState.selectedToolID) {
-            Section {
+        ScrollView {
+            VStack(alignment: .leading, spacing: 4) {
+                Text(UIStrings.Shell.toolsSection)
+                    .font(.system(size: 11, weight: .semibold))
+                    .foregroundStyle(tokens.inkMuted)
+                    .padding(.horizontal, 14)
+                    .padding(.top, 12)
+                    .padding(.bottom, 4)
+
                 if appState.enabledTools.isEmpty {
                     Text(UIStrings.Shell.noToolsEnabled)
                         .font(.system(size: 12))
                         .foregroundStyle(tokens.inkFaint)
+                        .padding(.horizontal, 14)
                         .padding(.vertical, 4)
-                        .listRowInsets(sidebarRowInsets)
                 } else {
                     ForEach(appState.enabledTools) { tool in
-                        Label {
-                            Text(appState.displayName(for: tool))
-                        } icon: {
-                            Image(systemName: tool.iconName)
-                        }
-                        .tag(tool.id)
-                        .listRowInsets(sidebarRowInsets)
+                        ToolSidebarRow(
+                            iconName: tool.iconName,
+                            title: appState.displayName(for: tool),
+                            isSelected: appState.selectedToolID == tool.id,
+                            tokens: tokens,
+                            onSelect: { appState.selectedToolID = tool.id }
+                        )
                     }
                 }
-            } header: {
-                Text(UIStrings.Shell.toolsSection)
             }
+            .padding(.horizontal, 8)
+            .padding(.bottom, 8)
         }
-        .listStyle(.sidebar)
-        .contentMargins(.top, 8, for: .scrollContent)
-        .contentMargins(.bottom, 8, for: .scrollContent)
-        .contentMargins(.horizontal, 4, for: .scrollContent)
-        .scrollContentBackground(.hidden)
         .background(tokens.shell)
         .frame(width: sidebarWidth)
     }
@@ -139,6 +139,41 @@ struct MainView: View {
             foreground: isError ? tokens.danger : nil,
             border: isError ? tokens.danger.opacity(0.5) : nil
         )
+    }
+}
+
+/// Sidebar tool row — selection highlight only; no List focus or press chrome.
+private struct ToolSidebarRow: View {
+    let iconName: String
+    let title: String
+    let isSelected: Bool
+    let tokens: DesignTokens
+    let onSelect: () -> Void
+
+    var body: some View {
+        HStack(spacing: 8) {
+            Image(systemName: iconName)
+                .font(.system(size: 13, weight: .medium))
+                .frame(width: 16, alignment: .center)
+            Text(title)
+                .font(.system(size: 13))
+            Spacer(minLength: 0)
+        }
+        .foregroundStyle(
+            isSelected
+                ? Color(nsColor: .alternateSelectedControlTextColor)
+                : tokens.ink
+        )
+        .padding(.horizontal, 10)
+        .padding(.vertical, 6)
+        .background {
+            if isSelected {
+                RoundedRectangle(cornerRadius: 6, style: .continuous)
+                    .fill(Color(nsColor: .selectedContentBackgroundColor))
+            }
+        }
+        .contentShape(RoundedRectangle(cornerRadius: 6, style: .continuous))
+        .onTapGesture(perform: onSelect)
     }
 }
 
