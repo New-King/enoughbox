@@ -20,6 +20,12 @@ enum ScreenCapture {
         CGPreflightScreenCaptureAccess()
     }
 
+    /// Shows the system screen-recording permission sheet (same as accessibility trust prompt).
+    static func requestScreenCaptureTrust() {
+        if CGPreflightScreenCaptureAccess() { return }
+        _ = CGRequestScreenCaptureAccess()
+    }
+
     static func requestAccess() -> Bool {
         if CGPreflightScreenCaptureAccess() { return true }
         return CGRequestScreenCaptureAccess()

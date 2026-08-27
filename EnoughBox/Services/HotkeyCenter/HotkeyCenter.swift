@@ -37,6 +37,9 @@ final class HotkeyCenter {
     private var listeningNames: Set<KeyboardShortcuts.Name> = []
     private var hotkeysSuspendedForRecording = false
 
+    /// True while a shortcut recorder has paused global hotkeys.
+    var isShortcutRecording: Bool { hotkeysSuspendedForRecording }
+
     private init() {}
 
     func register(_ identifier: String, handler: @escaping () -> Void) {
@@ -71,7 +74,9 @@ final class HotkeyCenter {
     }
 
     func suspendForShortcutRecording() {
+        guard !hotkeysSuspendedForRecording else { return }
         hotkeysSuspendedForRecording = true
+        KeyboardShortcuts.isEnabled = false
         guard !listeningNames.isEmpty else { return }
         KeyboardShortcuts.disable(Array(listeningNames))
     }
@@ -79,15 +84,14 @@ final class HotkeyCenter {
     func resumeAfterShortcutRecording() {
         guard hotkeysSuspendedForRecording else { return }
         hotkeysSuspendedForRecording = false
+        KeyboardShortcuts.isEnabled = true
         guard !listeningNames.isEmpty else { return }
         KeyboardShortcuts.enable(Array(listeningNames))
     }
 
     private func installListenerIfNeeded(for name: KeyboardShortcuts.Name) {
         if listeningNames.contains(name) {
-            if hotkeysSuspendedForRecording {
-                KeyboardShortcuts.disable(name)
-            } else {
+            if !hotkeysSuspendedForRecording {
                 KeyboardShortcuts.enable(name)
             }
             return
@@ -101,8 +105,8 @@ final class HotkeyCenter {
                 handler()
             }
         }
-        if hotkeysSuspendedForRecording {
-            KeyboardShortcuts.disable(name)
+        if !hotkeysSuspendedForRecording {
+            KeyboardShortcuts.enable(name)
         }
     }
 }

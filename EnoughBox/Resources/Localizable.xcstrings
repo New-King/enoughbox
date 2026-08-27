@@ -483,13 +483,13 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Hover to snap to a window and click to select; drag for a custom region. ⌘C copies color and exits; / switches HEX, RGB, or HSL."
+            "value" : "Hover to snap to a window and click to select; drag for a custom region. C copies color and exits; / switches HEX, RGB, or HSL."
           }
         },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "悬停吸附窗口、单击选中；拖动可自定义区域。⌘C 复制颜色并结束；/ 切换 HEX、RGB、HSL。"
+            "value" : "悬停吸附窗口、单击选中；拖动可自定义区域。C 复制颜色并结束；/ 切换 HEX、RGB、HSL。"
           }
         }
       }

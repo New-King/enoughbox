@@ -46,6 +46,7 @@ struct ToolDetailView: View {
     }
 
     private func resignFocus() {
+        guard !HotkeyCenter.shared.isShortcutRecording else { return }
         NSApp.keyWindow?.makeFirstResponder(nil)
     }
 

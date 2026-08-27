@@ -27,6 +27,10 @@ struct EnoughBoxApp: App {
 }
 
 final class EnoughBoxAppDelegate: NSObject, NSApplicationDelegate {
+    func applicationDidBecomeActive(_ notification: Notification) {
+        InputRecovery.recoverIfNeeded()
+    }
+
     func applicationShouldTerminate(_ sender: NSApplication) -> NSApplication.TerminateReply {
         if sender.keyWindow is NSPanel {
             sender.keyWindow?.orderOut(nil)

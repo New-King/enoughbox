@@ -2,6 +2,12 @@ import AppKit
 import CoreGraphics
 import UniformTypeIdentifiers
 
+private func isPlainKey(_ event: NSEvent, character: String) -> Bool {
+    guard event.charactersIgnoringModifiers?.lowercased() == character.lowercased() else { return false }
+    let flags = event.modifierFlags.intersection(.deviceIndependentFlagsMask)
+    return flags.intersection([.command, .control, .option]).isEmpty
+}
+
 private final class ScreenshotPanel: NSPanel {
     let overlayView: ScreenshotOverlayView
 
@@ -131,8 +137,7 @@ final class ScreenshotOverlayController {
                 return nil
             }
             if !view.isSelectionCommitted {
-                if event.modifierFlags.contains(.command),
-                   event.charactersIgnoringModifiers?.lowercased() == "c",
+                if isPlainKey(event, character: "c"),
                    let text = view.currentColorPasteboard() {
                     self.handle(.copyColor(text), from: view)
                     return nil
@@ -265,11 +270,13 @@ final class ScreenshotOverlayController {
         removeKeyMonitors()
         NSCursor.arrow.set()
         for panel in panels {
+            panel.makeFirstResponder(nil)
             panel.orderOut(nil)
         }
         panels = []
         sessionActive = false
         Self.isSessionOnScreen = false
+        HostWindowFocus.returnToMainWindow()
     }
 }
 
@@ -517,8 +524,7 @@ private final class ScreenshotOverlayView: NSView {
             if committed { onAction?(.confirm) }
             return
         }
-        if event.modifierFlags.contains(.command),
-           event.charactersIgnoringModifiers?.lowercased() == "c",
+        if isPlainKey(event, character: "c"),
            !committed,
            let text = currentColorPasteboard() {
             onAction?(.copyColor(text))
@@ -1025,6 +1031,7 @@ private final class ScreenshotMagnifierView: NSView {
 }
 
 private final class ScreenshotColorHUD: NSView {
+    private let clipContainer = NSView(frame: .zero)
     private let magnifier = ScreenshotMagnifierView(frame: .zero)
     private let footerBar = NSView(frame: .zero)
     private let coordLabel = NSTextField(labelWithString: "")
@@ -1040,19 +1047,20 @@ private final class ScreenshotColorHUD: NSView {
     override init(frame frameRect: NSRect) {
         super.init(frame: frameRect)
         wantsLayer = true
-        layer?.cornerRadius = Self.cornerRadius
         layer?.masksToBounds = false
         layer?.shadowColor = NSColor.black.withAlphaComponent(0.14).cgColor
         layer?.shadowOffset = CGSize(width: 0, height: 6)
         layer?.shadowRadius = 14
         layer?.shadowOpacity = 1
-        layer?.borderWidth = 0.5
-        layer?.borderColor = NSColor.white.withAlphaComponent(0.35).cgColor
-        layer?.backgroundColor = NSColor(white: 0.97, alpha: 1).cgColor
+
+        clipContainer.wantsLayer = true
+        clipContainer.layer?.cornerRadius = Self.cornerRadius
+        clipContainer.layer?.masksToBounds = true
+        clipContainer.layer?.borderWidth = 0.5
+        clipContainer.layer?.borderColor = NSColor.white.withAlphaComponent(0.35).cgColor
+        clipContainer.layer?.backgroundColor = NSColor(white: 0.97, alpha: 1).cgColor
 
         magnifier.wantsLayer = true
-        magnifier.layer?.maskedCorners = [.layerMinXMinYCorner, .layerMaxXMinYCorner]
-        magnifier.layer?.cornerRadius = Self.cornerRadius
         magnifier.layer?.masksToBounds = true
 
         footerBar.wantsLayer = true
@@ -1075,11 +1083,12 @@ private final class ScreenshotColorHUD: NSView {
             field.isBezeled = false
         }
 
-        addSubview(magnifier)
-        addSubview(footerBar)
+        addSubview(clipContainer)
+        clipContainer.addSubview(magnifier)
+        clipContainer.addSubview(footerBar)
         footerBar.addSubview(coordLabel)
         footerBar.addSubview(colorLabel)
-        addSubview(hintLabel)
+        clipContainer.addSubview(hintLabel)
     }
 
     required init?(coder: NSCoder) { nil }
@@ -1112,8 +1121,10 @@ private final class ScreenshotColorHUD: NSView {
 
     override func layout() {
         super.layout()
+        clipContainer.frame = bounds
         let width = bounds.width
-        magnifier.frame = CGRect(x: 0, y: Self.footerHeight + Self.hintHeight, width: width, height: Self.magnifierHeight)
+        let footerStackHeight = Self.footerHeight + Self.hintHeight
+        magnifier.frame = CGRect(x: 0, y: footerStackHeight, width: width, height: Self.magnifierHeight)
         footerBar.frame = CGRect(x: 0, y: Self.hintHeight, width: width, height: Self.footerHeight)
         let inset: CGFloat = 10
         let labelWidth = width - inset * 2

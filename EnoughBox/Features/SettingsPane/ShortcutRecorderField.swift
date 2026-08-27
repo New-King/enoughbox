@@ -21,7 +21,9 @@ struct ShortcutRecorderField: NSViewRepresentable {
         nsView.shortcutName = name
         nsView.onSaved = onSaved
         nsView.onConflict = onConflict
-        nsView.refreshTitle()
+        if !nsView.isRecordingShortcut {
+            nsView.refreshTitle()
+        }
     }
 
     func sizeThatFits(
@@ -50,6 +52,7 @@ final class ShortcutRecorderButton: NSButton {
     var onConflict: ((ShortcutConflict) -> Void)?
 
     private var isRecording = false
+    var isRecordingShortcut: Bool { isRecording }
     private var eventMonitor: Any?
     private var exitObservers: [NSObjectProtocol] = []
     private var previewTitle: String?
@@ -86,32 +89,41 @@ final class ShortcutRecorderButton: NSButton {
 
     @objc private func beginRecording() {
         guard !isRecording else { return }
-        guard window?.makeFirstResponder(self) == true else { return }
+
+        HotkeyCenter.shared.suspendForShortcutRecording()
+        guard window?.makeFirstResponder(self) == true else {
+            HotkeyCenter.shared.resumeAfterShortcutRecording()
+            return
+        }
 
         isRecording = true
         previewTitle = nil
         didPreviewKeyForHeldModifiers = false
-        HotkeyCenter.shared.suspendForShortcutRecording()
         installEventMonitor()
         observeExits()
         refreshTitle()
     }
 
     func stopRecording() {
-        guard isRecording else { return }
-        isRecording = false
-        previewTitle = nil
-        didPreviewKeyForHeldModifiers = false
-
         if let eventMonitor {
             NSEvent.removeMonitor(eventMonitor)
             self.eventMonitor = nil
         }
-        exitObservers.forEach(NotificationCenter.default.removeObserver)
-        exitObservers.removeAll()
+        if !exitObservers.isEmpty {
+            exitObservers.forEach(NotificationCenter.default.removeObserver)
+            exitObservers.removeAll()
+        }
 
-        HotkeyCenter.shared.resumeAfterShortcutRecording()
-        refreshTitle()
+        if isRecording {
+            isRecording = false
+            previewTitle = nil
+            didPreviewKeyForHeldModifiers = false
+            refreshTitle()
+        }
+
+        if HotkeyCenter.shared.isShortcutRecording {
+            HotkeyCenter.shared.resumeAfterShortcutRecording()
+        }
     }
 
     override func performKeyEquivalent(with event: NSEvent) -> Bool {
@@ -243,16 +255,12 @@ final class ShortcutRecorderButton: NSButton {
             for: shortcut,
             excluding: shortcutName
         ) {
-            DispatchQueue.main.async { [weak self] in
-                self?.onConflict?(conflict)
-            }
+            onConflict?(conflict)
             return
         }
 
         KeyboardShortcuts.setShortcut(shortcut, for: shortcutName)
-        // setShortcut registers immediately. Disable again while this control
-        // keeps recording, otherwise the new hotkey steals the next attempt.
-        HotkeyCenter.shared.suspendForShortcutRecording()
+        window?.makeFirstResponder(nil)
         DispatchQueue.main.async { [weak self] in
             self?.onSaved?(shortcut)
         }

@@ -1,3 +1,4 @@
+import AppKit
 import SwiftUI
 
 enum AppearanceMode: String, CaseIterable, Identifiable {
@@ -28,6 +29,25 @@ enum AppearanceMode: String, CaseIterable, Identifiable {
         case .system: "circle.lefthalf.filled"
         case .light: "sun.max"
         case .dark: "moon"
+        }
+    }
+
+    static var stored: AppearanceMode {
+        let raw = UserDefaults.standard.string(forKey: "appearance") ?? AppearanceMode.system.rawValue
+        return AppearanceMode(rawValue: raw) ?? .system
+    }
+
+    var effectiveColorScheme: ColorScheme {
+        switch self {
+        case .system:
+            if NSApp.effectiveAppearance.bestMatch(from: [.darkAqua, .aqua]) == .darkAqua {
+                return .dark
+            }
+            return .light
+        case .light:
+            return .light
+        case .dark:
+            return .dark
         }
     }
 }

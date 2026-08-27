@@ -36,6 +36,7 @@ struct MainView: View {
 
     private func clearWindowFocus() {
         DispatchQueue.main.async {
+            guard !HotkeyCenter.shared.isShortcutRecording else { return }
             NSApp.keyWindow?.makeFirstResponder(nil)
         }
     }
@@ -118,25 +119,11 @@ struct MainView: View {
 
     private func toast(message: String) -> some View {
         let isError = appState.toastStyle == .error
-        return floatingBanner(
+        return FloatingBanner(
             message: message,
-            foreground: isError ? tokens.danger : tokens.ink,
-            border: isError ? tokens.danger.opacity(0.5) : tokens.border
+            foreground: isError ? tokens.danger : nil,
+            border: isError ? tokens.danger.opacity(0.5) : nil
         )
-    }
-
-    private func floatingBanner(message: String, foreground: Color, border: Color) -> some View {
-        Text(message)
-            .font(.system(size: 13, weight: .medium))
-            .foregroundStyle(foreground)
-            .padding(.horizontal, 16)
-            .padding(.vertical, 10)
-            .background(tokens.card, in: RoundedRectangle(cornerRadius: 11, style: .continuous))
-            .overlay(
-                RoundedRectangle(cornerRadius: 11, style: .continuous)
-                    .strokeBorder(border, lineWidth: 1)
-            )
-            .appleShadow(tokens)
     }
 }
 

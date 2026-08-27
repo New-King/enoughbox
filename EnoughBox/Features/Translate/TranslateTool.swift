@@ -165,6 +165,7 @@ struct TranslateSettingsView: View {
     }
 
     private func resignFocus() {
+        guard !HotkeyCenter.shared.isShortcutRecording else { return }
         focusedField = nil
     }
 

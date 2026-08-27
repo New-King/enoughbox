@@ -204,7 +204,9 @@ final class TranslationPanelController: NSWindowController {
     }
 
     override func close() {
+        window?.makeFirstResponder(nil)
         window?.orderOut(nil)
+        HostWindowFocus.returnToMainWindow()
     }
 
     private func installCloseKeyMonitor() {

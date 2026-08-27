@@ -109,13 +109,13 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Press ⌘C to copy color"
+            "value" : "Press C to copy color"
           }
         },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "按 ⌘C 复制色值"
+            "value" : "按 C 复制色值"
           }
         }
       }
@@ -126,13 +126,13 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "⌘C copy · / switch"
+            "value" : "C copy · / switch"
           }
         },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "⌘C 复制 · / 切换"
+            "value" : "C 复制 · / 切换"
           }
         }
       }
@@ -177,13 +177,13 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Move the pointer to sample color. Press ⌘C to copy; press / to switch HEX, RGB, or HSL."
+            "value" : "Move the pointer to sample color. Press C to copy; press / to switch HEX, RGB, or HSL."
           }
         },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "移动指针可取色。按 ⌘C 复制；按 / 在 HEX、RGB、HSL 间切换。"
+            "value" : "移动指针可取色。按 C 复制；按 / 在 HEX、RGB、HSL 间切换。"
           }
         }
       }

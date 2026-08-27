@@ -69,7 +69,7 @@ struct ScreenshotSettingsView: View {
 
             HStack {
                 Spacer()
-                Button(action: openScreenRecordingSettings) {
+                Button(action: requestScreenCapturePermission) {
                     Text("plugin.screenshot.settings.openPermission", tableName: ScreenshotL10n.tableName, bundle: ScreenshotL10n.bundle)
                         .font(.system(size: 12, weight: .medium))
                         .padding(.horizontal, 12)
@@ -89,15 +89,7 @@ struct ScreenshotSettingsView: View {
         )
     }
 
-    private func openScreenRecordingSettings() {
-        let candidates = [
-            "x-apple.systempreferences:com.apple.settings.PrivacySecurity.extension?Privacy_ScreenCapture",
-            "x-apple.systempreferences:com.apple.preference.security?Privacy_ScreenCapture",
-        ]
-        for candidate in candidates {
-            if let url = URL(string: candidate), NSWorkspace.shared.open(url) {
-                return
-            }
-        }
+    private func requestScreenCapturePermission() {
+        ScreenCapture.requestScreenCaptureTrust()
     }
 }
