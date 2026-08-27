@@ -58,7 +58,6 @@ final class ScreenshotOverlayController {
 
     var onCopied: ((String) -> Void)?
     var onSaved: ((String) -> Void)?
-    var onPermissionDenied: (() -> Void)?
     var onFailed: (() -> Void)?
 
     private var panels: [ScreenshotPanel] = []
@@ -69,12 +68,6 @@ final class ScreenshotOverlayController {
 
     func start() {
         guard !sessionActive, !Self.isSessionOnScreen else { return }
-        if !ScreenCapture.requestAccess() {
-            DispatchQueue.main.async { [weak self] in
-                self?.onPermissionDenied?()
-            }
-            return
-        }
         sessionActive = true
         Self.isSessionOnScreen = true
         let protectedIDs = protectedWindowIDs()
@@ -276,6 +269,17 @@ final class ScreenshotOverlayController {
         panels = []
         sessionActive = false
         Self.isSessionOnScreen = false
+        HostWindowFocus.returnToMainWindow()
+    }
+
+    /// Clears shielding-level overlay panels left after a failed or interrupted session.
+    static func dismissOrphanedOverlayWindows() {
+        guard !isSessionOnScreen else { return }
+        for window in NSApp.windows {
+            guard let panel = window as? NSPanel else { continue }
+            guard panel.level.rawValue >= Int(CGShieldingWindowLevel()) else { continue }
+            panel.orderOut(nil)
+        }
         HostWindowFocus.returnToMainWindow()
     }
 }

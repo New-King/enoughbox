@@ -3,10 +3,26 @@ import AppKit
 import Foundation
 
 enum SelectionCapture {
+    static func hasAccessibilityTrust() -> Bool {
+        AXIsProcessTrusted()
+    }
+
     static func requestAccessibilityTrust() {
         let key = kAXTrustedCheckOptionPrompt.takeUnretainedValue() as String
         let options = [key: true] as CFDictionary
         _ = AXIsProcessTrustedWithOptions(options)
+    }
+
+    static func openAccessibilitySettings() {
+        let candidates = [
+            "x-apple.systempreferences:com.apple.settings.PrivacySecurity.extension?Privacy_Accessibility",
+            "x-apple.systempreferences:com.apple.preference.security?Privacy_Accessibility",
+        ]
+        for candidate in candidates {
+            if let url = URL(string: candidate), NSWorkspace.shared.open(url) {
+                return
+            }
+        }
     }
 
     static func textForTranslation() async -> String {

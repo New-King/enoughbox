@@ -4,6 +4,7 @@ import KeyboardShortcuts
 @MainActor
 enum InputRecovery {
     static func recoverIfNeeded() {
+        ScreenshotOverlayController.dismissOrphanedOverlayWindows()
         recoverStuckShortcutSuspend()
         recoverOrphanedPanelKeyWindow()
         if !KeyboardShortcuts.isEnabled {
@@ -25,8 +26,7 @@ enum InputRecovery {
     private static func recoverOrphanedPanelKeyWindow() {
         guard !ScreenshotOverlayController.isSessionOnScreen else { return }
         guard let keyWindow = NSApp.keyWindow as? NSPanel else { return }
-        let isShielding = keyWindow.level.rawValue >= Int(CGShieldingWindowLevel())
-        if !keyWindow.isVisible || isShielding {
+        if !keyWindow.isVisible {
             HostWindowFocus.returnToMainWindow()
         }
     }

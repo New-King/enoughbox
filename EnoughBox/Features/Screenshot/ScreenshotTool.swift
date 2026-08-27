@@ -18,9 +18,6 @@ final class ScreenshotTool {
                 String(format: ScreenshotL10n.string("plugin.screenshot.toast.saved"), name)
             )
         }
-        overlay.onPermissionDenied = { [weak self] in
-            self?.toastHandler(ScreenshotL10n.string("plugin.screenshot.toast.permission"))
-        }
         overlay.onFailed = { [weak self] in
             self?.toastHandler(ScreenshotL10n.string("plugin.screenshot.toast.failed"))
         }
@@ -28,13 +25,22 @@ final class ScreenshotTool {
 
     func activate() {
         HotkeyCenter.shared.register(HotkeyCatalog.screenshotRegionID) { [weak self] in
-            self?.overlay.start()
+            self?.startCapture()
         }
     }
 
     func deactivate() {
         HotkeyCenter.shared.unregister(HotkeyCatalog.screenshotRegionID)
         overlay.cancel()
+    }
+
+    /// Hotkey: authorized → overlay; otherwise system permission sheet only.
+    func startCapture() {
+        if ScreenCapture.hasAccess() {
+            overlay.start()
+        } else {
+            ScreenCapture.requestScreenCaptureTrust()
+        }
     }
 }
 
@@ -69,7 +75,7 @@ struct ScreenshotSettingsView: View {
 
             HStack {
                 Spacer()
-                Button(action: requestScreenCapturePermission) {
+                Button(action: openScreenRecordingPermission) {
                     Text("plugin.screenshot.settings.openPermission", tableName: ScreenshotL10n.tableName, bundle: ScreenshotL10n.bundle)
                         .font(.system(size: 12, weight: .medium))
                         .padding(.horizontal, 12)
@@ -89,7 +95,11 @@ struct ScreenshotSettingsView: View {
         )
     }
 
-    private func requestScreenCapturePermission() {
-        ScreenCapture.requestScreenCaptureTrust()
+    private func openScreenRecordingPermission() {
+        if ScreenCapture.hasAccess() {
+            ScreenCapture.openScreenRecordingSettings()
+        } else {
+            ScreenCapture.requestScreenCaptureTrust()
+        }
     }
 }

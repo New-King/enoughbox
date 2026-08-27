@@ -27,7 +27,7 @@ final class TranslateTool {
         panelController = nil
     }
 
-    private func translateSelection() {
+    private func beginTranslation() {
         captureTask?.cancel()
         captureTask = Task { @MainActor [weak self] in
             guard let self else { return }
@@ -37,6 +37,14 @@ final class TranslateTool {
                 toastHandler(TranslateL10n.string("plugin.translate.toast.noSelection"))
             }
             presentPanel(sourceText: text)
+        }
+    }
+
+    private func translateSelection() {
+        if SelectionCapture.hasAccessibilityTrust() {
+            beginTranslation()
+        } else {
+            SelectionCapture.requestAccessibilityTrust()
         }
     }
 
@@ -228,7 +236,7 @@ struct TranslateSettingsView: View {
 
             HStack {
                 Spacer()
-                Button(action: openAccessibilitySettings) {
+                Button(action: openAccessibilityPermission) {
                     Text("plugin.translate.settings.openAccessibility", tableName: TranslateL10n.tableName, bundle: TranslateL10n.bundle)
                         .font(.system(size: 12, weight: .medium))
                         .padding(.horizontal, 12)
@@ -250,8 +258,12 @@ struct TranslateSettingsView: View {
         .settingsCard(tokens: tokens, resignFocus: resignFocus)
     }
 
-    private func openAccessibilitySettings() {
-        SelectionCapture.requestAccessibilityTrust()
+    private func openAccessibilityPermission() {
+        if SelectionCapture.hasAccessibilityTrust() {
+            SelectionCapture.openAccessibilitySettings()
+        } else {
+            SelectionCapture.requestAccessibilityTrust()
+        }
     }
 }
 

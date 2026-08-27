@@ -26,9 +26,16 @@ enum ScreenCapture {
         _ = CGRequestScreenCaptureAccess()
     }
 
-    static func requestAccess() -> Bool {
-        if CGPreflightScreenCaptureAccess() { return true }
-        return CGRequestScreenCaptureAccess()
+    static func openScreenRecordingSettings() {
+        let candidates = [
+            "x-apple.systempreferences:com.apple.settings.PrivacySecurity.extension?Privacy_ScreenCapture",
+            "x-apple.systempreferences:com.apple.preference.security?Privacy_ScreenCapture",
+        ]
+        for candidate in candidates {
+            if let url = URL(string: candidate), NSWorkspace.shared.open(url) {
+                return
+            }
+        }
     }
 
     static func freezeDisplays(protectedWindowIDs: Set<CGWindowID>) async throws -> [FrozenDisplay] {
