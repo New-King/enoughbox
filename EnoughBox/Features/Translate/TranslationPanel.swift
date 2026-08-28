@@ -46,8 +46,10 @@ final class TranslationPanelModel: ObservableObject {
         translate()
     }
 
-    func translate() {
-        TranslateSettings.targetLanguage = targetLanguage
+    func translate(persistTarget: Bool = true) {
+        if persistTarget {
+            TranslateSettings.targetLanguage = targetLanguage
+        }
         detectedLanguage = LanguageDetector.detect(sourceText)
         let text = sourceText.trimmingCharacters(in: .whitespacesAndNewlines)
         let target = targetLanguage.resolvedTarget(for: detectedLanguage)
@@ -105,18 +107,10 @@ final class TranslationPanelModel: ObservableObject {
     }
 
     func toggleTargetLanguage() {
-        switch targetLanguage {
-        case .auto:
-            targetLanguage = detectedLanguage == .zhHans ? .en : .zhHans
-        case .en:
-            targetLanguage = .zhHans
-        case .zhHans:
-            targetLanguage = .auto
-        }
-        TranslateSettings.targetLanguage = targetLanguage
+        targetLanguage = visibleTargetLanguage == .zhHans ? .en : .zhHans
         let text = sourceText.trimmingCharacters(in: .whitespacesAndNewlines)
         guard !text.isEmpty else { return }
-        translate()
+        translate(persistTarget: false)
     }
 
     func clearSource() {
@@ -389,7 +383,7 @@ private struct TranslationPanelView: View {
 
                 Spacer(minLength: 8)
 
-                Button(action: session.translate) {
+                Button(action: { session.translate() }) {
                     HStack(spacing: 4) {
                         Image(systemName: "character.book.closed")
                         Text(UIStrings.Translate.action)
