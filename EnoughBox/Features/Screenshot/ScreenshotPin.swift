@@ -1,5 +1,33 @@
 import AppKit
 
+private final class ScreenshotPinImageView: NSImageView {
+    private var lastMouseLocation: CGPoint?
+
+    override func mouseDown(with event: NSEvent) {
+        lastMouseLocation = NSEvent.mouseLocation
+    }
+
+    override func mouseDragged(with event: NSEvent) {
+        guard let lastMouseLocation, let window else { return }
+        let current = NSEvent.mouseLocation
+        let delta = CGPoint(
+            x: current.x - lastMouseLocation.x,
+            y: current.y - lastMouseLocation.y
+        )
+        window.setFrameOrigin(CGPoint(
+            x: window.frame.origin.x + delta.x,
+            y: window.frame.origin.y + delta.y
+        ))
+        self.lastMouseLocation = current
+    }
+
+    override func mouseUp(with event: NSEvent) {
+        lastMouseLocation = nil
+    }
+
+    override func acceptsFirstMouse(for event: NSEvent?) -> Bool { true }
+}
+
 @MainActor
 final class ScreenshotPinController: NSObject, NSWindowDelegate {
     private var panels: [NSPanel] = []
@@ -18,7 +46,7 @@ final class ScreenshotPinController: NSObject, NSWindowDelegate {
         )
         guard logicalSize.width > 0, logicalSize.height > 0 else { return }
 
-        let imageView = NSImageView(frame: CGRect(origin: .zero, size: logicalSize))
+        let imageView = ScreenshotPinImageView(frame: CGRect(origin: .zero, size: logicalSize))
         imageView.image = NSImage(cgImage: image, size: logicalSize)
         imageView.imageScaling = .scaleAxesIndependently
         imageView.imageAlignment = .alignCenter

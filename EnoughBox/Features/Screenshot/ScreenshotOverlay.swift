@@ -1139,9 +1139,9 @@ private final class ScreenshotMosaicSizePanel: NSView {
 
 private enum ScreenshotToolbarIcons {
     static func textBadge(_ text: String, tint: NSColor) -> NSImage {
-        NSImage(size: NSSize(width: 16, height: 16), flipped: false) { rect in
+        NSImage(size: NSSize(width: 18, height: 18), flipped: false) { rect in
             let attributes: [NSAttributedString.Key: Any] = [
-                .font: NSFont.systemFont(ofSize: text == "OCR" ? 7.5 : 10, weight: .bold),
+                .font: NSFont.systemFont(ofSize: text == "OCR" ? 8.1 : 11.5, weight: .bold),
                 .foregroundColor: tint,
             ]
             let size = (text as NSString).size(withAttributes: attributes)
@@ -1151,6 +1151,34 @@ private enum ScreenshotToolbarIcons {
             )
             return true
         }
+    }
+
+    static func shiftedSymbol(
+        _ name: String,
+        pointSize: CGFloat,
+        verticalOffset: CGFloat
+    ) -> NSImage {
+        let configuration = NSImage.SymbolConfiguration(pointSize: pointSize, weight: .semibold)
+        let source = NSImage(systemSymbolName: name, accessibilityDescription: nil)?
+            .withSymbolConfiguration(configuration)
+        let image = NSImage(size: NSSize(width: 18, height: 18), flipped: false) { rect in
+            guard let source else { return false }
+            let sourceSize = source.size
+            source.draw(
+                in: CGRect(
+                    x: rect.midX - sourceSize.width / 2,
+                    y: rect.midY - sourceSize.height / 2 + verticalOffset,
+                    width: sourceSize.width,
+                    height: sourceSize.height
+                ),
+                from: .zero,
+                operation: .sourceOver,
+                fraction: 1
+            )
+            return true
+        }
+        image.isTemplate = true
+        return image
     }
 
     static func mosaic(size: CGFloat, tint: NSColor) -> NSImage {
@@ -1279,7 +1307,6 @@ private final class ScreenshotToolbar: NSView {
         }
         addSubview(mosaicSizePanel)
 
-        let symbolConfig = NSImage.SymbolConfiguration(pointSize: 14, weight: .semibold)
         let items: [(Item, String?, String)] = [
             (.mosaic, nil, UIStrings.Screenshot.mosaic),
             (.ocr, nil, UIStrings.Screenshot.ocr),
@@ -1293,8 +1320,18 @@ private final class ScreenshotToolbar: NSView {
         for (item, symbol, tooltip) in items {
             let button = ScreenshotToolbarButton(frame: .zero)
             if let symbol {
-                button.image = NSImage(systemSymbolName: symbol, accessibilityDescription: nil)?
-                    .withSymbolConfiguration(symbolConfig)
+                let pointSize: CGFloat = [.pin, .cancel, .confirm].contains(item) ? 12.6 : 14
+                let symbolConfig = NSImage.SymbolConfiguration(pointSize: pointSize, weight: .semibold)
+                if item == .save {
+                    button.image = ScreenshotToolbarIcons.shiftedSymbol(
+                        symbol,
+                        pointSize: pointSize,
+                        verticalOffset: 0.9
+                    )
+                } else {
+                    button.image = NSImage(systemSymbolName: symbol, accessibilityDescription: nil)?
+                        .withSymbolConfiguration(symbolConfig)
+                }
             }
             button.toolTip = tooltip
             button.target = self
@@ -1347,7 +1384,7 @@ private final class ScreenshotToolbar: NSView {
         mosaicSizePanel.applyTheme(tokens)
         let hover = tokens.ink.nsColor.withAlphaComponent(0.1)
         let armed = tokens.border.nsColor
-        let mosaicImage = ScreenshotToolbarIcons.mosaic(size: 14, tint: tokens.controlTint.nsColor)
+        let mosaicImage = ScreenshotToolbarIcons.mosaic(size: 12.5, tint: tokens.controlTint.nsColor)
         let ocrImage = ScreenshotToolbarIcons.textBadge("OCR", tint: tokens.controlTint.nsColor)
         let translateImage = ScreenshotToolbarIcons.textBadge("译", tint: tokens.controlTint.nsColor)
         for button in buttons {
