@@ -106,3 +106,6 @@ cat "$HOME/Library/Application Support/EnoughBox/registry.json"
 - [ ] 在外部 App 选中文字后按快捷键可以翻译
 - [ ] 没有选区且剪贴板为空时显示无选区提示
 - [ ] 辅助功能未授权时不会把剪贴板旧内容误当成当前选区
+
+## 代码借鉴
+- https://github.com/pot-app/pot-desktop

@@ -18,3 +18,9 @@
 3. 首次应出现屏幕录制权限。
 4. 快捷键后拖选区域，调大小，勾选复制；再试用马赛克、钉图、保存、Esc。
 5. 未框选时移动指针看色值，按 `/` 应复制颜色并退出。
+
+## 代码借鉴
+
+- https://github.com/vorssaintapp/vorssaint-utils
+- https://github.com/SunnyCapturer/ShotX
+- https://github.com/KiZmzz/Aurora
