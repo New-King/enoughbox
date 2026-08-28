@@ -60,8 +60,7 @@ final class ScreenshotPinController: NSObject, NSWindowDelegate {
     }
 
     private func layoutPinContent(panel: NSPanel, container: NSView, imageView: NSImageView) {
-        let contentRect = panel.contentLayoutRect
-        container.frame = contentRect
+        container.frame = panel.contentView?.bounds ?? container.frame
         imageView.frame = container.bounds
     }
 

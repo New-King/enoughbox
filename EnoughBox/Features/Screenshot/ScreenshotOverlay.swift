@@ -1281,11 +1281,11 @@ private final class ScreenshotToolbar: NSView {
 
         let symbolConfig = NSImage.SymbolConfiguration(pointSize: 14, weight: .semibold)
         let items: [(Item, String?, String)] = [
-            (.pin, "pin.fill", UIStrings.Screenshot.pin),
             (.mosaic, nil, UIStrings.Screenshot.mosaic),
             (.ocr, nil, UIStrings.Screenshot.ocr),
             (.translate, nil, UIStrings.Translate.action),
             (.save, "square.and.arrow.down.fill", UIStrings.Screenshot.save),
+            (.pin, "pin", UIStrings.Screenshot.pin),
             (.cancel, "xmark", UIStrings.Screenshot.cancel),
             (.confirm, "checkmark", UIStrings.Screenshot.confirm),
         ]
