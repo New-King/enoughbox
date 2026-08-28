@@ -66,6 +66,7 @@ final class ScreenshotOverlayController {
     private var sessionActive = false
     private var keyMonitor: Any?
     private var globalKeyMonitor: Any?
+    private var ocrGeneration = 0
 
     func start() {
         guard !sessionActive, !Self.isSessionOnScreen else { return }
@@ -193,6 +194,8 @@ final class ScreenshotOverlayController {
             let scale = view.displayScale
             pinController.pin(image, screenRect: screenRect, scale: scale)
             dismiss(copyColor: false)
+        case .ocr:
+            runOCR(from: view)
         case .captureWindow(let windowID, let frame):
             markCapturePending()
             let scale = view.displayScale
@@ -207,6 +210,33 @@ final class ScreenshotOverlayController {
                 }
                 view.applyWindowCapture(image, windowRect: frame)
             }
+        }
+    }
+
+    private func runOCR(from view: ScreenshotOverlayView) {
+        guard let image = view.croppedImage() else { return }
+        ocrGeneration += 1
+        let generation = ocrGeneration
+        view.setToolbarInteractionEnabled(false)
+        ScreenshotCenterToast.show(UIStrings.Screenshot.ocrProcessing)
+
+        Task { @MainActor [weak self, weak view] in
+            do {
+                let text = try await ScreenshotOCR.recognize(image)
+                guard let self, self.ocrGeneration == generation else { return }
+                let trimmed = text.trimmingCharacters(in: .whitespacesAndNewlines)
+                if trimmed.isEmpty {
+                    ScreenshotCenterToast.show(UIStrings.Screenshot.ocrNoText)
+                } else {
+                    NSPasteboard.general.clearContents()
+                    NSPasteboard.general.setString(trimmed, forType: .string)
+                    ScreenshotCenterToast.show(UIStrings.Screenshot.ocrCopied)
+                }
+            } catch {
+                guard let self, self.ocrGeneration == generation else { return }
+                ScreenshotCenterToast.show(UIStrings.Screenshot.ocrFailed)
+            }
+            view?.setToolbarInteractionEnabled(true)
         }
     }
 
@@ -294,6 +324,7 @@ private enum ScreenshotOverlayAction {
     case confirm
     case save
     case pin
+    case ocr
     case copyColor(String)
     case captureWindow(CGWindowID, CGRect)
 }
@@ -324,6 +355,10 @@ private final class ScreenshotOverlayView: NSView {
 
     var isSelectionCommitted: Bool { committed }
     var displayScale: CGFloat { frozen.screen.backingScaleFactor }
+
+    func setToolbarInteractionEnabled(_ enabled: Bool) {
+        toolbar.setInteractionEnabled(enabled)
+    }
 
     func currentColorPasteboard() -> String? {
         sampled?.pasteboard(for: colorDisplayFormat)
@@ -744,6 +779,8 @@ private final class ScreenshotOverlayView: NSView {
             layoutChrome()
         case .pin:
             onAction?(.pin)
+        case .ocr:
+            onAction?(.ocr)
         case .save:
             onAction?(.save)
         case .cancel:
@@ -1181,7 +1218,7 @@ private final class ScreenshotToolbarButton: NSButton {
 
 private final class ScreenshotToolbar: NSView {
     enum Item: Int, CaseIterable {
-        case pin, mosaic, save, cancel, confirm
+        case pin, mosaic, ocr, save, cancel, confirm
     }
 
     var onPick: ((Item) -> Void)?
@@ -1216,6 +1253,7 @@ private final class ScreenshotToolbar: NSView {
         let items: [(Item, String?, String)] = [
             (.pin, "pin.fill", UIStrings.Screenshot.pin),
             (.mosaic, nil, UIStrings.Screenshot.mosaic),
+            (.ocr, "text.viewfinder", UIStrings.Screenshot.ocr),
             (.save, "square.and.arrow.down.fill", UIStrings.Screenshot.save),
             (.cancel, "xmark", UIStrings.Screenshot.cancel),
             (.confirm, "checkmark", UIStrings.Screenshot.confirm),
@@ -1295,6 +1333,10 @@ private final class ScreenshotToolbar: NSView {
         invalidateIntrinsicContentSize()
         needsLayout = true
         superview?.needsLayout = true
+    }
+
+    func setInteractionEnabled(_ enabled: Bool) {
+        buttons.forEach { $0.isEnabled = enabled }
     }
 
     var mosaicBrushDiameter: CGFloat {

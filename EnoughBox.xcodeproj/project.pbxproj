@@ -48,6 +48,7 @@
 		C7AC25CD4296F376687F0FBC /* UIStrings.swift in Sources */ = {isa = PBXBuildFile; fileRef = 73BC34BD0610838C32FA4A4D /* UIStrings.swift */; };
 		CDF06785774E0298440C8CA9 /* AppPaths.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1E332521763E4DEB27F1F241 /* AppPaths.swift */; };
 		DCB529BC069B942C9AD53E1C /* ShortcutSettingsViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = B4AACB91BDE6536D0F957C13 /* ShortcutSettingsViewController.swift */; };
+		E16641AF78743B5B57D11A41 /* ScreenshotOCR.swift in Sources */ = {isa = PBXBuildFile; fileRef = D8CF3930BDD24F9AB878C4AF /* ScreenshotOCR.swift */; };
 		F388ADD80A9428352261C67E /* ShortcutRecorderField.swift in Sources */ = {isa = PBXBuildFile; fileRef = B0842B672B213124ACF3D0C9 /* ShortcutRecorderField.swift */; };
 /* End PBXBuildFile section */
 
@@ -89,6 +90,7 @@
 		B8370BBAD0FEEF3FFC391DA3 /* ScreenshotTool.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScreenshotTool.swift; sourceTree = "<group>"; };
 		C8789202810DA85768E64FA7 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		CEF495582C9BFB2CA05DC64B /* ToolDetailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ToolDetailView.swift; sourceTree = "<group>"; };
+		D8CF3930BDD24F9AB878C4AF /* ScreenshotOCR.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScreenshotOCR.swift; sourceTree = "<group>"; };
 		E2ED94DCA5F2CE554FDF5E07 /* DeepSeekTranslator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeepSeekTranslator.swift; sourceTree = "<group>"; };
 		E64C21170554FB94B7A3BFD4 /* FloatingBanner.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FloatingBanner.swift; sourceTree = "<group>"; };
 		E87D5AA12725A1A39F4C3729 /* YoudaoTranslator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = YoudaoTranslator.swift; sourceTree = "<group>"; };
@@ -173,6 +175,7 @@
 			children = (
 				86E1B05429EF4CCD61A9F25E /* ScreenshotCenterToast.swift */,
 				28C29C5E4257E1CDD2F79C6E /* ScreenshotMosaic.swift */,
+				D8CF3930BDD24F9AB878C4AF /* ScreenshotOCR.swift */,
 				4C546E38CE8EADA9BC2B946E /* ScreenshotOverlay.swift */,
 				EDDC78515BD7BABFC248986C /* ScreenshotPin.swift */,
 				B8370BBAD0FEEF3FFC391DA3 /* ScreenshotTool.swift */,
@@ -335,6 +338,7 @@
 				LastUpgradeCheck = 1430;
 				TargetAttributes = {
 					CE660CBFAF1C528F6FFAE9AD = {
+						DevelopmentTeam = VA9NZV3TUY;
 						ProvisioningStyle = Automatic;
 					};
 				};
@@ -397,6 +401,7 @@
 				A578552C79CDB7774F38AAA0 /* ScreenshotCenterToast.swift in Sources */,
 				ACCADF8A7DB3AA3508940D25 /* ScreenshotGeometry.swift in Sources */,
 				4128944B337F010EDEA647B9 /* ScreenshotMosaic.swift in Sources */,
+				E16641AF78743B5B57D11A41 /* ScreenshotOCR.swift in Sources */,
 				1E41C82CF85A823406D6C8D6 /* ScreenshotOverlay.swift in Sources */,
 				8B2721D27BBCA95BB04213A7 /* ScreenshotPin.swift in Sources */,
 				72358958B8EBDA22CBA76FBE /* ScreenshotTool.swift in Sources */,
