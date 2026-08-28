@@ -55,7 +55,7 @@ enum UIStrings {
 
   enum Screenshot {
     static let settingsSection = "屏幕录制"
-    static let permissionHint = "截取屏幕需要此权限。"
+    static let permissionHint = "截图功能需要此权限，若无效果请在录屏设置中移除 EnoughBox.app 后重新添加。"
     static let openScreenRecording = "打开屏幕录制设置"
     static let pin = "钉在桌面"
     static let mosaic = "马赛克"
@@ -87,16 +87,12 @@ enum UIStrings {
     static let model = "模型 ID"
     static let baseURL = "接口 URL"
     static let accessibility = "辅助功能"
-    static let accessibilityHint =
-      "如果没有效果，请在辅助功能中移除 EnoughBox.app，退出应用后，重新打开并勾选。"
+    static let accessibilityHint = "翻译功能需要此权限，若无效果请在辅助功能中移除 EnoughBox.app 后重新添加。"
     static let openAccessibility = "打开辅助功能设置"
     static let footer = "优先翻译划词；没有选中则用剪贴板。"
-    static let systemHint =
-      "使用 macOS 15 及以上的系统翻译。首次使用时系统可能会下载语言包。优先划词，没有选中则用剪贴板。"
-    static let youdaoHint =
-      "使用有道文本翻译（NMT）。应用 ID 和应用密钥必填；若控制台把应用 ID 标成 API Key，填其中一个即可。"
-    static let deepseekHint =
-      "请填写完整接口 URL，例如 https://api.deepseek.com/chat/completions。默认模型为 deepseek-v4-flash。"
+    static let systemHint = "使用 macOS 15 及以上的系统翻译。首次使用时系统可能会下载语言包。优先划词，没有选中则用剪贴板。"
+    static let youdaoHint = "使用有道文本翻译（NMT）。应用 ID 和应用密钥必填；若控制台把应用 ID 标成 API Key，填其中一个即可。"
+    static let deepseekHint = "请填写完整接口 URL，例如 https://api.deepseek.com/chat/completions。默认模型为 deepseek-v4-flash。"
     static let apply = "申请"
     static let engineYoudao = "有道翻译"
     static let engineDeepSeek = "DeepSeek"
