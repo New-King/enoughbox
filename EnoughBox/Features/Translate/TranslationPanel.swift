@@ -14,7 +14,7 @@ final class TranslationPanelModel: ObservableObject {
     @Published var isPinned = false
     @Published var isTranslating = false
     @Published var targetLanguage = TranslateSettings.targetLanguage
-    @Published var detectedLanguage: TranslateLanguage = .en
+    @Published var sourceLanguage: TranslateLanguage = .en
     @Published var engine = TranslateSettings.engine
     @Published var appleRequestID: UUID?
 
@@ -27,7 +27,7 @@ final class TranslationPanelModel: ObservableObject {
         self.sourceText = sourceText
         targetLanguage = TranslateSettings.targetLanguage
         engine = TranslateSettings.engine
-        detectedLanguage = LanguageDetector.detect(sourceText)
+        sourceLanguage = LanguageDetector.detect(sourceText)
         if sourceText.isEmpty {
             translatedText = ""
             isTranslating = false
@@ -37,7 +37,7 @@ final class TranslationPanelModel: ObservableObject {
     }
 
     var visibleTargetLanguage: TranslateLanguage {
-        targetLanguage.resolvedTarget(for: detectedLanguage)
+        targetLanguage.resolvedTarget(for: sourceLanguage)
     }
 
     /// Cycles the session engine without writing `TranslateSettings.engine`.
@@ -46,14 +46,16 @@ final class TranslationPanelModel: ObservableObject {
         translate()
     }
 
-    func translate(persistTarget: Bool = true) {
+    func translate(persistTarget: Bool = true, redetectSource: Bool = true) {
         if persistTarget {
             TranslateSettings.targetLanguage = targetLanguage
         }
-        detectedLanguage = LanguageDetector.detect(sourceText)
         let text = sourceText.trimmingCharacters(in: .whitespacesAndNewlines)
-        let target = targetLanguage.resolvedTarget(for: detectedLanguage)
-        let source = detectedLanguage
+        if redetectSource {
+            sourceLanguage = LanguageDetector.detect(text)
+        }
+        let target = targetLanguage.resolvedTarget(for: sourceLanguage)
+        let source = sourceLanguage
         translateTask?.cancel()
         let id = UUID()
         requestID = id
@@ -107,10 +109,13 @@ final class TranslationPanelModel: ObservableObject {
     }
 
     func toggleTargetLanguage() {
-        targetLanguage = visibleTargetLanguage == .zhHans ? .en : .zhHans
+        let oldSourceLanguage = sourceLanguage
+        sourceLanguage = visibleTargetLanguage
+        targetLanguage = oldSourceLanguage
+
         let text = sourceText.trimmingCharacters(in: .whitespacesAndNewlines)
         guard !text.isEmpty else { return }
-        translate(persistTarget: false)
+        translate(persistTarget: false, redetectSource: false)
     }
 
     func clearSource() {
@@ -129,7 +134,7 @@ final class TranslationPanelModel: ObservableObject {
 
     func speak(_ text: String, language: TranslateLanguage) {
         guard !text.isEmpty else { return }
-        let speechLanguage = language.resolvedTarget(for: detectedLanguage)
+        let speechLanguage = language.resolvedTarget(for: sourceLanguage)
         synthesizer.stopSpeaking(at: .immediate)
         let utterance = AVSpeechUtterance(string: text)
         utterance.voice = AVSpeechSynthesisVoice(language: speechLanguage.speechLanguage)
@@ -370,7 +375,7 @@ private struct TranslationPanelView: View {
 
             HStack(spacing: 8) {
                 panelIconButton("speaker.wave.2") {
-                    session.speak(session.sourceText, language: session.detectedLanguage)
+                    session.speak(session.sourceText, language: session.sourceLanguage)
                 }
                 panelIconButton("square.on.square") {
                     session.copy(session.sourceText)
@@ -379,7 +384,7 @@ private struct TranslationPanelView: View {
                     session.clearSource()
                 }
 
-                languageChip(session.detectedLanguage.localizedName)
+                languageChip(session.sourceLanguage.localizedName)
 
                 Spacer(minLength: 8)
 
@@ -406,7 +411,7 @@ private struct TranslationPanelView: View {
         HStack {
             Text(session.sourceText.isEmpty
                  ? UIStrings.Translate.sourceAuto
-                 : session.detectedLanguage.localizedName)
+                 : session.sourceLanguage.localizedName)
                 .font(.system(size: 12))
                 .foregroundStyle(tokens.inkSoft)
             Spacer()
@@ -666,8 +671,8 @@ private struct AppleTranslationTaskBridge<Panel: View>: View {
 
     private func applyConfiguration() {
         guard session.appleRequestID != nil else { return }
-        let source = Locale.Language(identifier: session.detectedLanguage.appleIdentifier)
-        let targetLanguage = session.targetLanguage.resolvedTarget(for: session.detectedLanguage)
+        let source = Locale.Language(identifier: session.sourceLanguage.appleIdentifier)
+        let targetLanguage = session.targetLanguage.resolvedTarget(for: session.sourceLanguage)
         let target = Locale.Language(identifier: targetLanguage.appleIdentifier)
         if configuration == nil {
             configuration = TranslationSession.Configuration(source: source, target: target)
