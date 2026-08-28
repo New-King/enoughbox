@@ -67,6 +67,8 @@ final class ScreenshotOverlayController {
     private var keyMonitor: Any?
     private var globalKeyMonitor: Any?
     private var ocrGeneration = 0
+    private let ocrResultPanel = ScreenshotOCRResultPanelController()
+    private let translationController = TranslationPanelController()
 
     func start() {
         guard !sessionActive, !Self.isSessionOnScreen else { return }
@@ -195,7 +197,9 @@ final class ScreenshotOverlayController {
             pinController.pin(image, screenRect: screenRect, scale: scale)
             dismiss(copyColor: false)
         case .ocr:
-            runOCR(from: view)
+            runOCR(from: view, openingTranslation: false)
+        case .translate:
+            runOCR(from: view, openingTranslation: true)
         case .captureWindow(let windowID, let frame):
             markCapturePending()
             let scale = view.displayScale
@@ -213,7 +217,7 @@ final class ScreenshotOverlayController {
         }
     }
 
-    private func runOCR(from view: ScreenshotOverlayView) {
+    private func runOCR(from view: ScreenshotOverlayView, openingTranslation: Bool) {
         guard let image = view.croppedImage() else { return }
         ocrGeneration += 1
         let generation = ocrGeneration
@@ -226,14 +230,22 @@ final class ScreenshotOverlayController {
                 guard let self, self.ocrGeneration == generation else { return }
                 let trimmed = text.trimmingCharacters(in: .whitespacesAndNewlines)
                 if trimmed.isEmpty {
+                    self.dismiss(copyColor: false)
                     ScreenshotCenterToast.show(UIStrings.Screenshot.ocrNoText)
                 } else {
                     NSPasteboard.general.clearContents()
                     NSPasteboard.general.setString(trimmed, forType: .string)
-                    ScreenshotCenterToast.show(UIStrings.Screenshot.ocrCopied)
+                    self.dismiss(copyColor: false)
+                    if openingTranslation {
+                        self.translationController.present(sourceText: trimmed)
+                    } else {
+                        self.ocrResultPanel.present(text: trimmed)
+                        ScreenshotCenterToast.show(UIStrings.Screenshot.ocrCopied)
+                    }
                 }
             } catch {
                 guard let self, self.ocrGeneration == generation else { return }
+                self.dismiss(copyColor: false)
                 ScreenshotCenterToast.show(UIStrings.Screenshot.ocrFailed)
             }
             view?.setToolbarInteractionEnabled(true)
@@ -325,6 +337,7 @@ private enum ScreenshotOverlayAction {
     case save
     case pin
     case ocr
+    case translate
     case copyColor(String)
     case captureWindow(CGWindowID, CGRect)
 }
@@ -781,6 +794,8 @@ private final class ScreenshotOverlayView: NSView {
             onAction?(.pin)
         case .ocr:
             onAction?(.ocr)
+        case .translate:
+            onAction?(.translate)
         case .save:
             onAction?(.save)
         case .cancel:
@@ -1218,7 +1233,7 @@ private final class ScreenshotToolbarButton: NSButton {
 
 private final class ScreenshotToolbar: NSView {
     enum Item: Int, CaseIterable {
-        case pin, mosaic, ocr, save, cancel, confirm
+        case pin, mosaic, ocr, translate, save, cancel, confirm
     }
 
     var onPick: ((Item) -> Void)?
@@ -1254,6 +1269,7 @@ private final class ScreenshotToolbar: NSView {
             (.pin, "pin.fill", UIStrings.Screenshot.pin),
             (.mosaic, nil, UIStrings.Screenshot.mosaic),
             (.ocr, "text.viewfinder", UIStrings.Screenshot.ocr),
+            (.translate, "character.bubble", UIStrings.Translate.action),
             (.save, "square.and.arrow.down.fill", UIStrings.Screenshot.save),
             (.cancel, "xmark", UIStrings.Screenshot.cancel),
             (.confirm, "checkmark", UIStrings.Screenshot.confirm),
@@ -1272,6 +1288,11 @@ private final class ScreenshotToolbar: NSView {
             addSubview(button)
             buttons.append(button)
             if item == .mosaic { mosaicButton = button }
+            if item == .translate {
+                button.isEnabled = ToolRegistry.shared.load().contains {
+                    $0.id == TranslateTool.id
+                }
+            }
         }
     }
 
