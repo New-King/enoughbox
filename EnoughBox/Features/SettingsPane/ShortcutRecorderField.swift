@@ -10,33 +10,59 @@ struct ShortcutRecorderField: NSViewRepresentable {
     let onSaved: (KeyboardShortcuts.Shortcut) -> Void
     let onConflict: (ShortcutConflict) -> Void
 
-    func makeNSView(context: Context) -> ShortcutRecorderButton {
+    func makeNSView(context: Context) -> ShortcutRecorderHostView {
         let button = ShortcutRecorderButton(name: name)
         button.onSaved = onSaved
         button.onConflict = onConflict
-        return button
+        return ShortcutRecorderHostView(button: button)
     }
 
-    func updateNSView(_ nsView: ShortcutRecorderButton, context: Context) {
-        nsView.shortcutName = name
-        nsView.onSaved = onSaved
-        nsView.onConflict = onConflict
-        if !nsView.isRecordingShortcut {
-            nsView.refreshTitle()
+    func updateNSView(_ nsView: ShortcutRecorderHostView, context: Context) {
+        let button = nsView.button
+        button.shortcutName = name
+        button.onSaved = onSaved
+        button.onConflict = onConflict
+        if !button.isRecordingShortcut {
+            button.refreshTitle()
         }
     }
 
     func sizeThatFits(
         _ proposal: ProposedViewSize,
-        nsView: ShortcutRecorderButton,
+        nsView: ShortcutRecorderHostView,
         context: Context
     ) -> CGSize? {
-        let intrinsic = nsView.intrinsicContentSize
-        return CGSize(width: proposal.width ?? intrinsic.width, height: intrinsic.height)
+        CGSize(width: SettingsControlMetrics.width, height: SettingsControlMetrics.height)
     }
 
-    static func dismantleNSView(_ nsView: ShortcutRecorderButton, coordinator: ()) {
-        nsView.stopRecording()
+    static func dismantleNSView(_ nsView: ShortcutRecorderHostView, coordinator: ()) {
+        nsView.button.stopRecording()
+    }
+}
+
+final class ShortcutRecorderHostView: NSView {
+    let button: ShortcutRecorderButton
+
+    init(button: ShortcutRecorderButton) {
+        self.button = button
+        super.init(frame: NSRect(
+            x: 0,
+            y: 0,
+            width: SettingsControlMetrics.width,
+            height: SettingsControlMetrics.height
+        ))
+        button.autoresizingMask = [.width, .height]
+        addSubview(button)
+        button.frame = bounds
+    }
+
+    @available(*, unavailable)
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
+
+    override var intrinsicContentSize: NSSize {
+        NSSize(width: SettingsControlMetrics.width, height: SettingsControlMetrics.height)
     }
 }
 
@@ -68,7 +94,7 @@ final class ShortcutRecorderButton: NSButton {
 
     init(name: KeyboardShortcuts.Name) {
         shortcutName = name
-        super.init(frame: NSRect(x: 0, y: 0, width: 140, height: 24))
+        super.init(frame: NSRect(x: 0, y: 0, width: SettingsControlMetrics.width, height: SettingsControlMetrics.height))
         bezelStyle = .rounded
         setButtonType(.momentaryPushIn)
         font = .systemFont(ofSize: 13, weight: .medium)

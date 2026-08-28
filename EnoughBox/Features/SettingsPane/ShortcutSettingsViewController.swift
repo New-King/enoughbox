@@ -16,20 +16,14 @@ struct ToolShortcutSettingsCard: View {
                 .foregroundStyle(tokens.inkMuted)
                 .textCase(.uppercase)
 
-            HStack(spacing: 12) {
-                Text(UIStrings.Shortcut.placeholder)
-                    .font(.system(size: 13))
-                    .foregroundStyle(tokens.inkSoft)
-
-                Spacer(minLength: 8)
-
+            SettingsTrailingRow(title: UIStrings.Shortcut.placeholder) {
                 ShortcutRecorderField(name: shortcutName) { shortcut in
                     let message = String(format: UIStrings.Shortcut.savedFormat, "\(shortcut)")
                     appState.showToast(message)
                 } onConflict: { conflict in
                     appState.showToast(conflict.localizedMessage, style: .error)
                 }
-                .frame(width: 160, height: 24)
+                .fixedSize(horizontal: true, vertical: false)
             }
 
             Text(footer)

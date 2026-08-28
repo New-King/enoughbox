@@ -60,8 +60,6 @@ struct TranslateSettingsView: View {
     @Environment(\.designTokens) private var tokens
     @FocusState private var focusedField: String?
 
-    private let settingsControlWidth: CGFloat = 160
-
     private static let youdaoApplyURL = URL(string: "https://ai.youdao.com/console/#/")!
     private static let deepSeekApplyURL = URL(string: "https://platform.deepseek.com/")!
 
@@ -89,27 +87,23 @@ struct TranslateSettingsView: View {
         VStack(alignment: .leading, spacing: 12) {
             settingsHeader(UIStrings.Translate.settingsSection)
 
-            settingsRow(UIStrings.Translate.targetLanguage) {
-                Picker("", selection: $targetLanguage) {
-                    ForEach(TranslateLanguage.allCases) { language in
-                        Text(language.localizedName).tag(language)
-                    }
-                }
-                .labelsHidden()
-                .frame(width: settingsControlWidth)
+            SettingsTrailingRow(title: UIStrings.Translate.targetLanguage) {
+                SettingsMenuPicker(
+                    selection: $targetLanguage,
+                    options: TranslateLanguage.allCases.map { ($0, $0.localizedName) }
+                )
+                .fixedSize(horizontal: true, vertical: false)
                 .onChange(of: targetLanguage) { _, newValue in
                     TranslateSettings.targetLanguage = newValue
                 }
             }
 
-            settingsRow(UIStrings.Translate.engine) {
-                Picker("", selection: $engine) {
-                    ForEach(TranslationEngine.allCases) { item in
-                        Text(item.localizedName).tag(item)
-                    }
-                }
-                .labelsHidden()
-                .frame(width: settingsControlWidth)
+            SettingsTrailingRow(title: UIStrings.Translate.engine) {
+                SettingsMenuPicker(
+                    selection: $engine,
+                    options: TranslationEngine.allCases.map { ($0, $0.localizedName) }
+                )
+                .fixedSize(horizontal: true, vertical: false)
                 .onChange(of: engine) { _, newValue in
                     TranslateSettings.engine = newValue
                 }
@@ -173,37 +167,18 @@ struct TranslateSettingsView: View {
     }
 
     private func hintText(_ text: String, applyURL: URL? = nil) -> some View {
-        HStack(alignment: .firstTextBaseline, spacing: 12) {
+        HStack(alignment: .firstTextBaseline, spacing: 4) {
             Text(text)
                 .font(.system(size: 11))
                 .foregroundStyle(tokens.inkMuted)
-                .fixedSize(horizontal: false, vertical: true)
-                .frame(maxWidth: .infinity, alignment: .leading)
-                .onTapGesture(perform: resignFocus)
 
             if let applyURL {
-                applyLink(applyURL)
+                Link(UIStrings.Translate.apply, destination: applyURL)
+                    .font(.system(size: 11))
             }
         }
-    }
-
-    private func applyLink(_ url: URL) -> some View {
-        Button {
-            NSWorkspace.shared.open(url)
-        } label: {
-            Text(UIStrings.Translate.apply)
-                .font(.system(size: 11))
-                .underline()
-        }
-        .buttonStyle(.plain)
-        .foregroundStyle(tokens.controlTint)
-        .onHover { isHovered in
-            if isHovered {
-                NSCursor.pointingHand.push()
-            } else {
-                NSCursor.pop()
-            }
-        }
+        .fixedSize(horizontal: false, vertical: true)
+        .onTapGesture(perform: resignFocus)
     }
 
     private func settingsHeader(_ title: String) -> some View {
@@ -212,17 +187,6 @@ struct TranslateSettingsView: View {
             .foregroundStyle(tokens.inkMuted)
             .textCase(.uppercase)
             .onTapGesture(perform: resignFocus)
-    }
-
-    private func settingsRow<Content: View>(_ title: String, @ViewBuilder content: () -> Content) -> some View {
-        HStack {
-            Text(title)
-                .font(.system(size: 13))
-                .foregroundStyle(tokens.ink)
-                .onTapGesture(perform: resignFocus)
-            Spacer(minLength: 8)
-            content()
-        }
     }
 
     private func labeledField(
