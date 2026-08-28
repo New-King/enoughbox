@@ -36,6 +36,10 @@ final class TranslationPanelModel: ObservableObject {
         translate()
     }
 
+    var visibleTargetLanguage: TranslateLanguage {
+        targetLanguage.resolvedTarget(for: detectedLanguage)
+    }
+
     /// Cycles the session engine without writing `TranslateSettings.engine`.
     func cycleEngine() {
         engine = engine.next()
@@ -46,7 +50,7 @@ final class TranslationPanelModel: ObservableObject {
         TranslateSettings.targetLanguage = targetLanguage
         detectedLanguage = LanguageDetector.detect(sourceText)
         let text = sourceText.trimmingCharacters(in: .whitespacesAndNewlines)
-        let target = targetLanguage
+        let target = targetLanguage.resolvedTarget(for: detectedLanguage)
         let source = detectedLanguage
         translateTask?.cancel()
         let id = UUID()
@@ -101,7 +105,14 @@ final class TranslationPanelModel: ObservableObject {
     }
 
     func toggleTargetLanguage() {
-        targetLanguage = targetLanguage == .en ? .zhHans : .en
+        switch targetLanguage {
+        case .auto:
+            targetLanguage = detectedLanguage == .zhHans ? .en : .zhHans
+        case .en:
+            targetLanguage = .zhHans
+        case .zhHans:
+            targetLanguage = .auto
+        }
         TranslateSettings.targetLanguage = targetLanguage
         let text = sourceText.trimmingCharacters(in: .whitespacesAndNewlines)
         guard !text.isEmpty else { return }
@@ -124,9 +135,10 @@ final class TranslationPanelModel: ObservableObject {
 
     func speak(_ text: String, language: TranslateLanguage) {
         guard !text.isEmpty else { return }
+        let speechLanguage = language.resolvedTarget(for: detectedLanguage)
         synthesizer.stopSpeaking(at: .immediate)
         let utterance = AVSpeechUtterance(string: text)
-        utterance.voice = AVSpeechSynthesisVoice(language: language.speechLanguage)
+        utterance.voice = AVSpeechSynthesisVoice(language: speechLanguage.speechLanguage)
         synthesizer.speak(utterance)
     }
 }
@@ -398,7 +410,9 @@ private struct TranslationPanelView: View {
 
     private var languageBar: some View {
         HStack {
-            Text(UIStrings.Translate.sourceAuto)
+            Text(session.sourceText.isEmpty
+                 ? UIStrings.Translate.sourceAuto
+                 : session.detectedLanguage.localizedName)
                 .font(.system(size: 12))
                 .foregroundStyle(tokens.inkSoft)
             Spacer()
@@ -410,18 +424,19 @@ private struct TranslationPanelView: View {
             .buttonStyle(.plain)
             .help(UIStrings.Translate.swap)
             Spacer()
-            Picker("", selection: $session.targetLanguage) {
-                ForEach(TranslateLanguage.allCases) { language in
+            Picker("", selection: Binding(
+                get: { session.visibleTargetLanguage },
+                set: { newValue in
+                    session.targetLanguage = newValue
+                    session.translate()
+                }
+            )) {
+                ForEach([TranslateLanguage.zhHans, .en]) { language in
                     Text(language.localizedName).tag(language)
                 }
             }
             .labelsHidden()
             .frame(width: 110)
-            .onChange(of: session.targetLanguage) { _, _ in
-                if !session.sourceText.isEmpty {
-                    session.translate()
-                }
-            }
         }
         .padding(.horizontal, 4)
     }
@@ -658,7 +673,8 @@ private struct AppleTranslationTaskBridge<Panel: View>: View {
     private func applyConfiguration() {
         guard session.appleRequestID != nil else { return }
         let source = Locale.Language(identifier: session.detectedLanguage.appleIdentifier)
-        let target = Locale.Language(identifier: session.targetLanguage.appleIdentifier)
+        let targetLanguage = session.targetLanguage.resolvedTarget(for: session.detectedLanguage)
+        let target = Locale.Language(identifier: targetLanguage.appleIdentifier)
         if configuration == nil {
             configuration = TranslationSession.Configuration(source: source, target: target)
             return

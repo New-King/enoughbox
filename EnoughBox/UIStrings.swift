@@ -107,6 +107,7 @@ enum UIStrings {
     static let engineSystem = "系统翻译"
     static let languageZhHans = "简体中文"
     static let languageEn = "英语"
+    static let languageAuto = "自动检测"
     static let errorEmpty = "请输入要翻译的文本"
     static let errorMissingYoudao = "请先在工具设置里填写有道应用 ID 和应用密钥"
     static let errorMissingDeepSeek = "请先在工具设置里填写 DeepSeek API Key"

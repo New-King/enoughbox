@@ -1,4 +1,5 @@
 import Foundation
+import NaturalLanguage
 
 protocol Translator: Sendable {
     func translate(_ text: String, from: TranslateLanguage, to: TranslateLanguage) async throws -> String
@@ -66,6 +67,7 @@ enum TranslatorError: LocalizedError {
 }
 
 enum TranslateLanguage: String, CaseIterable, Identifiable {
+    case auto = "auto"
     case zhHans = "zh-Hans"
     case en
 
@@ -73,6 +75,8 @@ enum TranslateLanguage: String, CaseIterable, Identifiable {
 
     var localizedName: String {
         switch self {
+        case .auto:
+            return UIStrings.Translate.languageAuto
         case .zhHans:
             return UIStrings.Translate.languageZhHans
         case .en:
@@ -82,6 +86,7 @@ enum TranslateLanguage: String, CaseIterable, Identifiable {
 
     var speechLanguage: String {
         switch self {
+        case .auto: return "en-US"
         case .zhHans: return "zh-CN"
         case .en: return "en-US"
         }
@@ -89,6 +94,7 @@ enum TranslateLanguage: String, CaseIterable, Identifiable {
 
     var youdaoCode: String {
         switch self {
+        case .auto: return "en"
         case .zhHans: return "zh-CHS"
         case .en: return "en"
         }
@@ -98,9 +104,15 @@ enum TranslateLanguage: String, CaseIterable, Identifiable {
 
     var englishLabel: String {
         switch self {
+        case .auto: return "Detected language"
         case .zhHans: return "Simplified Chinese"
         case .en: return "English"
         }
+    }
+
+    func resolvedTarget(for source: TranslateLanguage) -> TranslateLanguage {
+        guard self == .auto else { return self }
+        return source == .zhHans ? .en : .zhHans
     }
 }
 
@@ -119,7 +131,7 @@ enum TranslateSettings {
 
     static var targetLanguage: TranslateLanguage {
         get {
-            TranslateLanguage(rawValue: UserDefaults.standard.string(forKey: targetKey) ?? "") ?? .zhHans
+            TranslateLanguage(rawValue: UserDefaults.standard.string(forKey: targetKey) ?? "") ?? .auto
         }
         set {
             UserDefaults.standard.set(newValue.rawValue, forKey: targetKey)
@@ -262,7 +274,21 @@ enum TranslationHTTP {
 
 enum LanguageDetector {
     static func detect(_ text: String) -> TranslateLanguage {
-        let cjk = text.unicodeScalars.filter { (0x4E00...0x9FFF).contains($0.value) }.count
-        return cjk * 4 >= max(text.count, 1) ? .zhHans : .en
+        let trimmed = text.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard !trimmed.isEmpty else { return .en }
+
+        let recognizer = NLLanguageRecognizer()
+        recognizer.processString(trimmed)
+        if let language = recognizer.dominantLanguage {
+            if language.rawValue.hasPrefix("zh") {
+                return .zhHans
+            }
+            if language == .english {
+                return .en
+            }
+        }
+
+        let cjk = trimmed.unicodeScalars.filter { (0x4E00...0x9FFF).contains($0.value) }.count
+        return cjk * 4 >= max(trimmed.count, 1) ? .zhHans : .en
     }
 }
