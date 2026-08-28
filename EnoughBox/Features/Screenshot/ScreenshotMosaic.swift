@@ -37,12 +37,13 @@ enum ScreenshotMosaic {
                 height: image.height,
                 bitsPerComponent: 8,
                 bytesPerRow: 0,
-                space: image.colorSpace ?? CGColorSpaceCreateDeviceRGB(),
+                space: CGColorSpaceCreateDeviceRGB(),
                 bitmapInfo: CGImageAlphaInfo.premultipliedLast.rawValue
               )
         else { return image }
 
         canvas.interpolationQuality = .none
+        canvas.setBlendMode(.copy)
         canvas.draw(image, in: CGRect(x: 0, y: 0, width: image.width, height: image.height))
 
         canvas.saveGState()

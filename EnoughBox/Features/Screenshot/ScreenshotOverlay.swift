@@ -1138,6 +1138,21 @@ private final class ScreenshotMosaicSizePanel: NSView {
 }
 
 private enum ScreenshotToolbarIcons {
+    static func textBadge(_ text: String, tint: NSColor) -> NSImage {
+        NSImage(size: NSSize(width: 16, height: 16), flipped: false) { rect in
+            let attributes: [NSAttributedString.Key: Any] = [
+                .font: NSFont.systemFont(ofSize: text == "OCR" ? 7.5 : 10, weight: .bold),
+                .foregroundColor: tint,
+            ]
+            let size = (text as NSString).size(withAttributes: attributes)
+            (text as NSString).draw(
+                at: CGPoint(x: rect.midX - size.width / 2, y: rect.midY - size.height / 2),
+                withAttributes: attributes
+            )
+            return true
+        }
+    }
+
     static func mosaic(size: CGFloat, tint: NSColor) -> NSImage {
         let dimension = size
         return NSImage(size: NSSize(width: dimension, height: dimension), flipped: false) { rect in
@@ -1268,8 +1283,8 @@ private final class ScreenshotToolbar: NSView {
         let items: [(Item, String?, String)] = [
             (.pin, "pin.fill", UIStrings.Screenshot.pin),
             (.mosaic, nil, UIStrings.Screenshot.mosaic),
-            (.ocr, "text.viewfinder", UIStrings.Screenshot.ocr),
-            (.translate, "character.bubble", UIStrings.Translate.action),
+            (.ocr, nil, UIStrings.Screenshot.ocr),
+            (.translate, nil, UIStrings.Translate.action),
             (.save, "square.and.arrow.down.fill", UIStrings.Screenshot.save),
             (.cancel, "xmark", UIStrings.Screenshot.cancel),
             (.confirm, "checkmark", UIStrings.Screenshot.confirm),
@@ -1333,9 +1348,16 @@ private final class ScreenshotToolbar: NSView {
         let hover = tokens.ink.nsColor.withAlphaComponent(0.1)
         let armed = tokens.border.nsColor
         let mosaicImage = ScreenshotToolbarIcons.mosaic(size: 14, tint: tokens.controlTint.nsColor)
+        let ocrImage = ScreenshotToolbarIcons.textBadge("OCR", tint: tokens.controlTint.nsColor)
+        let translateImage = ScreenshotToolbarIcons.textBadge("译", tint: tokens.controlTint.nsColor)
         for button in buttons {
             if button === mosaicButton {
                 button.image = mosaicImage
+            }
+            if button.tag == Item.ocr.rawValue {
+                button.image = ocrImage
+            } else if button.tag == Item.translate.rawValue {
+                button.image = translateImage
             }
             button.applyChrome(
                 tint: tokens.controlTint.nsColor,
