@@ -56,6 +56,8 @@ final class AppState: ObservableObject {
             return UIStrings.Tool.translateName
         case "com.enoughbox.screenshot":
             return UIStrings.Tool.screenshotName
+        case "com.enoughbox.clipboard":
+            return UIStrings.Tool.clipboardName
         default:
             return tool.id
         }

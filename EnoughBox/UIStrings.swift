@@ -33,6 +33,8 @@ enum UIStrings {
     static let translateDescription = "在任意 App 里划词翻译"
     static let screenshotName = "截图"
     static let screenshotDescription = "区域截图、钉图、马赛克与取色"
+    static let clipboardName = "剪贴板"
+    static let clipboardDescription = "浏览剪贴板历史，搜索并粘贴"
     static let missingBundle = "工具不可用，请从内置工具中重新启用。"
     static let reinstallHint = "在工具中心启用或移除内置工具。"
     static let reinstall = "打开内置工具"
@@ -40,6 +42,8 @@ enum UIStrings {
       "优先翻译选中文字；没有划词则翻译剪贴板。只有划词需要辅助功能权限。"
     static let screenshotShortcutFooter =
       "悬停吸附窗口、单击选中；拖动可自定义区域。C 复制颜色并结束；/ 切换 HEX、RGB、HSL。"
+    static let clipboardShortcutFooter =
+      "再次按下快捷键可关闭浮窗。点击条目会粘贴到打开浮窗前的应用；自动粘贴需要辅助功能权限。"
   }
 
   enum Shortcut {
@@ -119,5 +123,23 @@ enum UIStrings {
     static let errorYoudaoSign = "有道签名失败，请检查应用 ID 和应用密钥"
     static let errorYoudaoQuota = "有道额度不足或请求过于频繁"
     static let errorYoudaoCodeFormat = "有道错误 %@"
+  }
+
+  enum Clipboard {
+    static let settingsSection = "剪贴板"
+    static let historyLimit = "历史条数上限"
+    static let historyLimitFormat = "%d 条"
+    static let settingsHint = "最近显示最近 20 条。点击条目粘贴到原应用，浮窗保持打开。"
+    static let searchPlaceholder = "搜索"
+    static let categoryRecent = "最近"
+    static let categoryAll = "全部"
+    static let categoryText = "文本"
+    static let categoryImage = "图片"
+    static let categoryOther = "其他"
+    static let empty = "还没有剪贴板历史"
+    static let delete = "删除"
+    static let toastCopied = "已复制到剪贴板"
+    static let imageEntry = "图片"
+    static let otherEntry = "其他内容"
   }
 }

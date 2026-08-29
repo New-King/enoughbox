@@ -44,6 +44,14 @@ struct BuiltInTool: Identifiable, Equatable {
                 name: UIStrings.Tool.screenshotName,
                 description: UIStrings.Tool.screenshotDescription
             ),
+            BuiltInTool(
+                id: "com.enoughbox.clipboard",
+                iconName: "doc.on.clipboard",
+                version: "0.1.0",
+                capabilities: [.hotkey, .clipboard],
+                name: UIStrings.Tool.clipboardName,
+                description: UIStrings.Tool.clipboardDescription
+            ),
         ]
     }
 }

@@ -4,11 +4,13 @@ import KeyboardShortcuts
 extension KeyboardShortcuts.Name {
     static let translateSelection = Self("com.enoughbox.translate.selection")
     static let screenshotRegion = Self("com.enoughbox.screenshot.region")
+    static let clipboardPanel = Self("com.enoughbox.clipboard.panel")
 }
 
 enum HotkeyCatalog {
     static let translateSelectionID = "com.enoughbox.translate.selection"
     static let screenshotRegionID = "com.enoughbox.screenshot.region"
+    static let clipboardPanelID = "com.enoughbox.clipboard.panel"
 }
 
 enum HotkeyCatalogHost {
@@ -16,6 +18,7 @@ enum HotkeyCatalogHost {
         switch identifier {
         case HotkeyCatalog.translateSelectionID: .translateSelection
         case HotkeyCatalog.screenshotRegionID: .screenshotRegion
+        case HotkeyCatalog.clipboardPanelID: .clipboardPanel
         default: nil
         }
     }
@@ -24,6 +27,7 @@ enum HotkeyCatalogHost {
         switch toolID {
         case "com.enoughbox.translate": .translateSelection
         case "com.enoughbox.screenshot": .screenshotRegion
+        case "com.enoughbox.clipboard": .clipboardPanel
         default: nil
         }
     }

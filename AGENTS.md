@@ -11,6 +11,7 @@ macOS 轻量工具箱 + 内置工具中心。Slogan：**I don't need much.** MVP
 - **改 UI / 设计** → 先读 `docs/设计规范.md`，令牌只改 `DesignTokens.swift`（工程就绪后）。
 - **改文案** → 只改 `EnoughBox/UIStrings.swift`（按模块分 `enum`）；见 `docs/设计规范.md` §6。禁止在视图里散落硬编码用户可见字符串。
 - **改内置工具 / 工具中心** → 先读 `docs/架构.md`（工具代码随宿主编译；用户只管理启用状态）。
+- **改浮动 UI、异步流程或排查内存** → 先读 `docs/性能优化.md`。
 - **改工具目录 / 工具启用状态** → 先读 `docs/架构.md` 和 `docs/MVP.md`。
 - **改范围 / 里程碑** → 先读 `docs/MVP.md`，重大 scope 变更先与用户确认。
 

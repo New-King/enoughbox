@@ -23,6 +23,8 @@ struct ToolDetailView: View {
                     TranslateSettingsView()
                 } else if tool.id == ScreenshotTool.id {
                     ScreenshotSettingsView()
+                } else if tool.id == ClipboardTool.id {
+                    ClipboardSettingsView()
                 } else {
                     missingToolView
                 }
@@ -56,6 +58,8 @@ struct ToolDetailView: View {
             UIStrings.Tool.translateShortcutFooter
         case "com.enoughbox.screenshot":
             UIStrings.Tool.screenshotShortcutFooter
+        case "com.enoughbox.clipboard":
+            UIStrings.Tool.clipboardShortcutFooter
         default:
             UIStrings.Shortcut.section
         }

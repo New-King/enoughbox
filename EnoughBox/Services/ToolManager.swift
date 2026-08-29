@@ -4,11 +4,13 @@ import Foundation
 final class ToolManager: ObservableObject {
     private let translateTool: TranslateTool
     private let screenshotTool: ScreenshotTool
+    private let clipboardTool: ClipboardTool
     private var activeToolIDs: Set<String> = []
 
     init(toastHandler: @escaping (String) -> Void) {
         translateTool = TranslateTool(toastHandler: toastHandler)
         screenshotTool = ScreenshotTool(toastHandler: toastHandler)
+        clipboardTool = ClipboardTool(toastHandler: toastHandler)
     }
 
     func loadEnabled(_ tools: [EnabledTool]) {
@@ -24,6 +26,8 @@ final class ToolManager: ObservableObject {
             translateTool.activate()
         case ScreenshotTool.id:
             screenshotTool.activate()
+        case ClipboardTool.id:
+            clipboardTool.activate()
         default:
             activeToolIDs.remove(toolID)
         }
@@ -36,6 +40,8 @@ final class ToolManager: ObservableObject {
             translateTool.deactivate()
         case ScreenshotTool.id:
             screenshotTool.deactivate()
+        case ClipboardTool.id:
+            clipboardTool.deactivate()
         default:
             break
         }
