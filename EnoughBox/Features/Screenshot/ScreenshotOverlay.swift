@@ -64,6 +64,8 @@ final class ScreenshotOverlayController {
     private var panels: [ScreenshotPanel] = []
     private let pinController = ScreenshotPinController()
     private var sessionActive = false
+    private var sessionGeneration = 0
+    private var ignoreStartUntil = Date.distantPast
     private var keyMonitor: Any?
     private var globalKeyMonitor: Any?
     private var ocrGeneration = 0
@@ -71,16 +73,22 @@ final class ScreenshotOverlayController {
     private let translationController = TranslationPanelController()
 
     func start() {
-        guard !sessionActive, !Self.isSessionOnScreen else { return }
+        guard !sessionActive,
+              !Self.isSessionOnScreen,
+              Date() >= ignoreStartUntil else { return }
         sessionActive = true
         Self.isSessionOnScreen = true
+        sessionGeneration += 1
+        let generation = sessionGeneration
         let protectedIDs = protectedWindowIDs()
         Task { @MainActor [weak self] in
             guard let self else { return }
             do {
                 let displays = try await ScreenCapture.freezeDisplays(protectedWindowIDs: protectedIDs)
+                guard self.sessionActive, self.sessionGeneration == generation else { return }
                 self.present(displays: displays, protectedWindowIDs: protectedIDs)
             } catch {
+                guard self.sessionActive, self.sessionGeneration == generation else { return }
                 self.endSession()
                 DispatchQueue.main.async { [weak self] in
                     self?.onFailed?()
@@ -194,8 +202,8 @@ final class ScreenshotOverlayController {
             guard let image = view.croppedImage() else { return }
             let screenRect = view.selectionScreenRect()
             let scale = view.displayScale
-            pinController.pin(image, screenRect: screenRect, scale: scale)
             dismiss(copyColor: false)
+            pinController.pin(image, screenRect: screenRect, scale: scale)
         case .ocr:
             runOCR(from: view, openingTranslation: false)
         case .translate:
@@ -307,6 +315,8 @@ final class ScreenshotOverlayController {
     }
 
     private func endSession() {
+        sessionGeneration += 1
+        ignoreStartUntil = Date().addingTimeInterval(0.35)
         removeKeyMonitors()
         NSCursor.arrow.set()
         for panel in panels {

@@ -54,6 +54,11 @@ final class ScreenshotPinController: NSObject, NSWindowDelegate {
         let container = NSView(frame: CGRect(origin: .zero, size: logicalSize))
         container.wantsLayer = true
         container.layer?.backgroundColor = NSColor.clear.cgColor
+        let luminance = averageLuminance(of: image)
+        container.layer?.shadowColor = (luminance > 0.58 ? NSColor.black : NSColor.white).cgColor
+        container.layer?.shadowOpacity = 0.14
+        container.layer?.shadowRadius = 10
+        container.layer?.shadowOffset = CGSize(width: 0, height: -2)
         imageView.autoresizingMask = [.width, .height]
         container.addSubview(imageView)
 
@@ -69,7 +74,7 @@ final class ScreenshotPinController: NSObject, NSWindowDelegate {
         panel.isMovableByWindowBackground = true
         panel.level = .floating
         panel.collectionBehavior = [.canJoinAllSpaces, .fullScreenAuxiliary]
-        panel.hasShadow = false
+        panel.hasShadow = true
         panel.minSize = CGSize(width: 48, height: 48)
         panel.contentAspectRatio = CGSize(width: image.width, height: image.height)
         panel.isOpaque = false
@@ -89,7 +94,27 @@ final class ScreenshotPinController: NSObject, NSWindowDelegate {
 
     private func layoutPinContent(panel: NSPanel, container: NSView, imageView: NSImageView) {
         container.frame = panel.contentView?.bounds ?? container.frame
+        container.layer?.masksToBounds = false
+        container.layer?.shadowPath = CGPath(rect: container.bounds, transform: nil)
         imageView.frame = container.bounds
+    }
+
+    private func averageLuminance(of image: CGImage) -> CGFloat {
+        var pixel: UInt8 = 0
+        guard let context = CGContext(
+            data: &pixel,
+            width: 1,
+            height: 1,
+            bitsPerComponent: 8,
+            bytesPerRow: 1,
+            space: CGColorSpaceCreateDeviceGray(),
+            bitmapInfo: CGImageAlphaInfo.none.rawValue
+        ) else {
+            return 1
+        }
+        context.interpolationQuality = .low
+        context.draw(image, in: CGRect(x: 0, y: 0, width: 1, height: 1))
+        return CGFloat(pixel) / 255
     }
 
     func windowWillClose(_ notification: Notification) {
