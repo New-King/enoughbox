@@ -31,6 +31,7 @@ private final class ScreenshotPinImageView: NSImageView {
 @MainActor
 final class ScreenshotPinController: NSObject, NSWindowDelegate {
     private var panels: [NSPanel] = []
+    private let shadowPadding: CGFloat = 14
 
     var protectedWindowIDs: Set<CGWindowID> {
         Set(panels.compactMap { panel in
@@ -45,6 +46,10 @@ final class ScreenshotPinController: NSObject, NSWindowDelegate {
             height: CGFloat(image.height) / scale
         )
         guard logicalSize.width > 0, logicalSize.height > 0 else { return }
+        let paddedSize = CGSize(
+            width: logicalSize.width + shadowPadding * 2,
+            height: logicalSize.height + shadowPadding * 2
+        )
 
         let imageView = ScreenshotPinImageView(frame: CGRect(origin: .zero, size: logicalSize))
         imageView.image = NSImage(cgImage: image, size: logicalSize)
@@ -60,10 +65,22 @@ final class ScreenshotPinController: NSObject, NSWindowDelegate {
         container.layer?.shadowRadius = 10
         container.layer?.shadowOffset = CGSize(width: 0, height: -2)
         imageView.autoresizingMask = [.width, .height]
+        imageView.frame = CGRect(
+            x: shadowPadding,
+            y: shadowPadding,
+            width: logicalSize.width,
+            height: logicalSize.height
+        )
+        imageView.autoresizingMask = []
         container.addSubview(imageView)
 
         let panel = NSPanel(
-            contentRect: NSRect(origin: screenRect.origin, size: logicalSize),
+            contentRect: NSRect(
+                x: screenRect.minX - shadowPadding,
+                y: screenRect.minY - shadowPadding,
+                width: paddedSize.width,
+                height: paddedSize.height
+            ),
             styleMask: [.titled, .closable, .resizable, .fullSizeContentView, .nonactivatingPanel],
             backing: .buffered,
             defer: false
@@ -74,7 +91,7 @@ final class ScreenshotPinController: NSObject, NSWindowDelegate {
         panel.isMovableByWindowBackground = true
         panel.level = .floating
         panel.collectionBehavior = [.canJoinAllSpaces, .fullScreenAuxiliary]
-        panel.hasShadow = true
+        panel.hasShadow = false
         panel.minSize = CGSize(width: 48, height: 48)
         panel.contentAspectRatio = CGSize(width: image.width, height: image.height)
         panel.isOpaque = false
@@ -85,8 +102,11 @@ final class ScreenshotPinController: NSObject, NSWindowDelegate {
         panel.delegate = self
         panel.standardWindowButton(.miniaturizeButton)?.isHidden = true
         panel.standardWindowButton(.zoomButton)?.isHidden = true
-        panel.setContentSize(logicalSize)
-        panel.setFrameOrigin(screenRect.origin)
+        panel.setContentSize(paddedSize)
+        panel.setFrameOrigin(CGPoint(
+            x: screenRect.minX - shadowPadding,
+            y: screenRect.minY - shadowPadding
+        ))
         layoutPinContent(panel: panel, container: container, imageView: imageView)
         panel.orderFrontRegardless()
         panels.append(panel)
@@ -95,8 +115,9 @@ final class ScreenshotPinController: NSObject, NSWindowDelegate {
     private func layoutPinContent(panel: NSPanel, container: NSView, imageView: NSImageView) {
         container.frame = panel.contentView?.bounds ?? container.frame
         container.layer?.masksToBounds = false
-        container.layer?.shadowPath = CGPath(rect: container.bounds, transform: nil)
-        imageView.frame = container.bounds
+        let imageRect = container.bounds.insetBy(dx: shadowPadding, dy: shadowPadding)
+        container.layer?.shadowPath = CGPath(rect: imageRect, transform: nil)
+        imageView.frame = imageRect
     }
 
     private func averageLuminance(of image: CGImage) -> CGFloat {
