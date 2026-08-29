@@ -209,13 +209,13 @@ final class ScreenshotOverlayController {
             runOCR(from: view, openingTranslation: false)
         case .translate:
             runOCR(from: view, openingTranslation: true)
-        case .captureWindow(let windowID, let frame):
+        case .captureWindow(let target):
             markCapturePending()
             let scale = view.displayScale
             let generation = sessionGeneration
             Task { @MainActor [weak self, weak view] in
                 guard let self, let view else { return }
-                guard let image = await ScreenCapture.captureWindow(windowID, scale: scale) else {
+                guard let image = await ScreenCapture.captureWindow(target.windowID, scale: scale) else {
                     guard self.sessionActive, self.sessionGeneration == generation else { return }
                     view.isCapturePending = false
                     DispatchQueue.main.async { [weak self] in
@@ -224,7 +224,11 @@ final class ScreenshotOverlayController {
                     return
                 }
                 guard self.sessionActive, self.sessionGeneration == generation else { return }
-                view.applyWindowCapture(image, windowRect: frame)
+                view.applyWindowCapture(
+                    image,
+                    visibleRect: target.frame,
+                    fullWindowRect: target.fullFrame
+                )
             }
         }
     }
@@ -360,7 +364,7 @@ private enum ScreenshotOverlayAction {
     case ocr
     case translate
     case copyColor(String)
-    case captureWindow(CGWindowID, CGRect)
+    case captureWindow(ScreenshotGeometry.PickableWindow)
 }
 
 private enum ResizeEdge {
@@ -442,10 +446,14 @@ private final class ScreenshotOverlayView: NSView {
         needsDisplay = true
     }
 
-    func applyWindowCapture(_ image: CGImage, windowRect: CGRect) {
+    func applyWindowCapture(
+        _ image: CGImage,
+        visibleRect: CGRect,
+        fullWindowRect: CGRect
+    ) {
         workingImage = image
-        windowCaptureRect = windowRect
-        selection = windowRect
+        windowCaptureRect = fullWindowRect
+        selection = visibleRect
         isCapturePending = false
         commitSelection()
         needsDisplay = true
@@ -561,7 +569,7 @@ private final class ScreenshotOverlayView: NSView {
                 }
             } else if ScreenshotGeometry.isClick(from: start, to: point),
                       let target = ScreenshotGeometry.window(at: point, in: pickableWindows) {
-                onAction?(.captureWindow(target.windowID, target.frame))
+                onAction?(.captureWindow(target))
             } else if ScreenshotGeometry.isClick(from: start, to: point) {
                 selection = bounds
                 commitSelection()

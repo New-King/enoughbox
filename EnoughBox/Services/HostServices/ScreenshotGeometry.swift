@@ -7,8 +7,10 @@ enum ScreenshotGeometry {
 
     struct PickableWindow: Equatable {
         let windowID: CGWindowID
-        /// Frame in the overlay view's bottom-left coordinate system.
+        /// On-screen portion in the overlay view's bottom-left coordinate system.
         let frame: CGRect
+        /// Full window frame, including the portion outside this screen.
+        let fullFrame: CGRect
     }
 
     static func isClick(from origin: CGPoint, to end: CGPoint) -> Bool {
@@ -56,13 +58,16 @@ enum ScreenshotGeometry {
             guard serverRect.width >= 40, serverRect.height >= 40 else { return nil }
             if let alpha = entry[kCGWindowAlpha as String] as? Double, alpha <= 0.01 { return nil }
 
-            let viewRect = viewRect(
+            let fullViewRect = viewRect(
                 fromWindowServer: serverRect,
                 screenFrame: screenFrame,
                 mainScreenHeight: mainHeight
-            ).intersection(CGRect(origin: .zero, size: screenFrame.size))
-            guard viewRect.width >= 8, viewRect.height >= 8 else { return nil }
-            return PickableWindow(windowID: id, frame: viewRect)
+            )
+            let visibleFrame = fullViewRect.intersection(
+                CGRect(origin: .zero, size: screenFrame.size)
+            )
+            guard visibleFrame.width >= 8, visibleFrame.height >= 8 else { return nil }
+            return PickableWindow(windowID: id, frame: visibleFrame, fullFrame: fullViewRect)
         }
     }
 
