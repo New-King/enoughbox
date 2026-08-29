@@ -141,24 +141,50 @@ final class ClipboardPanelController: NSWindowController, NSWindowDelegate {
             guard let self, self.window?.isKeyWindow == true else { return event }
             switch event.keyCode {
             case 53:
+                if self.isEditingSearch(), !self.store.query.isEmpty {
+                    self.store.updateQuery("")
+                    return nil
+                }
                 self.close()
                 return nil
+            case 123:
+                if !self.isEditingSearch() {
+                    self.store.moveCategory(by: -1)
+                    return nil
+                }
+                return event
+            case 124:
+                if !self.isEditingSearch() {
+                    self.store.moveCategory(by: 1)
+                    return nil
+                }
+                return event
             case 126:
+                if self.isEditingSearch() { return event }
                 self.store.moveSelection(by: -1)
                 return nil
             case 125:
+                if self.isEditingSearch() { return event }
                 self.store.moveSelection(by: 1)
                 return nil
             case 36, 76:
+                if self.isEditingSearch() { return event }
                 if let entry = self.store.selectedEntry {
                     self.pasteFromKeyboard(entry)
                 }
                 return nil
             case 51:
+                if self.isEditingSearch() { return event }
                 self.store.removeSelected()
                 return nil
             default:
                 let modifiers = event.modifierFlags.intersection(.deviceIndependentFlagsMask)
+                if modifiers.isEmpty,
+                   event.charactersIgnoringModifiers == "/",
+                   !self.isEditingSearch() {
+                    self.store.requestSearchFocus()
+                    return nil
+                }
                 if modifiers == .command,
                    let key = event.charactersIgnoringModifiers?.lowercased(),
                    key == "w" || key == "q" {
@@ -175,6 +201,11 @@ final class ClipboardPanelController: NSWindowController, NSWindowDelegate {
             NSEvent.removeMonitor(keyMonitor)
             self.keyMonitor = nil
         }
+    }
+
+    private func isEditingSearch() -> Bool {
+        guard let responder = window?.firstResponder else { return false }
+        return responder is NSTextView || responder is NSTextField
     }
 
     private func positionNearMouse(_ window: NSWindow) {
@@ -236,6 +267,9 @@ private struct ClipboardPanelView: View {
                 .strokeBorder(tokens.border, lineWidth: 1)
         )
         .appleShadow(tokens)
+        .onChange(of: store.searchFocusToken) { _, _ in
+            searchFocused = true
+        }
     }
 
     private var header: some View {
@@ -261,17 +295,25 @@ private struct ClipboardPanelView: View {
             Image(systemName: "magnifyingglass")
                 .font(.system(size: 12, weight: .medium))
                 .foregroundStyle(tokens.inkMuted)
-            TextField(
-                UIStrings.Clipboard.searchPlaceholder,
-                text: Binding(
-                    get: { store.query },
-                    set: { store.updateQuery($0) }
+            ZStack(alignment: .leading) {
+                if store.query.isEmpty {
+                    Text(UIStrings.Clipboard.searchPlaceholder)
+                        .font(.system(size: 13))
+                        .foregroundStyle(tokens.inkMuted)
+                        .allowsHitTesting(false)
+                }
+                TextField(
+                    "",
+                    text: Binding(
+                        get: { store.query },
+                        set: { store.updateQuery($0) }
+                    )
                 )
-            )
-            .textFieldStyle(.plain)
-            .font(.system(size: 13))
-            .foregroundStyle(tokens.ink)
-            .focused($searchFocused)
+                .textFieldStyle(.plain)
+                .font(.system(size: 13))
+                .foregroundStyle(tokens.ink)
+                .focused($searchFocused)
+            }
         }
         .padding(.horizontal, 10)
         .padding(.vertical, 8)

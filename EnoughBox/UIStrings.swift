@@ -130,7 +130,7 @@ enum UIStrings {
     static let historyLimit = "历史条数上限"
     static let historyLimitFormat = "%d 条"
     static let settingsHint = "最近显示最近操作过的 20 条。全部按复制时间排序，最新在前。"
-    static let searchPlaceholder = "搜索"
+    static let searchPlaceholder = "按 / 搜索"
     static let categoryRecent = "最近"
     static let categoryAll = "全部"
     static let categoryText = "文本"

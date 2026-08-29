@@ -9,6 +9,7 @@ final class ClipboardStore: ObservableObject {
     @Published var query = ""
     @Published var category: ClipboardCategory = ClipboardSettings.selectedCategory
     @Published var selectedIndex = -1
+    @Published private(set) var searchFocusToken = 0
 
     private var sortedEntries: [ClipboardItem] = []
     private var timer: Timer?
@@ -80,6 +81,17 @@ final class ClipboardStore: ObservableObject {
         ClipboardSettings.selectedCategory = value
         selectedIndex = -1
         rebuildFilteredEntries()
+    }
+
+    func moveCategory(by delta: Int) {
+        let all = ClipboardCategory.allCases
+        guard let index = all.firstIndex(of: category) else { return }
+        let next = (index + delta + all.count) % all.count
+        updateCategory(all[next])
+    }
+
+    func requestSearchFocus() {
+        searchFocusToken += 1
     }
 
     private func refreshDerivedState() {
