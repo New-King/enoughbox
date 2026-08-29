@@ -17,7 +17,6 @@
 		33E5765256D3B926DA23D4D0 /* HotkeyCenter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6E505AD4E4312D4C01B58E38 /* HotkeyCenter.swift */; };
 		380BC38145D7A1851ABEB894 /* MainView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9704745508B442108DF65CF7 /* MainView.swift */; };
 		3B252953FA4637D5832036B6 /* TranslateTool.swift in Sources */ = {isa = PBXBuildFile; fileRef = 76FE9361E1B6C73CD9FF0C4E /* TranslateTool.swift */; };
-		4128944B337F010EDEA647B9 /* ScreenshotMosaic.swift in Sources */ = {isa = PBXBuildFile; fileRef = 28C29C5E4257E1CDD2F79C6E /* ScreenshotMosaic.swift */; };
 		46DF70774D7DB46B95026D79 /* ToolManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 73E3DEEA794027A64CD6CBE8 /* ToolManager.swift */; };
 		4A7454D68468C9573AA34C73 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = C8789202810DA85768E64FA7 /* Assets.xcassets */; };
 		4B6D64409B89CD73E5D69CE6 /* ToolModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = 01C5758E291DD9B1841DCA2A /* ToolModels.swift */; };
@@ -60,7 +59,6 @@
 		14C269FA1FD0194F652CAABB /* ToolToggleButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ToolToggleButton.swift; sourceTree = "<group>"; };
 		1E332521763E4DEB27F1F241 /* AppPaths.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppPaths.swift; sourceTree = "<group>"; };
 		20D4F8A95FC0E6F624CAE2D9 /* EmptyStateView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EmptyStateView.swift; sourceTree = "<group>"; };
-		28C29C5E4257E1CDD2F79C6E /* ScreenshotMosaic.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScreenshotMosaic.swift; sourceTree = "<group>"; };
 		2ACA6E86E67229F1AB53A0DE /* EnoughBox.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = EnoughBox.entitlements; sourceTree = "<group>"; };
 		2E798AA90D4ECE990344C323 /* AppState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppState.swift; sourceTree = "<group>"; };
 		37D14F070EAC7A8DB9468625 /* ToolCenterView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ToolCenterView.swift; sourceTree = "<group>"; };
@@ -176,7 +174,6 @@
 			isa = PBXGroup;
 			children = (
 				86E1B05429EF4CCD61A9F25E /* ScreenshotCenterToast.swift */,
-				28C29C5E4257E1CDD2F79C6E /* ScreenshotMosaic.swift */,
 				D8CF3930BDD24F9AB878C4AF /* ScreenshotOCR.swift */,
 				3F2C6A56FE0705445AAB519B /* ScreenshotOCRResultPanel.swift */,
 				4C546E38CE8EADA9BC2B946E /* ScreenshotOverlay.swift */,
@@ -403,7 +400,6 @@
 				BA3C78584A708ACE7F43C773 /* ScreenshotCapturePolicy.swift in Sources */,
 				A578552C79CDB7774F38AAA0 /* ScreenshotCenterToast.swift in Sources */,
 				ACCADF8A7DB3AA3508940D25 /* ScreenshotGeometry.swift in Sources */,
-				4128944B337F010EDEA647B9 /* ScreenshotMosaic.swift in Sources */,
 				E16641AF78743B5B57D11A41 /* ScreenshotOCR.swift in Sources */,
 				8727C6B90AA5802624DF76B8 /* ScreenshotOCRResultPanel.swift in Sources */,
 				1E41C82CF85A823406D6C8D6 /* ScreenshotOverlay.swift in Sources */,

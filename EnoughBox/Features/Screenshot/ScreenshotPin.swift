@@ -53,7 +53,7 @@ final class ScreenshotPinController: NSObject, NSWindowDelegate {
 
         let container = NSView(frame: CGRect(origin: .zero, size: logicalSize))
         container.wantsLayer = true
-        container.layer?.backgroundColor = NSColor.black.cgColor
+        container.layer?.backgroundColor = NSColor.clear.cgColor
         imageView.autoresizingMask = [.width, .height]
         container.addSubview(imageView)
 
@@ -69,11 +69,11 @@ final class ScreenshotPinController: NSObject, NSWindowDelegate {
         panel.isMovableByWindowBackground = true
         panel.level = .floating
         panel.collectionBehavior = [.canJoinAllSpaces, .fullScreenAuxiliary]
-        panel.hasShadow = true
+        panel.hasShadow = false
         panel.minSize = CGSize(width: 48, height: 48)
         panel.contentAspectRatio = CGSize(width: image.width, height: image.height)
-        panel.isOpaque = true
-        panel.backgroundColor = .black
+        panel.isOpaque = false
+        panel.backgroundColor = .clear
 
         container.autoresizingMask = [.width, .height]
         panel.contentView = container

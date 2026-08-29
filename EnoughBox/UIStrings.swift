@@ -58,8 +58,6 @@ enum UIStrings {
     static let permissionHint = "截图功能需要此权限，若无效果请在录屏设置中移除 EnoughBox.app 后重新添加。"
     static let openScreenRecording = "打开屏幕录制设置"
     static let pin = "钉在桌面"
-    static let mosaic = "马赛克"
-    static let mosaicBrushSize = "画笔粗细"
     static let save = "保存"
     static let cancel = "取消"
     static let confirm = "复制到剪贴板"
