@@ -32,8 +32,8 @@ final class EnoughBoxAppDelegate: NSObject, NSApplicationDelegate {
     }
 
     func applicationShouldTerminate(_ sender: NSApplication) -> NSApplication.TerminateReply {
-        if sender.keyWindow is NSPanel {
-            sender.keyWindow?.orderOut(nil)
+        if let panel = sender.keyWindow as? NSPanel {
+            panel.close()
             return .terminateCancel
         }
         return .terminateNow

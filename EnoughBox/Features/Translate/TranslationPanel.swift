@@ -121,9 +121,16 @@ final class TranslationPanelModel: ObservableObject {
     func clearSource() {
         translateTask?.cancel()
         translateTask = nil
+        requestID = UUID()
+        appleRequestID = nil
         sourceText = ""
         translatedText = ""
         isTranslating = false
+    }
+
+    func dismiss() {
+        synthesizer.stopSpeaking(at: .immediate)
+        clearSource()
     }
 
     func copy(_ text: String) {
@@ -197,7 +204,6 @@ final class TranslationPanelController: NSWindowController, NSWindowDelegate {
                 self?.scheduleFit()
             }
             .store(in: &cancellables)
-        installCloseKeyMonitor()
     }
 
     private var cancellables = Set<AnyCancellable>()
@@ -211,15 +217,27 @@ final class TranslationPanelController: NSWindowController, NSWindowDelegate {
         positionNearMouse(window)
         window.orderFrontRegardless()
         window.makeKey()
+        installCloseKeyMonitor()
         installClickOutsideMonitor()
         scheduleFit()
     }
 
     override func close() {
-        removeClickOutsideMonitor()
+        prepareForDismissal()
         window?.makeFirstResponder(nil)
         window?.orderOut(nil)
         HostWindowFocus.returnToMainWindow()
+    }
+
+    func windowWillClose(_ notification: Notification) {
+        prepareForDismissal()
+        HostWindowFocus.returnToMainWindow()
+    }
+
+    private func prepareForDismissal() {
+        removeClickOutsideMonitor()
+        removeCloseKeyMonitor()
+        session.dismiss()
     }
 
     func windowDidResignKey(_ notification: Notification) {
@@ -251,6 +269,7 @@ final class TranslationPanelController: NSWindowController, NSWindowDelegate {
     }
 
     private func installCloseKeyMonitor() {
+        removeCloseKeyMonitor()
         keyMonitor = NSEvent.addLocalMonitorForEvents(matching: .keyDown) { [weak self] event in
             guard let self, self.window?.isKeyWindow == true else { return event }
             if event.keyCode == 53 {
@@ -266,6 +285,13 @@ final class TranslationPanelController: NSWindowController, NSWindowDelegate {
                 return nil
             }
             return event
+        }
+    }
+
+    private func removeCloseKeyMonitor() {
+        if let keyMonitor {
+            NSEvent.removeMonitor(keyMonitor)
+            self.keyMonitor = nil
         }
     }
 

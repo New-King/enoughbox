@@ -1,5 +1,4 @@
 import Foundation
-import NaturalLanguage
 
 protocol Translator: Sendable {
     func translate(_ text: String, from: TranslateLanguage, to: TranslateLanguage) async throws -> String
@@ -273,22 +272,23 @@ enum TranslationHTTP {
 }
 
 enum LanguageDetector {
-    static func detect(_ text: String) -> TranslateLanguage {
-        let trimmed = text.trimmingCharacters(in: .whitespacesAndNewlines)
-        guard !trimmed.isEmpty else { return .en }
+    private static let sampleLimit = 50
 
-        let recognizer = NLLanguageRecognizer()
-        recognizer.processString(trimmed)
-        if let language = recognizer.dominantLanguage {
-            if language.rawValue.hasPrefix("zh") {
-                return .zhHans
-            }
-            if language == .english {
-                return .en
+    static func detect(_ text: String) -> TranslateLanguage {
+        var hanCount = 0
+        var latinCount = 0
+
+        for scalar in text.unicodeScalars.prefix(sampleLimit) {
+            switch scalar.value {
+            case 0x3400...0x4DBF, 0x4E00...0x9FFF, 0xF900...0xFAFF:
+                hanCount += 1
+            case 0x41...0x5A, 0x61...0x7A:
+                latinCount += 1
+            default:
+                continue
             }
         }
 
-        let cjk = trimmed.unicodeScalars.filter { (0x4E00...0x9FFF).contains($0.value) }.count
-        return cjk * 4 >= max(trimmed.count, 1) ? .zhHans : .en
+        return hanCount > latinCount ? .zhHans : .en
     }
 }

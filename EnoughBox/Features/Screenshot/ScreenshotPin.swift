@@ -28,9 +28,26 @@ private final class ScreenshotPinImageView: NSImageView {
     override func acceptsFirstMouse(for event: NSEvent?) -> Bool { true }
 }
 
+private final class ScreenshotPinPanel: NSPanel {
+    var onClose: ((ScreenshotPinPanel) -> Void)?
+
+    override func close() {
+        let closeHandler = onClose
+        onClose = nil
+        makeFirstResponder(nil)
+        contentView = nil
+        super.close()
+        closeHandler?(self)
+    }
+
+    @objc func closeFromSystemButton(_ sender: Any?) {
+        close()
+    }
+}
+
 @MainActor
-final class ScreenshotPinController: NSObject, NSWindowDelegate {
-    private var panels: [NSPanel] = []
+final class ScreenshotPinController {
+    private var panels: [ScreenshotPinPanel] = []
     private let shadowPadding: CGFloat = 14
 
     var protectedWindowIDs: Set<CGWindowID> {
@@ -74,7 +91,7 @@ final class ScreenshotPinController: NSObject, NSWindowDelegate {
         imageView.autoresizingMask = []
         container.addSubview(imageView)
 
-        let panel = NSPanel(
+        let panel = ScreenshotPinPanel(
             contentRect: NSRect(
                 x: screenRect.minX - shadowPadding,
                 y: screenRect.minY - shadowPadding,
@@ -100,9 +117,15 @@ final class ScreenshotPinController: NSObject, NSWindowDelegate {
 
         container.autoresizingMask = [.width, .height]
         panel.contentView = container
-        panel.delegate = self
+        panel.onClose = { [weak self] closedPanel in
+            self?.panels.removeAll { $0 === closedPanel }
+        }
         panel.standardWindowButton(.miniaturizeButton)?.isHidden = true
         panel.standardWindowButton(.zoomButton)?.isHidden = true
+        panel.standardWindowButton(.closeButton)?.target = panel
+        panel.standardWindowButton(.closeButton)?.action = #selector(
+            ScreenshotPinPanel.closeFromSystemButton(_:)
+        )
         panel.setContentSize(paddedSize)
         panel.setFrameOrigin(CGPoint(
             x: screenRect.minX - shadowPadding,
@@ -139,8 +162,4 @@ final class ScreenshotPinController: NSObject, NSWindowDelegate {
         return CGFloat(pixel) / 255
     }
 
-    func windowWillClose(_ notification: Notification) {
-        guard let panel = notification.object as? NSPanel else { return }
-        panels.removeAll { $0 === panel }
-    }
 }

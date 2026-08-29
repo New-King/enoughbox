@@ -1,12 +1,12 @@
 import AppKit
 
 @MainActor
-final class ScreenshotOCRResultPanelController {
+final class ScreenshotOCRResultPanelController: NSObject, NSWindowDelegate {
     private let panel: NSPanel
     private let textView = NSTextView()
     private let copyButton = NSButton()
 
-    init() {
+    override init() {
         panel = NSPanel(
             contentRect: NSRect(x: 0, y: 0, width: 520, height: 360),
             styleMask: [.titled, .closable, .resizable, .nonactivatingPanel],
@@ -20,6 +20,8 @@ final class ScreenshotOCRResultPanelController {
         panel.hidesOnDeactivate = false
         panel.collectionBehavior = [.canJoinAllSpaces, .fullScreenAuxiliary]
         panel.minSize = NSSize(width: 360, height: 220)
+        super.init()
+        panel.delegate = self
         buildContent()
     }
 
@@ -91,6 +93,11 @@ final class ScreenshotOCRResultPanelController {
     }
 
     @objc private func close() {
-        panel.orderOut(nil)
+        panel.close()
+    }
+
+    func windowWillClose(_ notification: Notification) {
+        textView.string = ""
+        textView.undoManager?.removeAllActions()
     }
 }

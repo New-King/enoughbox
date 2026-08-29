@@ -114,8 +114,9 @@ final class ScreenshotOverlayController {
                 protectedWindowIDs: protectedWindowIDs
             )
             let panel = ScreenshotPanel(screen: frozen.screen, frozen: frozen, pickableWindows: pickable)
-            panel.overlayView.onAction = { [weak self] action in
-                self?.handle(action, from: panel.overlayView)
+            panel.overlayView.onAction = { [weak self, weak panel] action in
+                guard let view = panel?.overlayView else { return }
+                self?.handle(action, from: view)
             }
             created.append(panel)
         }
@@ -211,15 +212,18 @@ final class ScreenshotOverlayController {
         case .captureWindow(let windowID, let frame):
             markCapturePending()
             let scale = view.displayScale
-            Task { @MainActor [weak self] in
-                guard let self else { return }
+            let generation = sessionGeneration
+            Task { @MainActor [weak self, weak view] in
+                guard let self, let view else { return }
                 guard let image = await ScreenCapture.captureWindow(windowID, scale: scale) else {
+                    guard self.sessionActive, self.sessionGeneration == generation else { return }
                     view.isCapturePending = false
                     DispatchQueue.main.async { [weak self] in
                         self?.onFailed?()
                     }
                     return
                 }
+                guard self.sessionActive, self.sessionGeneration == generation else { return }
                 view.applyWindowCapture(image, windowRect: frame)
             }
         }
@@ -316,12 +320,15 @@ final class ScreenshotOverlayController {
 
     private func endSession() {
         sessionGeneration += 1
+        ocrGeneration += 1
         ignoreStartUntil = Date().addingTimeInterval(0.35)
         removeKeyMonitors()
         NSCursor.arrow.set()
         for panel in panels {
+            panel.overlayView.onAction = nil
             panel.makeFirstResponder(nil)
-            panel.orderOut(nil)
+            panel.contentView = nil
+            panel.close()
         }
         panels = []
         sessionActive = false
@@ -335,7 +342,11 @@ final class ScreenshotOverlayController {
         for window in NSApp.windows {
             guard let panel = window as? NSPanel else { continue }
             guard panel.level.rawValue >= Int(CGShieldingWindowLevel()) else { continue }
-            panel.orderOut(nil)
+            if let screenshotPanel = panel as? ScreenshotPanel {
+                screenshotPanel.overlayView.onAction = nil
+            }
+            panel.contentView = nil
+            panel.close()
         }
         HostWindowFocus.returnToMainWindow()
     }

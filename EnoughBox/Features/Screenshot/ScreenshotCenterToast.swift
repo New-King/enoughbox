@@ -7,7 +7,7 @@ enum ScreenshotCenterToast {
     private static var activePanel: NSPanel?
 
     static func show(_ message: String) {
-        activePanel?.orderOut(nil)
+        closeActivePanel()
 
         let screen = NSScreen.screens.first(where: { $0.frame.contains(NSEvent.mouseLocation) })
             ?? NSScreen.main
@@ -50,9 +50,14 @@ enum ScreenshotCenterToast {
         Task { @MainActor in
             try? await Task.sleep(for: .seconds(2))
             if let active = activePanel, ObjectIdentifier(active) == panelID {
-                active.orderOut(nil)
-                activePanel = nil
+                closeActivePanel()
             }
         }
+    }
+
+    private static func closeActivePanel() {
+        activePanel?.contentView = nil
+        activePanel?.close()
+        activePanel = nil
     }
 }
