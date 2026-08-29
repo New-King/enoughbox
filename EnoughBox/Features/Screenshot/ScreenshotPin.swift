@@ -89,8 +89,9 @@ final class ScreenshotPinController: NSObject, NSWindowDelegate {
         panel.titlebarAppearsTransparent = true
         panel.titlebarSeparatorStyle = .none
         panel.isMovableByWindowBackground = true
-        panel.level = .floating
-        panel.collectionBehavior = [.canJoinAllSpaces, .fullScreenAuxiliary]
+        panel.level = .statusBar
+        panel.collectionBehavior = [.canJoinAllSpaces, .fullScreenAuxiliary, .stationary]
+        panel.hidesOnDeactivate = false
         panel.hasShadow = false
         panel.minSize = CGSize(width: 48, height: 48)
         panel.contentAspectRatio = CGSize(width: image.width, height: image.height)
