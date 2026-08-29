@@ -161,10 +161,19 @@ final class ClipboardPanelController: NSWindowController, NSWindowDelegate {
                 return event
             case 126:
                 if self.isEditingSearch() { return event }
+                if self.store.selectedIndex <= 0 {
+                    self.store.selectedIndex = -1
+                    self.store.requestSearchFocus()
+                    return nil
+                }
                 self.store.moveSelection(by: -1)
                 return nil
             case 125:
-                if self.isEditingSearch() { return event }
+                if self.isEditingSearch() {
+                    self.window?.makeFirstResponder(nil)
+                    self.store.focusListFromSearch()
+                    return nil
+                }
                 self.store.moveSelection(by: 1)
                 return nil
             case 36, 76:
@@ -269,6 +278,9 @@ private struct ClipboardPanelView: View {
         .appleShadow(tokens)
         .onChange(of: store.searchFocusToken) { _, _ in
             searchFocused = true
+        }
+        .onChange(of: store.listFocusToken) { _, _ in
+            searchFocused = false
         }
     }
 

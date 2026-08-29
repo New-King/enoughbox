@@ -10,6 +10,7 @@ final class ClipboardStore: ObservableObject {
     @Published var category: ClipboardCategory = ClipboardSettings.selectedCategory
     @Published var selectedIndex = -1
     @Published private(set) var searchFocusToken = 0
+    @Published private(set) var listFocusToken = 0
 
     private var sortedEntries: [ClipboardItem] = []
     private var timer: Timer?
@@ -92,6 +93,15 @@ final class ClipboardStore: ObservableObject {
 
     func requestSearchFocus() {
         searchFocusToken += 1
+    }
+
+    func focusListFromSearch() {
+        if filteredEntries.isEmpty {
+            selectedIndex = -1
+        } else {
+            selectedIndex = 0
+        }
+        listFocusToken += 1
     }
 
     private func refreshDerivedState() {
