@@ -61,10 +61,16 @@ final class ClipboardPanelController: NSWindowController, NSWindowDelegate {
     }
 
     override func close() {
+        dismissPanel(returningToMainWindow: true)
+    }
+
+    private func dismissPanel(returningToMainWindow: Bool) {
         prepareForDismissal()
         window?.makeFirstResponder(nil)
         window?.orderOut(nil)
-        HostWindowFocus.returnToMainWindow()
+        if returningToMainWindow {
+            HostWindowFocus.returnToMainWindow()
+        }
     }
 
     func windowWillClose(_ notification: Notification) {
@@ -89,6 +95,23 @@ final class ClipboardPanelController: NSWindowController, NSWindowDelegate {
         }
     }
 
+    private func pasteFromKeyboard(_ entry: ClipboardItem) {
+        guard store.applyToPasteboard(entry) else {
+            dismissPanel(returningToMainWindow: false)
+            return
+        }
+        let result = ClipboardPaste.perform(releasing: window) { [weak self] in
+            self?.dismissPanel(returningToMainWindow: false)
+        }
+        switch result {
+        case .pasted:
+            break
+        case .copiedOnly:
+            toastHandler(UIStrings.Clipboard.toastCopied)
+            dismissPanel(returningToMainWindow: false)
+        }
+    }
+
     private func makeHostingController() -> NSHostingController<ClipboardPanelRootView> {
         NSHostingController(rootView: makeRootView())
     }
@@ -105,6 +128,9 @@ final class ClipboardPanelController: NSWindowController, NSWindowDelegate {
             },
             onClose: { [weak self] in
                 self?.close()
+            },
+            onClearAll: { [weak self] in
+                self?.store.clearAll()
             }
         )
     }
@@ -125,7 +151,7 @@ final class ClipboardPanelController: NSWindowController, NSWindowDelegate {
                 return nil
             case 36, 76:
                 if let entry = self.store.selectedEntry {
-                    self.paste(entry)
+                    self.pasteFromKeyboard(entry)
                 }
                 return nil
             case 51:
@@ -169,13 +195,15 @@ private struct ClipboardPanelRootView: View {
     let onApply: (ClipboardItem) -> Void
     let onDelete: (ClipboardItem) -> Void
     let onClose: () -> Void
+    let onClearAll: () -> Void
 
     var body: some View {
         ClipboardPanelView(
             store: store,
             onApply: onApply,
             onDelete: onDelete,
-            onClose: onClose
+            onClose: onClose,
+            onClearAll: onClearAll
         )
         .preferredColorScheme(AppearanceMode.stored.effectiveColorScheme)
         .designTokensProvider()
@@ -190,6 +218,7 @@ private struct ClipboardPanelView: View {
     let onApply: (ClipboardItem) -> Void
     let onDelete: (ClipboardItem) -> Void
     let onClose: () -> Void
+    let onClearAll: () -> Void
 
     var body: some View {
         VStack(spacing: 10) {
@@ -255,28 +284,41 @@ private struct ClipboardPanelView: View {
 
     private var categoryBar: some View {
         HStack(spacing: 6) {
-            ForEach(ClipboardCategory.allCases) { item in
-                Button {
-                    store.updateCategory(item)
-                } label: {
-                    Text(categoryTitle(item))
-                        .font(.system(size: 11, weight: store.category == item ? .semibold : .medium))
-                        .foregroundStyle(store.category == item ? tokens.ink : tokens.inkMuted)
-                        .padding(.horizontal, 10)
-                        .padding(.vertical, 6)
-                        .background(
-                            store.category == item ? tokens.accentSoft : tokens.card,
-                            in: Capsule()
-                        )
-                        .overlay(
-                            Capsule()
-                                .strokeBorder(tokens.border, lineWidth: store.category == item ? 0 : 1)
-                        )
+            HStack(spacing: 6) {
+                ForEach(ClipboardCategory.allCases) { item in
+                    Button {
+                        store.updateCategory(item)
+                    } label: {
+                        Text(categoryTitle(item))
+                            .font(.system(size: 11, weight: store.category == item ? .semibold : .medium))
+                            .foregroundStyle(store.category == item ? tokens.ink : tokens.inkMuted)
+                            .padding(.horizontal, 10)
+                            .padding(.vertical, 6)
+                            .background(
+                                store.category == item ? tokens.accentSoft : tokens.card,
+                                in: Capsule()
+                            )
+                            .overlay(
+                                Capsule()
+                                    .strokeBorder(tokens.border, lineWidth: store.category == item ? 0 : 1)
+                            )
+                    }
+                    .buttonStyle(.plain)
                 }
-                .buttonStyle(.plain)
             }
+
+            Spacer(minLength: 8)
+
+            Button(action: onClearAll) {
+                Text(UIStrings.Clipboard.clearAll)
+                    .font(.system(size: 11, weight: .medium))
+                    .foregroundStyle(store.entries.isEmpty ? tokens.inkFaint : tokens.inkMuted)
+                    .padding(.horizontal, 10)
+                    .padding(.vertical, 6)
+            }
+            .buttonStyle(.plain)
+            .disabled(store.entries.isEmpty)
         }
-        .frame(maxWidth: .infinity, alignment: .leading)
     }
 
     private var entryList: some View {
@@ -298,7 +340,7 @@ private struct ClipboardPanelView: View {
                             ForEach(Array(store.filteredEntries.enumerated()), id: \.element.id) { index, entry in
                                 ClipboardRowView(
                                     entry: entry,
-                                    isSelected: index == store.selectedIndex,
+                                    isSelected: store.selectedIndex >= 0 && index == store.selectedIndex,
                                     onPaste: {
                                         store.selectedIndex = index
                                         onApply(entry)
@@ -384,11 +426,11 @@ private struct ClipboardRowView: View {
     }
 
     private var rowBackground: Color {
-        if isSelected {
-            return tokens.accentSoft
-        }
         if isHovered {
             return tokens.ink.opacity(0.08)
+        }
+        if isSelected {
+            return tokens.accentSoft
         }
         return .clear
     }

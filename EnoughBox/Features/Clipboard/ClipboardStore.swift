@@ -8,7 +8,7 @@ final class ClipboardStore: ObservableObject {
     @Published private(set) var filteredEntries: [ClipboardItem] = []
     @Published var query = ""
     @Published var category: ClipboardCategory = ClipboardSettings.selectedCategory
-    @Published var selectedIndex = 0
+    @Published var selectedIndex = -1
 
     private var sortedEntries: [ClipboardItem] = []
     private var timer: Timer?
@@ -61,7 +61,7 @@ final class ClipboardStore: ObservableObject {
 
     func resetPanelState() {
         query = ""
-        selectedIndex = 0
+        selectedIndex = -1
         rebuildFilteredEntries()
     }
 
@@ -78,7 +78,7 @@ final class ClipboardStore: ObservableObject {
     func updateCategory(_ value: ClipboardCategory) {
         category = value
         ClipboardSettings.selectedCategory = value
-        selectedIndex = 0
+        selectedIndex = -1
         rebuildFilteredEntries()
     }
 
@@ -88,29 +88,40 @@ final class ClipboardStore: ObservableObject {
     }
 
     private func rebuildFilteredEntries() {
-        filteredEntries = sortedEntries.enumerated().compactMap { index, entry in
-            guard entry.matchesCategory(category, recentLimit: ClipboardLimits.recentCount, rank: index) else {
-                return nil
-            }
-            guard entry.matchesSearch(query) else { return nil }
-            return entry
+        let searched = sortedEntries.filter { entry in
+            entry.matchesCategory(category) && entry.matchesSearch(query)
+        }
+
+        switch category {
+        case .recent:
+            filteredEntries = searched
+                .filter { $0.lastUsedAt != nil }
+                .sorted { ($0.lastUsedAt ?? .distantPast) > ($1.lastUsedAt ?? .distantPast) }
+                .prefix(ClipboardLimits.recentCount)
+                .map { $0 }
+        default:
+            filteredEntries = searched
         }
         clampSelection()
     }
 
     func clampSelection() {
         let count = filteredEntries.count
-        if count == 0 {
-            selectedIndex = 0
+        if count == 0 || selectedIndex < 0 {
+            selectedIndex = -1
         } else {
-            selectedIndex = min(max(0, selectedIndex), count - 1)
+            selectedIndex = min(selectedIndex, count - 1)
         }
     }
 
     func moveSelection(by delta: Int) {
         let count = filteredEntries.count
         guard count > 0 else {
-            selectedIndex = 0
+            selectedIndex = -1
+            return
+        }
+        if selectedIndex < 0 {
+            selectedIndex = delta > 0 ? 0 : count - 1
             return
         }
         selectedIndex = (selectedIndex + delta + count) % count
@@ -145,9 +156,18 @@ final class ClipboardStore: ObservableObject {
         remove(entry)
     }
 
+    func clearAll() {
+        guard !entries.isEmpty else { return }
+        entries.removeAll()
+        selectedIndex = -1
+        refreshDerivedState()
+        save()
+        cleanupPayloadFiles()
+    }
+
     private func touch(_ entryID: UUID) {
         guard let index = entries.firstIndex(where: { $0.id == entryID }) else { return }
-        entries[index].copiedAt = Date()
+        entries[index].lastUsedAt = Date()
         refreshDerivedState()
         save()
     }

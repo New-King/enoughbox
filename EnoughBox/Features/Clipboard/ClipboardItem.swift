@@ -19,6 +19,7 @@ enum ClipboardCategory: String, CaseIterable, Identifiable {
 struct ClipboardItem: Identifiable, Codable, Equatable, Sendable {
     let id: UUID
     var copiedAt: Date
+    var lastUsedAt: Date?
     let kind: ClipboardItemKind
     var text: String
     var imageFile: String?
@@ -38,10 +39,12 @@ struct ClipboardItem: Identifiable, Codable, Equatable, Sendable {
         imageWidth: Int? = nil,
         imageHeight: Int? = nil,
         textFile: String? = nil,
-        filePaths: [String] = []
+        filePaths: [String] = [],
+        lastUsedAt: Date? = nil
     ) {
         self.id = id
         self.copiedAt = copiedAt
+        self.lastUsedAt = lastUsedAt
         self.kind = kind
         self.text = text
         self.imageFile = imageFile
@@ -100,11 +103,9 @@ struct ClipboardItem: Identifiable, Codable, Equatable, Sendable {
         }
     }
 
-    func matchesCategory(_ category: ClipboardCategory, recentLimit: Int, rank: Int) -> Bool {
+    func matchesCategory(_ category: ClipboardCategory) -> Bool {
         switch category {
-        case .recent:
-            return rank < recentLimit
-        case .all:
+        case .recent, .all:
             return true
         case .text:
             return kind == .text

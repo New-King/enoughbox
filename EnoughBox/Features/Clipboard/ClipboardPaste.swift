@@ -26,7 +26,7 @@ enum ClipboardPaste {
     }
 
     @discardableResult
-    static func perform(releasing panel: NSWindow?) -> Result {
+    static func perform(releasing panel: NSWindow?, completion: (() -> Void)? = nil) -> Result {
         releasePanelFocus(panel)
 
         guard SelectionCapture.hasAccessibilityTrust() else {
@@ -34,16 +34,18 @@ enum ClipboardPaste {
                 promptedForAccessibility = true
                 SelectionCapture.requestAccessibilityTrust()
             }
+            completion?()
             return .copiedOnly
         }
 
         guard let app = targetApp, !app.isTerminated else {
+            completion?()
             return .copiedOnly
         }
 
         app.activate(options: [.activateIgnoringOtherApps])
         waitUntilTargetIsActive(app) {
-            postPasteWhenModifiersReleased(attempt: 0)
+            postPasteWhenModifiersReleased(attempt: 0, completion: completion)
         }
         return .pasted
     }
@@ -64,7 +66,7 @@ enum ClipboardPaste {
             completion()
             return
         }
-        guard attempt < 60 else {
+        guard attempt < 25 else {
             completion()
             return
         }
@@ -73,25 +75,28 @@ enum ClipboardPaste {
         }
     }
 
-    private static func postPasteWhenModifiersReleased(attempt: Int) {
+    private static func postPasteWhenModifiersReleased(attempt: Int, completion: (() -> Void)?) {
         let held = CGEventSource.flagsState(.combinedSessionState)
             .intersection([.maskCommand, .maskAlternate, .maskShift, .maskControl])
-        if attempt >= 100 {
+        if attempt >= 40 {
             NSSound.beep()
+            completion?()
             return
         }
         guard held.isEmpty else {
             DispatchQueue.main.asyncAfter(deadline: .now() + 0.015) {
-                postPasteWhenModifiersReleased(attempt: attempt + 1)
+                postPasteWhenModifiersReleased(attempt: attempt + 1, completion: completion)
             }
             return
         }
-        DispatchQueue.main.asyncAfter(deadline: .now() + 0.06) {
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.04) {
             guard !IsSecureEventInputEnabled() else {
                 NSSound.beep()
+                completion?()
                 return
             }
             postCommandV()
+            completion?()
         }
     }
 
