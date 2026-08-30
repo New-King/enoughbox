@@ -141,26 +141,34 @@ final class ClipboardPanelController: NSWindowController, NSWindowDelegate {
             guard let self, self.window?.isKeyWindow == true else { return event }
             switch event.keyCode {
             case 53:
-                if self.isEditingSearch(), !self.store.query.isEmpty {
-                    self.store.updateQuery("")
-                    return nil
+                if self.isEditingSearch() {
+                    if self.isComposingSearchText() { return event }
+                    if !self.store.query.isEmpty {
+                        self.store.updateQuery("")
+                        return nil
+                    }
                 }
                 self.close()
                 return nil
             case 123:
-                if !self.isEditingSearch() {
-                    self.store.moveCategory(by: -1)
-                    return nil
+                if self.isEditingSearch() {
+                    if self.isComposingSearchText() { return event }
+                    return event
                 }
-                return event
+                self.store.moveCategory(by: -1)
+                return nil
             case 124:
-                if !self.isEditingSearch() {
-                    self.store.moveCategory(by: 1)
-                    return nil
+                if self.isEditingSearch() {
+                    if self.isComposingSearchText() { return event }
+                    return event
                 }
-                return event
+                self.store.moveCategory(by: 1)
+                return nil
             case 126:
-                if self.isEditingSearch() { return event }
+                if self.isEditingSearch() {
+                    if self.isComposingSearchText() { return event }
+                    return event
+                }
                 if self.store.selectedIndex <= 0 {
                     self.store.selectedIndex = -1
                     self.store.requestSearchFocus()
@@ -170,14 +178,18 @@ final class ClipboardPanelController: NSWindowController, NSWindowDelegate {
                 return nil
             case 125:
                 if self.isEditingSearch() {
-                    self.window?.makeFirstResponder(nil)
-                    self.store.focusListFromSearch()
+                    if self.isComposingSearchText() { return event }
+                    self.moveFromSearchToList()
                     return nil
                 }
                 self.store.moveSelection(by: 1)
                 return nil
             case 36, 76:
-                if self.isEditingSearch() { return event }
+                if self.isEditingSearch() {
+                    if self.isComposingSearchText() { return event }
+                    self.moveFromSearchToList()
+                    return nil
+                }
                 if let entry = self.store.selectedEntry {
                     self.pasteFromKeyboard(entry)
                 }
@@ -215,6 +227,24 @@ final class ClipboardPanelController: NSWindowController, NSWindowDelegate {
     private func isEditingSearch() -> Bool {
         guard let responder = window?.firstResponder else { return false }
         return responder is NSTextView || responder is NSTextField
+    }
+
+    private func isComposingSearchText() -> Bool {
+        guard isEditingSearch() else { return false }
+        guard let responder = window?.firstResponder else { return false }
+        if let textView = responder as? NSTextView {
+            return textView.hasMarkedText()
+        }
+        if let textField = responder as? NSTextField,
+           let editor = textField.currentEditor() as? NSTextView {
+            return editor.hasMarkedText()
+        }
+        return false
+    }
+
+    private func moveFromSearchToList() {
+        window?.makeFirstResponder(nil)
+        store.focusListFromSearch()
     }
 
     private func positionNearMouse(_ window: NSWindow) {
