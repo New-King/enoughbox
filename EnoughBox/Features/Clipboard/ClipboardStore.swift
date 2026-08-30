@@ -63,8 +63,12 @@ final class ClipboardStore: ObservableObject {
 
     func resetPanelState() {
         query = ""
-        selectedIndex = -1
         rebuildFilteredEntries()
+        selectFirstItemIfAvailable()
+    }
+
+    private func selectFirstItemIfAvailable() {
+        selectedIndex = filteredEntries.isEmpty ? -1 : 0
     }
 
     func endPanelSession() {
@@ -80,8 +84,8 @@ final class ClipboardStore: ObservableObject {
     func updateCategory(_ value: ClipboardCategory) {
         category = value
         ClipboardSettings.selectedCategory = value
-        selectedIndex = -1
         rebuildFilteredEntries()
+        selectFirstItemIfAvailable()
     }
 
     func moveCategory(by delta: Int) {
