@@ -71,6 +71,9 @@ final class ScreenshotOverlayController {
     private var ocrGeneration = 0
     private let ocrResultPanel = ScreenshotOCRResultPanelController()
     private let translationController = TranslationPanelController()
+    private var scrollingTask: Task<Void, Never>?
+    private var scrollingCaptureID: UUID?
+    private var scrollingFinishSignal: ScreenshotScrollingCapture.FinishSignal?
 
     func start() {
         guard !sessionActive,
@@ -205,6 +208,9 @@ final class ScreenshotOverlayController {
             let scale = view.displayScale
             dismiss(copyColor: false)
             pinController.pin(image, screenRect: screenRect, scale: scale)
+        case .scroll:
+            guard let region = view.scrollingRegion() else { return }
+            startScrollingCapture(region: region)
         case .ocr:
             runOCR(from: view, openingTranslation: false)
         case .translate:
@@ -231,6 +237,65 @@ final class ScreenshotOverlayController {
                 )
             }
         }
+    }
+
+    private func startScrollingCapture(region: ScreenshotScrollingRegion) {
+        guard scrollingTask == nil else { return }
+        endSession()
+
+        let finishSignal = ScreenshotScrollingCapture.FinishSignal()
+        scrollingFinishSignal = finishSignal
+        ScreenshotScrollingHUD.show(
+            onFinish: { finishSignal.request() },
+            onCancel: { [weak self] in self?.scrollingTask?.cancel() }
+        )
+
+        var protectedIDs = pinController.protectedWindowIDs
+        if let hudID = ScreenshotScrollingHUD.windowNumber {
+            protectedIDs.insert(hudID)
+        }
+
+        let captureID = UUID()
+        scrollingCaptureID = captureID
+        scrollingTask = Task { [weak self] in
+            let result = await ScreenshotScrollingCapture.capture(
+                region: region,
+                protectedWindowIDs: protectedIDs,
+                finishSignal: finishSignal,
+                onProgress: { height in
+                    ScreenshotScrollingHUD.update(height: height)
+                }
+            )
+            await MainActor.run { [weak self] in
+                guard let self else { return }
+                guard self.scrollingCaptureID == captureID else { return }
+                self.scrollingCaptureID = nil
+                self.scrollingTask = nil
+                self.scrollingFinishSignal = nil
+                ScreenshotScrollingHUD.dismiss()
+
+                switch result {
+                case .success(let capture):
+                    self.finishScrollingCapture(capture)
+                case .partial(let capture):
+                    self.finishScrollingCapture(capture)
+                    ScreenshotCenterToast.show(UIStrings.Screenshot.scrollingPartial)
+                case .limited(let capture):
+                    self.finishScrollingCapture(capture)
+                    ScreenshotCenterToast.show(UIStrings.Screenshot.scrollingLimited)
+                case .cancelled:
+                    break
+                case .failed:
+                    self.onFailed?()
+                }
+            }
+        }
+    }
+
+    private func finishScrollingCapture(_ capture: ScreenshotScrollingCapture.CaptureResult) {
+        writePasteboard(capture.image)
+        let message = UIStrings.Screenshot.toastCopied
+        onCopied?(message)
     }
 
     private func runOCR(from view: ScreenshotOverlayView, openingTranslation: Bool) {
@@ -325,6 +390,11 @@ final class ScreenshotOverlayController {
     private func endSession() {
         sessionGeneration += 1
         ocrGeneration += 1
+        scrollingTask?.cancel()
+        scrollingTask = nil
+        scrollingCaptureID = nil
+        scrollingFinishSignal = nil
+        ScreenshotScrollingHUD.dismiss()
         ignoreStartUntil = Date().addingTimeInterval(0.35)
         removeKeyMonitors()
         NSCursor.arrow.set()
@@ -365,6 +435,7 @@ private enum ScreenshotOverlayAction {
     case translate
     case copyColor(String)
     case captureWindow(ScreenshotGeometry.PickableWindow)
+    case scroll
 }
 
 private enum ResizeEdge {
@@ -388,6 +459,7 @@ private final class ScreenshotOverlayView: NSView {
     var onAction: ((ScreenshotOverlayAction) -> Void)?
 
     var isSelectionCommitted: Bool { committed }
+    var canStartScrolling: Bool { committed && windowCaptureRect == nil }
     var displayScale: CGFloat { frozen.screen.backingScaleFactor }
 
     func setToolbarInteractionEnabled(_ enabled: Bool) {
@@ -456,6 +528,7 @@ private final class ScreenshotOverlayView: NSView {
         selection = visibleRect
         isCapturePending = false
         commitSelection()
+        toolbar.setScrollingEnabled(false)
         needsDisplay = true
     }
 
@@ -625,6 +698,15 @@ private final class ScreenshotOverlayView: NSView {
         return window.convertToScreen(convert(selection, to: nil))
     }
 
+    func scrollingRegion() -> ScreenshotScrollingRegion? {
+        guard canStartScrolling, !selection.isEmpty else { return nil }
+        return ScreenshotScrollingSupport.makeRegion(
+            selection: selection,
+            screen: frozen.screen,
+            anchorRect: selectionScreenRect()
+        )
+    }
+
     override func mouseExited(with event: NSEvent) {
         colorHUD.isHidden = true
     }
@@ -688,6 +770,7 @@ private final class ScreenshotOverlayView: NSView {
     private func commitSelection() {
         committed = true
         toolbar.isHidden = false
+        toolbar.setScrollingEnabled(canStartScrolling)
         colorHUD.isHidden = true
         layoutChrome()
     }
@@ -714,6 +797,8 @@ private final class ScreenshotOverlayView: NSView {
         switch item {
         case .pin:
             onAction?(.pin)
+        case .scroll:
+            onAction?(.scroll)
         case .ocr:
             onAction?(.ocr)
         case .translate:
@@ -1082,7 +1167,7 @@ private final class ScreenshotToolbarButton: NSButton {
 
 private final class ScreenshotToolbar: NSView {
     enum Item: Int, CaseIterable {
-        case pin, ocr, translate, save, cancel, confirm
+        case pin, scroll, ocr, translate, save, cancel, confirm
     }
 
     var onPick: ((Item) -> Void)?
@@ -1107,6 +1192,7 @@ private final class ScreenshotToolbar: NSView {
             (.translate, nil, UIStrings.Translate.action),
             (.save, "square.and.arrow.down.fill", UIStrings.Screenshot.save),
             (.pin, "pin", UIStrings.Screenshot.pin),
+            (.scroll, "rectangle.stack", UIStrings.Screenshot.scrolling),
             (.cancel, "xmark", UIStrings.Screenshot.cancel),
             (.confirm, "checkmark", UIStrings.Screenshot.confirm),
         ]
@@ -1182,6 +1268,10 @@ private final class ScreenshotToolbar: NSView {
 
     func setInteractionEnabled(_ enabled: Bool) {
         buttons.forEach { $0.isEnabled = enabled }
+    }
+
+    func setScrollingEnabled(_ enabled: Bool) {
+        buttons.first { $0.tag == Item.scroll.rawValue }?.isEnabled = enabled
     }
 
     @objc private func tap(_ sender: ScreenshotToolbarButton) {
@@ -1338,6 +1428,10 @@ private final class ScreenshotColorHUD: NSView {
         colorLabel.textColor = tokens.ink.nsColor
         hintLabel.textColor = tokens.inkMuted.nsColor
         magnifier.applyTheme(tokens)
+    }
+
+    func setHint(_ text: String) {
+        hintLabel.stringValue = text
     }
 
     override var fittingSize: NSSize {

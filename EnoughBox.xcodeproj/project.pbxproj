@@ -60,6 +60,9 @@
 		DCB529BC069B942C9AD53E1C /* ShortcutSettingsViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = B4AACB91BDE6536D0F957C13 /* ShortcutSettingsViewController.swift */; };
 		E16641AF78743B5B57D11A41 /* ScreenshotOCR.swift in Sources */ = {isa = PBXBuildFile; fileRef = D8CF3930BDD24F9AB878C4AF /* ScreenshotOCR.swift */; };
 		F388ADD80A9428352261C67E /* ShortcutRecorderField.swift in Sources */ = {isa = PBXBuildFile; fileRef = B0842B672B213124ACF3D0C9 /* ShortcutRecorderField.swift */; };
+		SCROLLCAP001BUILD /* ScreenshotScrollingCapture.swift in Sources */ = {isa = PBXBuildFile; fileRef = SCROLLCAP001REF /* ScreenshotScrollingCapture.swift */; };
+		SCROLLHUD001BUILD /* ScreenshotScrollingHUD.swift in Sources */ = {isa = PBXBuildFile; fileRef = SCROLLHUD001REF /* ScreenshotScrollingHUD.swift */; };
+		SCROLLSUP001BUILD /* ScreenshotScrollingSupport.swift in Sources */ = {isa = PBXBuildFile; fileRef = SCROLLSUP001REF /* ScreenshotScrollingSupport.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -117,6 +120,9 @@
 		EDDC78515BD7BABFC248986C /* ScreenshotPin.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScreenshotPin.swift; sourceTree = "<group>"; };
 		F930C8715715A653D3E948A9 /* ScreenCapture.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScreenCapture.swift; sourceTree = "<group>"; };
 		FECBD5A1083E8656811A832F /* ToolRegistry.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ToolRegistry.swift; sourceTree = "<group>"; };
+		SCROLLCAP001REF /* ScreenshotScrollingCapture.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScreenshotScrollingCapture.swift; sourceTree = "<group>"; };
+		SCROLLHUD001REF /* ScreenshotScrollingHUD.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScreenshotScrollingHUD.swift; sourceTree = "<group>"; };
+		SCROLLSUP001REF /* ScreenshotScrollingSupport.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScreenshotScrollingSupport.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -197,6 +203,9 @@
 				D8CF3930BDD24F9AB878C4AF /* ScreenshotOCR.swift */,
 				3F2C6A56FE0705445AAB519B /* ScreenshotOCRResultPanel.swift */,
 				4C546E38CE8EADA9BC2B946E /* ScreenshotOverlay.swift */,
+				SCROLLCAP001REF /* ScreenshotScrollingCapture.swift */,
+				SCROLLHUD001REF /* ScreenshotScrollingHUD.swift */,
+				SCROLLSUP001REF /* ScreenshotScrollingSupport.swift */,
 				EDDC78515BD7BABFC248986C /* ScreenshotPin.swift */,
 				B8370BBAD0FEEF3FFC391DA3 /* ScreenshotTool.swift */,
 			);
@@ -451,6 +460,9 @@
 				E16641AF78743B5B57D11A41 /* ScreenshotOCR.swift in Sources */,
 				8727C6B90AA5802624DF76B8 /* ScreenshotOCRResultPanel.swift in Sources */,
 				1E41C82CF85A823406D6C8D6 /* ScreenshotOverlay.swift in Sources */,
+				SCROLLCAP001BUILD /* ScreenshotScrollingCapture.swift in Sources */,
+				SCROLLHUD001BUILD /* ScreenshotScrollingHUD.swift in Sources */,
+				SCROLLSUP001BUILD /* ScreenshotScrollingSupport.swift in Sources */,
 				8B2721D27BBCA95BB04213A7 /* ScreenshotPin.swift in Sources */,
 				72358958B8EBDA22CBA76FBE /* ScreenshotTool.swift in Sources */,
 				BA6F1A0D0DA29688E644415E /* SelectionCapture.swift in Sources */,

@@ -32,7 +32,7 @@ enum UIStrings {
     static let translateName = "翻译"
     static let translateDescription = "在任意 App 里划词翻译"
     static let screenshotName = "截图"
-    static let screenshotDescription = "区域截图、钉图、马赛克与取色"
+    static let screenshotDescription = "区域截图、长截图、钉图与取色"
     static let clipboardName = "剪贴板"
     static let clipboardDescription = "浏览剪贴板历史，搜索并粘贴"
     static let missingBundle = "工具不可用，请从内置工具中重新启用。"
@@ -78,6 +78,11 @@ enum UIStrings {
     static let toastColorCopied = "已复制颜色信息"
     static let toastFailed = "无法截取屏幕"
     static let toastSavedFormat = "已保存 %@"
+    static let scrolling = "长截图"
+    static let scrollingProgress = "使用鼠标或触控板滚动。按下回车键或选择「完成」。"
+    static let scrollingDone = "完成"
+    static let scrollingPartial = "页面有变化，已保留已完成的部分"
+    static let scrollingLimited = "已达到安全上限，已停止捕获"
   }
 
   enum Translate {
