@@ -18,6 +18,11 @@ final class OverlayCaptureDriver {
     private var scrollingCaptureSession: ScrollingCaptureSession?
     private var sessionState: CaptureSessionState = .idle
     private var resultContinuation: CheckedContinuation<NSImage?, Never>?
+    private var previewPump: ScrollingPreviewPump?
+
+    init(onPreview: @escaping (NSImage, Int) -> Void = { _, _ in }) {
+        previewPump = ScrollingPreviewPump(onPreview: onPreview)
+    }
 
     func run(rectangle: NSRect) async -> NSImage? {
         self.rectangle = rectangle
@@ -59,6 +64,7 @@ final class OverlayCaptureDriver {
         captureSessionID = nil
         isScrollingCaptureActive = false
         invalidateCaptureTimer()
+        previewPump?.cancel()
 
         Task { [weak self] in
             guard let self else { return }
@@ -78,6 +84,7 @@ final class OverlayCaptureDriver {
 
         isScrollingCaptureActive = false
         invalidateCaptureTimer()
+        previewPump?.cancel()
 
         guard let finalImage = await scrollingCaptureSession.finish(),
               captureSessionID == sessionID else {
@@ -101,13 +108,19 @@ final class OverlayCaptureDriver {
               sessionState == .capturing else { return }
 
         let captureRectangle = rectangle
+        let pump = previewPump
         let screenshotSessionTask = Task { @MainActor in
             await ScreenshotCaptureSession(rectangle: captureRectangle)
         }
-        let scrollingCaptureSession = ScrollingCaptureSession {
-            guard let screenshotSession = await screenshotSessionTask.value else { return nil }
-            return await screenshotSession.capture()
-        }
+        let scrollingCaptureSession = ScrollingCaptureSession(
+            capture: {
+                guard let screenshotSession = await screenshotSessionTask.value else { return nil }
+                return await screenshotSession.capture()
+            },
+            stitcher: StitchingManager(previewHandler: { image in
+                pump?.submit(image)
+            })
+        )
         self.scrollingCaptureSession = scrollingCaptureSession
         isScrollingCaptureActive = true
 
@@ -159,7 +172,94 @@ final class OverlayCaptureDriver {
     }
 
     private func finishWith(_ image: NSImage?) {
+        previewPump?.cancel()
         resultContinuation?.resume(returning: image)
         resultContinuation = nil
+    }
+}
+
+/// Latest-wins preview on a utility queue. Must not run on the stitching queue or use `lockFocus`.
+private final class ScrollingPreviewPump: @unchecked Sendable {
+    private let queue = DispatchQueue(label: "com.enoughbox.scroll-preview", qos: .utility)
+    private let onPreview: (NSImage, Int) -> Void
+    private var latest: NSImage?
+    private var busy = false
+    private var cancelled = false
+
+    init(onPreview: @escaping (NSImage, Int) -> Void) {
+        self.onPreview = onPreview
+    }
+
+    func submit(_ image: NSImage) {
+        queue.async { [weak self] in
+            guard let self, !self.cancelled else { return }
+            self.latest = image
+            self.drain()
+        }
+    }
+
+    func cancel() {
+        queue.async { [weak self] in
+            self?.cancelled = true
+            self?.latest = nil
+        }
+    }
+
+    private func drain() {
+        guard !cancelled, !busy, let image = latest else { return }
+        latest = nil
+        busy = true
+        let height = Self.pixelHeight(of: image)
+        let thumbnail = Self.thumbnail(from: image) ?? image
+        DispatchQueue.main.async { [weak self] in
+            guard let self else { return }
+            if !self.cancelled {
+                self.onPreview(thumbnail, height)
+            }
+            self.queue.async {
+                self.busy = false
+                self.drain()
+            }
+        }
+    }
+
+    private static func pixelHeight(of image: NSImage) -> Int {
+        if let pixelsHigh = image.representations.compactMap({ $0 as? NSBitmapImageRep }).map(\.pixelsHigh).max(),
+           pixelsHigh > 0 {
+            return pixelsHigh
+        }
+        return max(1, Int(image.size.height.rounded()))
+    }
+
+    private static func thumbnail(from image: NSImage) -> NSImage? {
+        guard let cgImage = cgImage(from: image), cgImage.width > 0, cgImage.height > 0 else { return nil }
+        let maxWidth = 256
+        let scale = min(1, CGFloat(maxWidth) / CGFloat(cgImage.width))
+        let width = max(1, Int((CGFloat(cgImage.width) * scale).rounded()))
+        let height = max(1, Int((CGFloat(cgImage.height) * scale).rounded()))
+        let colorSpace = cgImage.colorSpace ?? CGColorSpaceCreateDeviceRGB()
+        guard let context = CGContext(
+            data: nil,
+            width: width,
+            height: height,
+            bitsPerComponent: 8,
+            bytesPerRow: 0,
+            space: colorSpace,
+            bitmapInfo: CGImageAlphaInfo.premultipliedLast.rawValue
+        ) else { return nil }
+        context.interpolationQuality = .low
+        context.draw(cgImage, in: CGRect(x: 0, y: 0, width: width, height: height))
+        guard let scaled = context.makeImage() else { return nil }
+        return NSImage(cgImage: scaled, size: NSSize(width: width, height: height))
+    }
+
+    private static func cgImage(from image: NSImage) -> CGImage? {
+        for representation in image.representations {
+            if let bitmap = representation as? NSBitmapImageRep, let cgImage = bitmap.cgImage {
+                return cgImage
+            }
+        }
+        var rect = CGRect(origin: .zero, size: image.size)
+        return image.cgImage(forProposedRect: &rect, context: nil, hints: nil)
     }
 }

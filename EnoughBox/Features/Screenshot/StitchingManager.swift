@@ -189,9 +189,15 @@ class StitchingManager {
     private let stitchingQueue = DispatchQueue(label: "com.scrollsnap.stitching", qos: .userInitiated)
     private let offsetEstimator: any VerticalOffsetEstimating
     private let movementDeadZone: CGFloat = 3
+    /// Only enqueue a reference. Callers must not do drawing or Vision work here.
+    private var previewHandler: ((NSImage) -> Void)?
 
-    init(offsetEstimator: any VerticalOffsetEstimating = VisionOffsetEstimator()) {
+    init(
+        offsetEstimator: any VerticalOffsetEstimating = VisionOffsetEstimator(),
+        previewHandler: ((NSImage) -> Void)? = nil
+    ) {
         self.offsetEstimator = offsetEstimator
+        self.previewHandler = previewHandler
     }
     
     // MARK: - Public API
@@ -200,6 +206,7 @@ class StitchingManager {
         runningStitchedImage = initialImage
         previousImage = initialImage // On start, the initial image is also the previous one.
         hasPendingReverseOffset = false
+        previewHandler?(initialImage)
     }
     
     func addImage(_ image: NSImage) {
@@ -212,6 +219,7 @@ class StitchingManager {
                 // This case should ideally not be hit after startStitching is called.
                 self.runningStitchedImage = image
                 self.previousImage = image
+                self.previewHandler?(image)
                 return
             }
             
@@ -236,6 +244,7 @@ class StitchingManager {
                 self.hasPendingReverseOffset = false
                 self.runningStitchedImage = newStitchedImage
                 self.previousImage = image
+                self.previewHandler?(newStitchedImage)
 
             } else {
                 guard self.hasPendingReverseOffset else {
@@ -256,6 +265,7 @@ class StitchingManager {
                 self.hasPendingReverseOffset = false
                 self.runningStitchedImage = croppedImage
                 self.previousImage = image
+                self.previewHandler?(croppedImage)
             }
         }
     }
@@ -270,6 +280,7 @@ class StitchingManager {
                 self?.runningStitchedImage = nil
                 self?.previousImage = nil
                 self?.hasPendingReverseOffset = false
+                self?.previewHandler = nil
                 continuation.resume(returning: finalImage)
             }
         }

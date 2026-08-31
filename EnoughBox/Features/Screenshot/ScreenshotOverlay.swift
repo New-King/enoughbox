@@ -243,9 +243,12 @@ final class ScreenshotOverlayController {
         guard scrollingTask == nil else { return }
         endSession(returnFocus: false)
 
-        let driver = OverlayCaptureDriver()
+        let driver = OverlayCaptureDriver { image, height in
+            ScreenshotScrollingHUD.update(image: image, height: height)
+        }
         scrollingCaptureDriver = driver
         ScreenshotScrollingHUD.show(
+            anchor: region.rectangle,
             onFinish: { driver.captureScreenshot() },
             onCancel: { driver.cancelScrollingCapture() }
         )

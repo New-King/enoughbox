@@ -81,6 +81,7 @@ enum UIStrings {
     static let scrolling = "长截图"
     static let scrollingProgress = "使用鼠标或触控板滚动。按下回车键或选择「完成」。"
     static let scrollingDone = "完成"
+    static let scrollingPreview = "长截图预览"
     static let scrollingPartial = "页面有变化，已保留已完成的部分"
     static let scrollingLimited = "已达到安全上限，已停止捕获"
   }
