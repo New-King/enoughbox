@@ -13,6 +13,10 @@ enum ScreenshotScrollingHUD {
     private static var previewAnchor = NSRect.zero
     private static var previewX: CGFloat?
     private static var previewTopY: CGFloat?
+    private static var finishHandler: (() -> Void)?
+    private static var cancelHandler: (() -> Void)?
+    private static var localKeyMonitor: Any?
+    private static var globalKeyMonitor: Any?
 
     static var windowNumber: CGWindowID? {
         guard let panel else { return nil }
@@ -38,18 +42,13 @@ enum ScreenshotScrollingHUD {
         let size = host.view.fittingSize
         let hudPanel = ensurePanel()
         hudPanel.contentViewController = host
-        let frame = NSScreen.main?.visibleFrame ?? .zero
-        hudPanel.setFrame(
-            NSRect(
-                x: frame.midX - size.width / 2,
-                y: frame.maxY - size.height - 24,
-                width: size.width,
-                height: size.height
-            ),
-            display: true
-        )
+        hudPanel.setFrame(hudFrame(size: size, anchor: anchor), display: true)
+        finishHandler = onFinish
+        cancelHandler = onCancel
+        installKeyMonitors()
         ScreenshotScrollingShade.show(hole: anchor)
-        hudPanel.orderFrontRegardless()
+        NSApp.activate(ignoringOtherApps: true)
+        hudPanel.makeKeyAndOrderFront(nil)
     }
 
     static func update(height: Int) {
@@ -63,6 +62,9 @@ enum ScreenshotScrollingHUD {
     }
 
     static func dismiss() {
+        removeKeyMonitors()
+        finishHandler = nil
+        cancelHandler = nil
         ScreenshotScrollingShade.dismiss()
         panel?.orderOut(nil)
         panel?.contentViewController = nil
@@ -138,6 +140,62 @@ enum ScreenshotScrollingHUD {
         previewImageView?.image = image
         previewImageView?.frame = NSRect(x: imageX, y: imageY, width: innerWidth, height: innerHeight)
         panel.orderFrontRegardless()
+    }
+
+    private static func hudFrame(size: NSSize, anchor: NSRect) -> NSRect {
+        let screen = NSScreen.screens.first { $0.frame.intersects(anchor) } ?? NSScreen.main
+        let visible = screen?.visibleFrame ?? NSRect(x: 0, y: 0, width: 800, height: 600)
+        let fallbackY = visible.maxY - size.height - 24
+        let gap: CGFloat = 8
+        let fitsAbove = anchor.maxY + gap + size.height <= visible.maxY - 4
+        let almostFullScreen = anchor.height >= visible.height * 0.85
+        var x = anchor.minX
+        let minX = visible.minX + 8
+        let maxX = visible.maxX - size.width - 8
+        if maxX >= minX {
+            x = min(max(x, minX), maxX)
+        } else {
+            x = visible.minX + 8
+        }
+        let y = (fitsAbove && !almostFullScreen) ? anchor.maxY + gap : fallbackY
+        return NSRect(x: x, y: y, width: size.width, height: size.height)
+    }
+
+    private static func installKeyMonitors() {
+        removeKeyMonitors()
+        localKeyMonitor = NSEvent.addLocalMonitorForEvents(matching: .keyDown) { event in
+            handleCaptureKey(event) ? nil : event
+        }
+        globalKeyMonitor = NSEvent.addGlobalMonitorForEvents(matching: .keyDown) { event in
+            _ = handleCaptureKey(event)
+        }
+    }
+
+    @discardableResult
+    private static func handleCaptureKey(_ event: NSEvent) -> Bool {
+        let modifiers = event.modifierFlags.intersection(.deviceIndependentFlagsMask)
+        guard modifiers.intersection([.command, .control, .option]).isEmpty else { return false }
+        switch event.keyCode {
+        case 36, 76:
+            finishHandler?()
+            return true
+        case 53:
+            cancelHandler?()
+            return true
+        default:
+            return false
+        }
+    }
+
+    private static func removeKeyMonitors() {
+        if let localKeyMonitor {
+            NSEvent.removeMonitor(localKeyMonitor)
+            self.localKeyMonitor = nil
+        }
+        if let globalKeyMonitor {
+            NSEvent.removeMonitor(globalKeyMonitor)
+            self.globalKeyMonitor = nil
+        }
     }
 
     private static func ensurePanel() -> NSPanel {
