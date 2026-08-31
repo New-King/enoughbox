@@ -31,16 +31,20 @@ enum ScreenshotScrollingHUD {
         previewAnchor = anchor
         let model = Model()
         self.model = model
+        let colorScheme = AppearanceMode.stored.effectiveColorScheme
         let host = NSHostingController(
             rootView: HUDView(
                 model: model,
                 onFinish: onFinish,
                 onCancel: onCancel
             )
+            .preferredColorScheme(colorScheme)
+            .designTokensProvider()
         )
         host.view.layoutSubtreeIfNeeded()
         let size = host.view.fittingSize
         let hudPanel = ensurePanel()
+        applyAppAppearance(hudPanel)
         hudPanel.contentViewController = host
         hudPanel.setFrame(hudFrame(size: size, anchor: anchor), display: true)
         finishHandler = onFinish
@@ -83,6 +87,8 @@ enum ScreenshotScrollingHUD {
     private static func presentPreview(_ image: NSImage) {
         guard image.size.width > 0, image.size.height > 0 else { return }
         let panel = ensurePreviewPanel()
+        applyAppAppearance(panel)
+        refreshPreviewChrome()
         let screen = NSScreen.screens.first { $0.frame.intersects(previewAnchor) } ?? NSScreen.main
         let visible = screen?.visibleFrame ?? NSRect(x: 0, y: 0, width: 800, height: 600)
         let padding = previewPadding
@@ -140,6 +146,18 @@ enum ScreenshotScrollingHUD {
         previewImageView?.image = image
         previewImageView?.frame = NSRect(x: imageX, y: imageY, width: innerWidth, height: innerHeight)
         panel.orderFrontRegardless()
+    }
+
+    private static func applyAppAppearance(_ panel: NSPanel) {
+        let dark = AppearanceMode.stored.effectiveColorScheme == .dark
+        panel.appearance = NSAppearance(named: dark ? .darkAqua : .aqua)
+    }
+
+    private static func refreshPreviewChrome() {
+        let tokens = DesignTokens.current
+        guard let container = previewPanel?.contentView else { return }
+        container.layer?.backgroundColor = tokens.card.nsColor.cgColor
+        container.layer?.borderColor = tokens.border.nsColor.cgColor
     }
 
     private static func hudFrame(size: NSSize, anchor: NSRect) -> NSRect {
@@ -271,7 +289,7 @@ enum ScreenshotScrollingHUD {
             HStack(spacing: 10) {
                 Image(systemName: "rectangle.stack.fill")
                     .font(.system(size: 13, weight: .semibold))
-                    .foregroundStyle(DesignTokens.current.ink)
+                    .foregroundStyle(DesignTokens.dark.ink)
                 VStack(alignment: .leading, spacing: 1) {
                     Text(UIStrings.Screenshot.scrollingProgress)
                         .font(.system(size: 12, weight: .semibold))
