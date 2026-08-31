@@ -233,7 +233,7 @@ private final class ScrollingPreviewPump: @unchecked Sendable {
 
     private static func thumbnail(from image: NSImage) -> NSImage? {
         guard let cgImage = cgImage(from: image), cgImage.width > 0, cgImage.height > 0 else { return nil }
-        let maxWidth = 256
+        let maxWidth = 384
         let scale = min(1, CGFloat(maxWidth) / CGFloat(cgImage.width))
         let width = max(1, Int((CGFloat(cgImage.width) * scale).rounded()))
         let height = max(1, Int((CGFloat(cgImage.height) * scale).rounded()))

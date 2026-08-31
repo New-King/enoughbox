@@ -275,7 +275,7 @@ final class ScreenshotOverlayController {
     }
 
     private func finishScrollingCapture(_ image: NSImage) {
-        saveScrollingCaptureToClipboard(image)
+        writePasteboard(image)
         onCopied?(UIStrings.Screenshot.toastCopied)
     }
 
@@ -338,6 +338,15 @@ final class ScreenshotOverlayController {
                 }
             }
         }
+    }
+
+    private func writePasteboard(_ image: NSImage) {
+        guard let tiffData = image.tiffRepresentation,
+              let bitmapRep = NSBitmapImageRep(data: tiffData),
+              let pngData = bitmapRep.representation(using: .png, properties: [:]) else { return }
+        let pasteboard = NSPasteboard.general
+        pasteboard.clearContents()
+        pasteboard.setData(pngData, forType: .png)
     }
 
     private func writePasteboard(_ image: CGImage) {

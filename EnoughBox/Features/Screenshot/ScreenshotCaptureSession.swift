@@ -120,19 +120,3 @@ private func resolveCaptureContext(for nsScreen: NSScreen) async -> ScreenCaptur
         return nil
     }
 }
-
-/// Saves PNG data to the system clipboard.
-///
-/// - Parameter pngData: The `Data` in PNG format to copy.
-/// - Note: Clears the clipboard before writing; does not verify success.
-func saveScrollingCaptureToClipboard(_ image: NSImage) {
-    guard let tiffData = image.tiffRepresentation,
-          let bitmapRep = NSBitmapImageRep(data: tiffData),
-          let pngData = bitmapRep.representation(using: .png, properties: [:]) else {
-        print("Failed to generate PNG data.")
-        return
-    }
-    let pasteboard = NSPasteboard.general
-    pasteboard.clearContents()
-    pasteboard.setData(pngData, forType: .png)
-}

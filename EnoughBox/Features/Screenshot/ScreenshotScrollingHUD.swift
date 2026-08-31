@@ -1,14 +1,18 @@
 import AppKit
-import QuartzCore
 import SwiftUI
 
 @MainActor
 enum ScreenshotScrollingHUD {
+    private static let previewColumnWidth: CGFloat = 192
+    private static let previewPadding: CGFloat = 3
+
     private static var panel: NSPanel?
     private static var model: Model?
     private static var previewPanel: NSPanel?
     private static var previewImageView: NSImageView?
     private static var previewAnchor = NSRect.zero
+    private static var previewX: CGFloat?
+    private static var previewTopY: CGFloat?
 
     static var windowNumber: CGWindowID? {
         guard let panel else { return nil }
@@ -68,56 +72,70 @@ enum ScreenshotScrollingHUD {
         previewPanel = nil
         previewImageView = nil
         previewAnchor = .zero
+        previewX = nil
+        previewTopY = nil
     }
 
     private static func presentPreview(_ image: NSImage) {
         guard image.size.width > 0, image.size.height > 0 else { return }
         let panel = ensurePreviewPanel()
-        let frame = previewFrame(for: image)
-        previewImageView?.image = image
-        previewImageView?.frame = panel.contentView?.bounds.insetBy(dx: 3, dy: 3) ?? .zero
-        if panel.frame.isEmpty || NSWorkspace.shared.accessibilityDisplayShouldReduceMotion {
-            panel.setFrame(frame, display: true)
-        } else {
-            NSAnimationContext.runAnimationGroup { context in
-                context.duration = 0.2
-                context.timingFunction = CAMediaTimingFunction(controlPoints: 0.22, 0.61, 0.36, 1)
-                panel.animator().setFrame(frame, display: true)
-            }
-        }
-        previewImageView?.frame = panel.contentView?.bounds.insetBy(dx: 3, dy: 3) ?? .zero
-        panel.orderFrontRegardless()
-    }
-
-    private static func previewFrame(for image: NSImage) -> NSRect {
         let screen = NSScreen.screens.first { $0.frame.intersects(previewAnchor) } ?? NSScreen.main
         let visible = screen?.visibleFrame ?? NSRect(x: 0, y: 0, width: 800, height: 600)
-        let columnWidth: CGFloat = 128
-        let padding: CGFloat = 3
-        let maxHeight = visible.height * 0.75
-        let aspect = image.size.height / image.size.width
-        var innerHeight = columnWidth * aspect
-        if innerHeight > maxHeight - padding * 2 {
-            innerHeight = maxHeight - padding * 2
+        let padding = previewPadding
+        let columnWidth = previewColumnWidth
+        let naturalHeight = columnWidth * (image.size.height / image.size.width)
+        let maxInnerHeight = max(40, visible.height * 0.75 - padding * 2)
+        let fits = naturalHeight <= maxInnerHeight
+        let innerWidth: CGFloat
+        let innerHeight: CGFloat
+        if fits {
+            innerWidth = columnWidth
+            innerHeight = naturalHeight
+        } else {
+            let scale = min(columnWidth / image.size.width, maxInnerHeight / image.size.height)
+            innerWidth = image.size.width * scale
+            innerHeight = image.size.height * scale
         }
-        let size = NSSize(width: columnWidth + padding * 2, height: innerHeight + padding * 2)
+        let boxHeight = fits ? innerHeight : maxInnerHeight
+        let panelSize = NSSize(
+            width: columnWidth + padding * 2,
+            height: boxHeight + padding * 2
+        )
 
-        var x = previewAnchor.maxX + 12
-        if x + size.width > visible.maxX - 8 {
-            x = previewAnchor.minX - size.width - 12
-        }
-        if x < visible.minX + 8 {
-            x = max(visible.minX + 8, visible.maxX - size.width - 16)
+        if previewX == nil || previewTopY == nil {
+            var x = previewAnchor.maxX + 12
+            if x + panelSize.width > visible.maxX - 8 {
+                x = previewAnchor.minX - panelSize.width - 12
+            }
+            if x < visible.minX + 8 {
+                x = max(visible.minX + 8, visible.maxX - panelSize.width - 16)
+            }
+            var topY = previewAnchor.maxY
+            if topY > visible.maxY - 8 {
+                topY = visible.maxY - 8
+            }
+            previewX = x
+            previewTopY = topY
         }
 
-        var y = previewAnchor.maxY - size.height
+        var y = (previewTopY ?? visible.maxY) - panelSize.height
         if y < visible.minY + 8 {
             y = visible.minY + 8
+            previewTopY = y + panelSize.height
         }
-        if y + size.height > visible.maxY - 8 {
-            y = visible.maxY - size.height - 8
-        }
-        return NSRect(origin: CGPoint(x: x, y: y), size: size)
+
+        panel.setFrame(
+            NSRect(x: previewX ?? visible.maxX - panelSize.width - 16, y: y, width: panelSize.width, height: panelSize.height),
+            display: true
+        )
+
+        let imageX = padding + (columnWidth - innerWidth) / 2
+        let imageY = padding + (boxHeight - innerHeight) / 2
+        previewImageView?.imageScaling = .scaleProportionallyUpOrDown
+        previewImageView?.imageAlignment = .alignCenter
+        previewImageView?.image = image
+        previewImageView?.frame = NSRect(x: imageX, y: imageY, width: innerWidth, height: innerHeight)
+        panel.orderFrontRegardless()
     }
 
     private static func ensurePanel() -> NSPanel {
@@ -161,9 +179,7 @@ enum ScreenshotScrollingHUD {
         let imageView = NSImageView(frame: .zero)
         imageView.imageScaling = .scaleProportionallyUpOrDown
         imageView.imageAlignment = .alignTop
-        imageView.autoresizingMask = [.width, .height]
         imageView.wantsLayer = true
-        imageView.layer?.cornerRadius = 8
         imageView.layer?.masksToBounds = true
         container.addSubview(imageView)
 
