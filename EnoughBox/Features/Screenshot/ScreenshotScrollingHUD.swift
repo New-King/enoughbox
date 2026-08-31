@@ -48,6 +48,7 @@ enum ScreenshotScrollingHUD {
             ),
             display: true
         )
+        ScreenshotScrollingShade.show(hole: anchor)
         hudPanel.orderFrontRegardless()
     }
 
@@ -62,6 +63,7 @@ enum ScreenshotScrollingHUD {
     }
 
     static func dismiss() {
+        ScreenshotScrollingShade.dismiss()
         panel?.orderOut(nil)
         panel?.contentViewController = nil
         panel = nil
@@ -232,6 +234,106 @@ enum ScreenshotScrollingHUD {
             .padding(.horizontal, 14)
             .padding(.vertical, 9)
             .background(.regularMaterial, in: RoundedRectangle(cornerRadius: 10, style: .continuous))
+        }
+    }
+}
+
+/// WeChat-style dim: everything except the live selection hole is shaded.
+/// HUD / preview sit on a higher window level so they keep original brightness.
+/// Capture excludes this app, so the shade does not appear in stitched frames.
+/// Slabs around the hole swallow clicks; the hole has no window so scroll reaches the page.
+@MainActor
+private enum ScreenshotScrollingShade {
+    private static let dimAlpha: CGFloat = 0.36
+    private static let windowLevel = NSWindow.Level(rawValue: Int(NSWindow.Level.statusBar.rawValue) - 1)
+    private static var panels: [NSPanel] = []
+
+    static func show(hole: NSRect) {
+        dismiss()
+        for screen in NSScreen.screens {
+            let screenFrame = screen.frame
+            let cut = hole.intersection(screenFrame)
+            if cut.isNull || cut.width < 1 || cut.height < 1 {
+                addFill(screenFrame)
+                continue
+            }
+            let top = NSRect(x: screenFrame.minX, y: cut.maxY, width: screenFrame.width, height: max(0, screenFrame.maxY - cut.maxY))
+            let bottom = NSRect(x: screenFrame.minX, y: screenFrame.minY, width: screenFrame.width, height: max(0, cut.minY - screenFrame.minY))
+            let left = NSRect(x: screenFrame.minX, y: cut.minY, width: max(0, cut.minX - screenFrame.minX), height: cut.height)
+            let right = NSRect(x: cut.maxX, y: cut.minY, width: max(0, screenFrame.maxX - cut.maxX), height: cut.height)
+            for slab in [top, bottom, left, right] where slab.width >= 0.5 && slab.height >= 0.5 {
+                addFill(slab)
+            }
+            addBorder(around: cut)
+        }
+        for panel in panels {
+            panel.orderFrontRegardless()
+        }
+    }
+
+    static func dismiss() {
+        for panel in panels {
+            panel.orderOut(nil)
+            panel.contentView = nil
+            panel.close()
+        }
+        panels = []
+    }
+
+    private static func addFill(_ frame: NSRect) {
+        let panel = ShadePanel(contentRect: frame, styleMask: [.borderless, .nonactivatingPanel], backing: .buffered, defer: false)
+        configure(panel, frame: frame, clickThrough: false)
+        let fill = NSView(frame: panel.contentView?.bounds ?? .zero)
+        fill.wantsLayer = true
+        fill.layer?.backgroundColor = NSColor.black.withAlphaComponent(dimAlpha).cgColor
+        fill.autoresizingMask = [.width, .height]
+        panel.contentView = fill
+        panels.append(panel)
+    }
+
+    private static func addBorder(around hole: NSRect) {
+        let frame = hole.insetBy(dx: -2, dy: -2)
+        let panel = ShadePanel(contentRect: frame, styleMask: [.borderless, .nonactivatingPanel], backing: .buffered, defer: false)
+        configure(panel, frame: frame, clickThrough: true)
+        let border = ShadeBorderView(frame: panel.contentView?.bounds ?? .zero)
+        border.autoresizingMask = [.width, .height]
+        panel.contentView = border
+        panels.append(panel)
+    }
+
+    private static func configure(_ panel: NSPanel, frame: NSRect, clickThrough: Bool) {
+        panel.setFrame(frame, display: false)
+        panel.level = windowLevel
+        panel.isOpaque = false
+        panel.backgroundColor = .clear
+        panel.hasShadow = false
+        panel.hidesOnDeactivate = false
+        panel.isReleasedWhenClosed = false
+        panel.ignoresMouseEvents = clickThrough
+        panel.sharingType = .none
+        panel.animationBehavior = .none
+        panel.collectionBehavior = [.canJoinAllSpaces, .fullScreenAuxiliary, .stationary, .ignoresCycle]
+    }
+
+    private final class ShadePanel: NSPanel {
+        override var canBecomeKey: Bool { false }
+        override var canBecomeMain: Bool { false }
+    }
+
+    private final class ShadeBorderView: NSView {
+        override var isOpaque: Bool { false }
+
+        override func draw(_ dirtyRect: NSRect) {
+            let rect = bounds.insetBy(dx: 2.5, dy: 2.5)
+            let path = NSBezierPath(rect: rect)
+            path.lineWidth = 1
+            let dash: [CGFloat] = [4, 4]
+            NSColor.black.setStroke()
+            path.setLineDash(dash, count: 2, phase: 0)
+            path.stroke()
+            NSColor.white.setStroke()
+            path.setLineDash(dash, count: 2, phase: 4)
+            path.stroke()
         }
     }
 }
