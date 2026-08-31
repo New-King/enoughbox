@@ -118,55 +118,6 @@ enum ScreenCapture {
         return cropped
     }
 
-    static func captureDisplayRegion(
-        displayID: CGDirectDisplayID,
-        pixelRect: CGRect,
-        protectedWindowIDs: Set<CGWindowID>
-    ) async -> CGImage? {
-        guard let content = try? await SCShareableContent.excludingDesktopWindows(false, onScreenWindowsOnly: true),
-              let display = content.displays.first(where: { $0.displayID == displayID })
-        else { return nil }
-
-        let screen = NSScreen.screens.first {
-            guard let number = $0.deviceDescription[NSDeviceDescriptionKey("NSScreenNumber")] as? NSNumber else {
-                return false
-            }
-            return CGDirectDisplayID(number.uint32Value) == displayID
-        }
-        let scale = screen?.backingScaleFactor ?? 2
-        let displayPixels = CGRect(
-            x: 0,
-            y: 0,
-            width: CGFloat(display.width) * scale,
-            height: CGFloat(display.height) * scale
-        )
-        let clamped = ScreenshotScrollingSupport.clamp(pixelRect, to: displayPixels).integral
-        guard !clamped.isEmpty else { return nil }
-
-        let ownWindowIDs = Set(content.windows.compactMap { window in
-            window.owningApplication?.processID == getpid() ? window.windowID : nil
-        })
-        let excludedIDs = ScreenshotCapturePolicy.excludedOwnWindowIDs(
-            hideOwnWindows: true,
-            ownWindowIDs: ownWindowIDs,
-            protectedWindowIDs: protectedWindowIDs
-        )
-        let excludedWindows = content.windows.filter { excludedIDs.contains($0.windowID) }
-        let filter = SCContentFilter(display: display, excludingWindows: excludedWindows)
-        let configuration = SCStreamConfiguration()
-        configuration.sourceRect = CGRect(
-            x: clamped.minX / scale,
-            y: clamped.minY / scale,
-            width: clamped.width / scale,
-            height: clamped.height / scale
-        )
-        configuration.width = max(1, Int(clamped.width))
-        configuration.height = max(1, Int(clamped.height))
-        configuration.showsCursor = false
-        configuration.colorSpaceName = CGColorSpace.sRGB
-        return try? await SCScreenshotManager.captureImage(contentFilter: filter, configuration: configuration)
-    }
-
     private static func display(for screen: NSScreen, in content: SCShareableContent) -> SCDisplay? {
         guard let number = screen.deviceDescription[NSDeviceDescriptionKey("NSScreenNumber")] as? NSNumber else {
             return nil

@@ -73,7 +73,7 @@ final class ScreenshotOverlayController {
     private let translationController = TranslationPanelController()
     private var scrollingTask: Task<Void, Never>?
     private var scrollingCaptureID: UUID?
-    private var scrollingFinishSignal: ScreenshotScrollingCapture.FinishSignal?
+    private var scrollingCaptureDriver: OverlayCaptureDriver?
 
     func start() {
         guard !sessionActive,
@@ -241,61 +241,39 @@ final class ScreenshotOverlayController {
 
     private func startScrollingCapture(region: ScreenshotScrollingRegion) {
         guard scrollingTask == nil else { return }
-        endSession()
+        endSession(returnFocus: false)
 
-        let finishSignal = ScreenshotScrollingCapture.FinishSignal()
-        scrollingFinishSignal = finishSignal
+        let driver = OverlayCaptureDriver()
+        scrollingCaptureDriver = driver
         ScreenshotScrollingHUD.show(
-            onFinish: { finishSignal.request() },
-            onCancel: { [weak self] in self?.scrollingTask?.cancel() }
+            onFinish: { driver.captureScreenshot() },
+            onCancel: { driver.cancelScrollingCapture() }
         )
-
-        var protectedIDs = pinController.protectedWindowIDs
-        if let hudID = ScreenshotScrollingHUD.windowNumber {
-            protectedIDs.insert(hudID)
-        }
+        ScreenshotScrollingHUD.update(height: Int((region.rectangle.height * region.scale).rounded()))
 
         let captureID = UUID()
         scrollingCaptureID = captureID
         scrollingTask = Task { [weak self] in
-            let result = await ScreenshotScrollingCapture.capture(
-                region: region,
-                protectedWindowIDs: protectedIDs,
-                finishSignal: finishSignal,
-                onProgress: { height in
-                    ScreenshotScrollingHUD.update(height: height)
-                }
-            )
+            let image = await driver.run(rectangle: region.rectangle)
             await MainActor.run { [weak self] in
                 guard let self else { return }
                 guard self.scrollingCaptureID == captureID else { return }
                 self.scrollingCaptureID = nil
                 self.scrollingTask = nil
-                self.scrollingFinishSignal = nil
+                self.scrollingCaptureDriver = nil
                 ScreenshotScrollingHUD.dismiss()
+                HostWindowFocus.returnToMainWindow()
 
-                switch result {
-                case .success(let capture):
-                    self.finishScrollingCapture(capture)
-                case .partial(let capture):
-                    self.finishScrollingCapture(capture)
-                    ScreenshotCenterToast.show(UIStrings.Screenshot.scrollingPartial)
-                case .limited(let capture):
-                    self.finishScrollingCapture(capture)
-                    ScreenshotCenterToast.show(UIStrings.Screenshot.scrollingLimited)
-                case .cancelled:
-                    break
-                case .failed:
-                    self.onFailed?()
+                if let image {
+                    self.finishScrollingCapture(image)
                 }
             }
         }
     }
 
-    private func finishScrollingCapture(_ capture: ScreenshotScrollingCapture.CaptureResult) {
-        writePasteboard(capture.image)
-        let message = UIStrings.Screenshot.toastCopied
-        onCopied?(message)
+    private func finishScrollingCapture(_ image: NSImage) {
+        saveScrollingCaptureToClipboard(image)
+        onCopied?(UIStrings.Screenshot.toastCopied)
     }
 
     private func runOCR(from view: ScreenshotOverlayView, openingTranslation: Bool) {
@@ -387,13 +365,16 @@ final class ScreenshotOverlayController {
         _ = copyColor
     }
 
-    private func endSession() {
+    /// `returnFocus` stays false while a long capture runs so the host window
+    /// does not cover the page being scrolled.
+    private func endSession(returnFocus: Bool = true) {
         sessionGeneration += 1
         ocrGeneration += 1
+        scrollingCaptureDriver?.cancelScrollingCapture()
+        scrollingCaptureDriver = nil
         scrollingTask?.cancel()
         scrollingTask = nil
         scrollingCaptureID = nil
-        scrollingFinishSignal = nil
         ScreenshotScrollingHUD.dismiss()
         ignoreStartUntil = Date().addingTimeInterval(0.35)
         removeKeyMonitors()
@@ -407,7 +388,9 @@ final class ScreenshotOverlayController {
         panels = []
         sessionActive = false
         Self.isSessionOnScreen = false
-        HostWindowFocus.returnToMainWindow()
+        if returnFocus {
+            HostWindowFocus.returnToMainWindow()
+        }
     }
 
     /// Clears shielding-level overlay panels left after a failed or interrupted session.
@@ -701,9 +684,8 @@ private final class ScreenshotOverlayView: NSView {
     func scrollingRegion() -> ScreenshotScrollingRegion? {
         guard canStartScrolling, !selection.isEmpty else { return nil }
         return ScreenshotScrollingSupport.makeRegion(
-            selection: selection,
-            screen: frozen.screen,
-            anchorRect: selectionScreenRect()
+            rectangle: selectionScreenRect(),
+            screen: frozen.screen
         )
     }
 

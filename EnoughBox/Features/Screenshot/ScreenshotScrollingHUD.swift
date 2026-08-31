@@ -39,7 +39,6 @@ enum ScreenshotScrollingHUD {
             display: true
         )
         hudPanel.orderFrontRegardless()
-        hudPanel.makeKey()
     }
 
     static func update(height: Int) {
@@ -84,7 +83,7 @@ enum ScreenshotScrollingHUD {
             HStack(spacing: 10) {
                 Image(systemName: "rectangle.stack.fill")
                     .font(.system(size: 13, weight: .semibold))
-                    .foregroundStyle(Color.accentColor)
+                    .foregroundStyle(DesignTokens.current.ink)
                 VStack(alignment: .leading, spacing: 1) {
                     Text(UIStrings.Screenshot.scrollingProgress)
                         .font(.system(size: 12, weight: .semibold))
