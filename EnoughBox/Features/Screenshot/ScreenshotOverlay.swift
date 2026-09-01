@@ -74,6 +74,7 @@ final class ScreenshotOverlayController {
     private var scrollingTask: Task<Void, Never>?
     private var scrollingCaptureID: UUID?
     private var scrollingCaptureDriver: OverlayCaptureDriver?
+    private var scrollingShouldSave = false
 
     func start() {
         guard !sessionActive,
@@ -195,10 +196,7 @@ final class ScreenshotOverlayController {
             }
             writePasteboard(image)
             dismiss(copyColor: false)
-            let message = UIStrings.Screenshot.toastCopied
-            DispatchQueue.main.async { [weak self] in
-                self?.onCopied?(message)
-            }
+            ScreenshotCenterToast.show(UIStrings.Screenshot.toastCopied)
         case .save:
             guard let image = view.croppedImage() else { return }
             save(image)
@@ -247,9 +245,14 @@ final class ScreenshotOverlayController {
             ScreenshotScrollingHUD.update(image: image, height: height)
         }
         scrollingCaptureDriver = driver
+        scrollingShouldSave = false
         ScreenshotScrollingHUD.show(
             anchor: region.rectangle,
             onFinish: { driver.captureScreenshot() },
+            onSave: { [weak self] in
+                self?.scrollingShouldSave = true
+                driver.captureScreenshot()
+            },
             onCancel: { driver.cancelScrollingCapture() }
         )
         ScreenshotScrollingHUD.update(height: Int((region.rectangle.height * region.scale).rounded()))
@@ -265,7 +268,6 @@ final class ScreenshotOverlayController {
                 self.scrollingTask = nil
                 self.scrollingCaptureDriver = nil
                 ScreenshotScrollingHUD.dismiss()
-                HostWindowFocus.returnToMainWindow()
 
                 if let image {
                     self.finishScrollingCapture(image)
@@ -275,8 +277,41 @@ final class ScreenshotOverlayController {
     }
 
     private func finishScrollingCapture(_ image: NSImage) {
+        let saveFile = scrollingShouldSave
+        scrollingShouldSave = false
+        if saveFile {
+            presentSavePanel(for: image)
+            return
+        }
         writePasteboard(image)
-        onCopied?(UIStrings.Screenshot.toastCopied)
+        ScreenshotCenterToast.show(UIStrings.Screenshot.toastCopied)
+    }
+
+    private func presentSavePanel(for image: NSImage) {
+        guard let data = pngData(from: image) else {
+            ScreenshotCenterToast.show(UIStrings.Screenshot.toastFailed)
+            return
+        }
+        let panel = NSSavePanel()
+        panel.allowedContentTypes = [.png]
+        panel.canCreateDirectories = true
+        panel.showsTagField = true
+        panel.isExtensionHidden = false
+        panel.nameFieldStringValue = defaultFileName()
+        panel.title = UIStrings.Screenshot.save
+        panel.prompt = UIStrings.Screenshot.save
+        panel.begin { [weak self] response in
+            guard let self else { return }
+            if response == .OK, let url = panel.url {
+                try? data.write(to: url)
+                ScreenshotCenterToast.show(
+                    String(format: UIStrings.Screenshot.toastSavedFormat, url.lastPathComponent)
+                )
+            } else {
+                self.writePasteboard(image)
+                ScreenshotCenterToast.show(UIStrings.Screenshot.toastCopied)
+            }
+        }
     }
 
     private func runOCR(from view: ScreenshotOverlayView, openingTranslation: Bool) {
@@ -332,10 +367,9 @@ final class ScreenshotOverlayController {
             if response == .OK, let url = panel.url, let data = pngData(image) {
                 try? data.write(to: url)
                 self.dismiss(copyColor: false)
-                let name = url.lastPathComponent
-                DispatchQueue.main.async { [weak self] in
-                    self?.onSaved?(name)
-                }
+                ScreenshotCenterToast.show(
+                    String(format: UIStrings.Screenshot.toastSavedFormat, url.lastPathComponent)
+                )
             }
         }
     }
@@ -354,6 +388,12 @@ final class ScreenshotOverlayController {
         pasteboard.clearContents()
         let nsImage = NSImage(cgImage: image, size: NSSize(width: image.width, height: image.height))
         pasteboard.writeObjects([nsImage])
+    }
+
+    private func pngData(from image: NSImage) -> Data? {
+        guard let tiffData = image.tiffRepresentation,
+              let bitmapRep = NSBitmapImageRep(data: tiffData) else { return nil }
+        return bitmapRep.representation(using: .png, properties: [:])
     }
 
     private func pngData(_ image: CGImage) -> Data? {
@@ -387,6 +427,7 @@ final class ScreenshotOverlayController {
         scrollingTask?.cancel()
         scrollingTask = nil
         scrollingCaptureID = nil
+        scrollingShouldSave = false
         ScreenshotScrollingHUD.dismiss()
         ignoreStartUntil = Date().addingTimeInterval(0.35)
         removeKeyMonitors()

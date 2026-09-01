@@ -26,6 +26,7 @@ enum ScreenshotScrollingHUD {
     static func show(
         anchor: NSRect,
         onFinish: @escaping () -> Void,
+        onSave: @escaping () -> Void,
         onCancel: @escaping () -> Void
     ) {
         previewAnchor = anchor
@@ -36,6 +37,7 @@ enum ScreenshotScrollingHUD {
             rootView: HUDView(
                 model: model,
                 onFinish: onFinish,
+                onSave: onSave,
                 onCancel: onCancel
             )
             .preferredColorScheme(colorScheme)
@@ -51,8 +53,7 @@ enum ScreenshotScrollingHUD {
         cancelHandler = onCancel
         installKeyMonitors()
         ScreenshotScrollingShade.show(hole: anchor)
-        NSApp.activate(ignoringOtherApps: true)
-        hudPanel.makeKeyAndOrderFront(nil)
+        hudPanel.orderFrontRegardless()
     }
 
     static func update(height: Int) {
@@ -283,10 +284,11 @@ enum ScreenshotScrollingHUD {
     private struct HUDView: View {
         @ObservedObject var model: Model
         let onFinish: () -> Void
+        let onSave: () -> Void
         let onCancel: () -> Void
 
         var body: some View {
-            HStack(spacing: 10) {
+            HStack(spacing: 8) {
                 Image(systemName: "rectangle.stack.fill")
                     .font(.system(size: 13, weight: .semibold))
                     .foregroundStyle(DesignTokens.dark.ink)
@@ -299,17 +301,28 @@ enum ScreenshotScrollingHUD {
                         .foregroundStyle(.secondary)
                         .monospacedDigit()
                 }
-                Button(UIStrings.Screenshot.cancel, action: onCancel)
-                    .controlSize(.small)
+                hudIconButton("xmark", help: UIStrings.Screenshot.cancel, action: onCancel)
                     .keyboardShortcut(.cancelAction)
-                Button(UIStrings.Screenshot.scrollingDone, action: onFinish)
-                    .buttonStyle(.borderedProminent)
-                    .controlSize(.small)
+                hudIconButton("square.and.arrow.down.fill", help: UIStrings.Screenshot.save, action: onSave)
+                hudIconButton("checkmark", help: UIStrings.Screenshot.scrollingDone, action: onFinish)
                     .keyboardShortcut(.defaultAction)
             }
-            .padding(.horizontal, 14)
-            .padding(.vertical, 9)
+            .padding(.horizontal, 12)
+            .padding(.vertical, 8)
             .background(.regularMaterial, in: RoundedRectangle(cornerRadius: 10, style: .continuous))
+        }
+
+        private func hudIconButton(_ systemName: String, help: String, action: @escaping () -> Void) -> some View {
+            Button(action: action) {
+                Image(systemName: systemName)
+                    .font(.system(size: 12.6, weight: .semibold))
+                    .foregroundStyle(.primary)
+                    .frame(width: 28, height: 28)
+                    .contentShape(Rectangle())
+            }
+            .buttonStyle(.plain)
+            .help(help)
+            .accessibilityLabel(help)
         }
     }
 }

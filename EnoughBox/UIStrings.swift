@@ -79,7 +79,7 @@ enum UIStrings {
     static let toastFailed = "无法截取屏幕"
     static let toastSavedFormat = "已保存 %@"
     static let scrolling = "长截图"
-    static let scrollingProgress = "使用鼠标或触控板滚动。按下回车键或选择「完成」。"
+    static let scrollingProgress = "使用鼠标或触控板滚动。按下回车键完成。"
     static let scrollingDone = "完成"
     static let scrollingPreview = "长截图预览"
     static let scrollingPartial = "页面有变化，已保留已完成的部分"
