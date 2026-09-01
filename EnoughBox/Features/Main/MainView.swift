@@ -109,6 +109,7 @@ struct MainView: View {
             }
             .toolbarIconStyle(tokens)
             .help(UIStrings.Shell.builtInTools)
+            .id("toolbar-tools-\(appearance.mode.rawValue)")
 
             Menu {
                 ForEach(AppearanceMode.allCases) { mode in
@@ -128,6 +129,7 @@ struct MainView: View {
             }
             .toolbarIconStyle(tokens)
             .help(UIStrings.Shell.appearance)
+            .id("toolbar-appearance-\(appearance.mode.rawValue)")
 
         }
     }

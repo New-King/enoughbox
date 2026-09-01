@@ -59,12 +59,32 @@ final class AppearanceManager: ObservableObject {
     }
 
     @Published var mode: AppearanceMode {
-        didSet { UserDefaults.standard.set(mode.rawValue, forKey: Keys.appearance) }
+        didSet {
+            UserDefaults.standard.set(mode.rawValue, forKey: Keys.appearance)
+            DispatchQueue.main.async { [weak self] in
+                self?.applyAppKitAppearance()
+            }
+        }
     }
 
     init() {
         let raw = UserDefaults.standard.string(forKey: Keys.appearance) ?? AppearanceMode.system.rawValue
         mode = AppearanceMode(rawValue: raw) ?? .system
+        DispatchQueue.main.async { [weak self] in
+            self?.applyAppKitAppearance()
+        }
+    }
+
+    /// Window chrome / NSToolbar often keep the previous tint until the window is clicked.
+    func applyAppKitAppearance() {
+        switch mode {
+        case .system:
+            NSApp.appearance = nil
+        case .light:
+            NSApp.appearance = NSAppearance(named: .aqua)
+        case .dark:
+            NSApp.appearance = NSAppearance(named: .darkAqua)
+        }
     }
 
     func cycle() {
