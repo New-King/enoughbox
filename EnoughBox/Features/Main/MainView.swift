@@ -49,7 +49,7 @@ struct MainView: View {
                 Text(UIStrings.Shell.toolsSection)
                     .font(.system(size: 11, weight: .semibold))
                     .foregroundStyle(tokens.inkMuted)
-                    .padding(.horizontal, 14)
+                    .padding(.horizontal, 10)
                     .padding(.top, 12)
                     .padding(.bottom, 4)
 
@@ -57,7 +57,7 @@ struct MainView: View {
                     Text(UIStrings.Shell.noToolsEnabled)
                         .font(.system(size: 12))
                         .foregroundStyle(tokens.inkFaint)
-                        .padding(.horizontal, 14)
+                        .padding(.horizontal, 10)
                         .padding(.vertical, 4)
                 } else {
                     ForEach(appState.enabledTools) { tool in

@@ -30,7 +30,7 @@ struct BuiltInTool: Identifiable, Equatable {
         [
             BuiltInTool(
                 id: "com.enoughbox.translate",
-                iconName: "textformat",
+                iconName: "bubble.left",
                 version: "0.1.0",
                 capabilities: [.hotkey, .accessibility],
                 name: UIStrings.Tool.translateName,
