@@ -11,8 +11,12 @@ final class TranslationPanelModel: ObservableObject {
     @Published var sourceRevision = UUID()
     @Published var sourceText = ""
     @Published var translatedText = ""
-    @Published var isPinned = false
+    @Published var isPinned = TranslateSettings.panelPinned {
+        didSet { TranslateSettings.panelPinned = isPinned }
+    }
     @Published var isTranslating = false
+    @Published var panelToast: String?
+    private var toastGeneration = 0
     @Published var targetLanguage = TranslateSettings.targetLanguage
     @Published var sourceLanguage: TranslateLanguage = .en
     @Published var engine = TranslateSettings.engine
@@ -137,6 +141,19 @@ final class TranslationPanelModel: ObservableObject {
         guard !text.isEmpty else { return }
         NSPasteboard.general.clearContents()
         NSPasteboard.general.setString(text, forType: .string)
+        showPanelToast(UIStrings.Translate.toastCopied)
+    }
+
+    private func showPanelToast(_ message: String) {
+        toastGeneration += 1
+        let generation = toastGeneration
+        panelToast = message
+        Task { @MainActor in
+            try? await Task.sleep(for: .seconds(2))
+            if toastGeneration == generation {
+                panelToast = nil
+            }
+        }
     }
 
     func speak(_ text: String, language: TranslateLanguage) {
@@ -211,10 +228,12 @@ final class TranslationPanelController: NSWindowController, NSWindowDelegate {
 
     func present(sourceText: String) {
         lastFittedSize = .zero
-        session.isPinned = false
         session.present(sourceText: sourceText)
         guard let window else { return }
-        positionNearMouse(window)
+        let keepPlace = session.isPinned && window.isVisible
+        if !keepPlace {
+            positionNearMouse(window)
+        }
         window.orderFrontRegardless()
         window.makeKey()
         installCloseKeyMonitor()
@@ -374,14 +393,28 @@ private struct TranslationPanelView: View {
                 .strokeBorder(tokens.border, lineWidth: 1)
         )
         .fixedSize(horizontal: true, vertical: true)
+        .overlay(alignment: .top) {
+            if let panelToast = session.panelToast {
+                FloatingBanner(message: panelToast)
+                    .padding(.top, 16)
+                    .transition(.move(edge: .top).combined(with: .opacity))
+            }
+        }
+        .animation(.easeOut(duration: 0.2), value: session.panelToast)
         .modifier(AppleTranslationBridge(session: session))
     }
 
     private var header: some View {
         HStack {
-            panelIconButton(session.isPinned ? "pin.fill" : "pin") {
+            Button {
                 session.isPinned.toggle()
+            } label: {
+                Image(systemName: session.isPinned ? "pin.fill" : "pin")
+                    .font(.system(size: 11, weight: .semibold))
+                    .foregroundStyle(session.isPinned ? tokens.ink : tokens.inkMuted)
             }
+            .buttonStyle(TranslationPanelIconButtonStyle(hoverFill: tokens.ink.opacity(0.1)))
+            .help(session.isPinned ? UIStrings.Translate.unpin : UIStrings.Translate.pin)
             Spacer()
             panelIconButton("xmark") {
                 onClose()

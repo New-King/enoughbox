@@ -146,6 +146,13 @@ enum TranslateSettings {
         }
     }
 
+    private static let panelPinnedKey = "com.enoughbox.translate.panelPinned"
+
+    static var panelPinned: Bool {
+        get { UserDefaults.standard.bool(forKey: panelPinnedKey) }
+        set { UserDefaults.standard.set(newValue, forKey: panelPinnedKey) }
+    }
+
     static var deepSeekBaseURL: String {
         get {
             let value = UserDefaults.standard.string(forKey: deepSeekURLKey)?

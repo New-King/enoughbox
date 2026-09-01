@@ -86,29 +86,31 @@ final class ClipboardPanelController: NSWindowController, NSWindowDelegate {
     }
 
     private func paste(_ entry: ClipboardItem) {
-        guard store.applyToPasteboard(entry) else { return }
-        switch ClipboardPaste.perform(releasing: window) {
-        case .pasted:
-            break
-        case .copiedOnly:
-            toastHandler(UIStrings.Clipboard.toastCopied)
-        }
+        applyAndPaste(entry)
     }
 
     private func pasteFromKeyboard(_ entry: ClipboardItem) {
+        applyAndPaste(entry)
+    }
+
+    private func applyAndPaste(_ entry: ClipboardItem) {
+        let keepOpen = store.isPinned
         guard store.applyToPasteboard(entry) else {
-            dismissPanel(returningToMainWindow: false)
+            if !keepOpen {
+                dismissPanel(returningToMainWindow: false)
+            }
             return
         }
-        let result = ClipboardPaste.perform(releasing: window) { [weak self] in
+        switch ClipboardPaste.perform(releasing: window, completion: keepOpen ? nil : { [weak self] in
             self?.dismissPanel(returningToMainWindow: false)
-        }
-        switch result {
+        }) {
         case .pasted:
             break
         case .copiedOnly:
             toastHandler(UIStrings.Clipboard.toastCopied)
-            dismissPanel(returningToMainWindow: false)
+            if !keepOpen {
+                dismissPanel(returningToMainWindow: false)
+            }
         }
     }
 
@@ -128,7 +130,7 @@ final class ClipboardPanelController: NSWindowController, NSWindowDelegate {
             },
             onCopy: { [weak self] entry in
                 guard let self, self.store.applyToPasteboard(entry) else { return }
-                self.toastHandler(UIStrings.Clipboard.toastCopied)
+                self.store.showPanelToast(UIStrings.Clipboard.toastCopied)
             },
             onClose: { [weak self] in
                 self?.close()
@@ -144,16 +146,6 @@ final class ClipboardPanelController: NSWindowController, NSWindowDelegate {
         keyMonitor = NSEvent.addLocalMonitorForEvents(matching: .keyDown) { [weak self] event in
             guard let self, self.window?.isKeyWindow == true else { return event }
             switch event.keyCode {
-            case 53:
-                if self.isEditingSearch() {
-                    if self.isComposingSearchText() { return event }
-                    if !self.store.query.isEmpty {
-                        self.store.updateQuery("")
-                        return nil
-                    }
-                }
-                self.close()
-                return nil
             case 123:
                 if self.isEditingSearch() {
                     if self.isComposingSearchText() { return event }
@@ -201,6 +193,16 @@ final class ClipboardPanelController: NSWindowController, NSWindowDelegate {
             case 51:
                 if self.isEditingSearch() { return event }
                 self.store.removeSelected()
+                return nil
+            case 53:
+                if self.isEditingSearch() {
+                    if self.isComposingSearchText() { return event }
+                    if !self.store.query.isEmpty {
+                        self.store.updateQuery("")
+                        return nil
+                    }
+                }
+                self.close()
                 return nil
             default:
                 let modifiers = event.modifierFlags.intersection(.deviceIndependentFlagsMask)
@@ -312,6 +314,14 @@ private struct ClipboardPanelView: View {
             RoundedRectangle(cornerRadius: 11, style: .continuous)
                 .strokeBorder(tokens.border, lineWidth: 1)
         )
+        .overlay(alignment: .top) {
+            if let panelToast = store.panelToast {
+                FloatingBanner(message: panelToast)
+                    .padding(.top, 16)
+                    .transition(.move(edge: .top).combined(with: .opacity))
+            }
+        }
+        .animation(.easeOut(duration: 0.2), value: store.panelToast)
         .appleShadow(tokens)
         .onChange(of: store.searchFocusToken) { _, _ in
             searchFocused = true
@@ -323,18 +333,29 @@ private struct ClipboardPanelView: View {
 
     private var header: some View {
         HStack {
-            Text(UIStrings.Tool.clipboardName)
-                .font(.system(size: 13, weight: .semibold))
-                .foregroundStyle(tokens.ink)
+            Button {
+                store.isPinned.toggle()
+            } label: {
+                Image(systemName: store.isPinned ? "pin.fill" : "pin")
+                    .font(.system(size: 11, weight: .semibold))
+                    .foregroundStyle(store.isPinned ? tokens.ink : tokens.inkMuted)
+                    .frame(width: 28, height: 28)
+                    .contentShape(Rectangle())
+            }
+            .buttonStyle(.plain)
+            .clipboardHoverFill(cornerRadius: 7)
+            .help(store.isPinned ? UIStrings.Clipboard.unpin : UIStrings.Clipboard.pin)
             Spacer()
             Button(action: onClose) {
                 Image(systemName: "xmark")
                     .font(.system(size: 11, weight: .semibold))
                     .foregroundStyle(tokens.inkMuted)
-                    .frame(width: 24, height: 24)
+                    .frame(width: 28, height: 28)
+                    .contentShape(Rectangle())
             }
             .buttonStyle(.plain)
             .clipboardHoverFill(cornerRadius: 7)
+            .help(UIStrings.Clipboard.close)
         }
         .background(ClipboardWindowDragRegion())
     }
@@ -394,6 +415,7 @@ private struct ClipboardPanelView: View {
                     .foregroundStyle(store.entries.isEmpty ? tokens.inkFaint : tokens.inkMuted)
                     .padding(.horizontal, 10)
                     .padding(.vertical, 6)
+                    .contentShape(RoundedRectangle(cornerRadius: 8, style: .continuous))
             }
             .buttonStyle(.plain)
             .clipboardHoverFill(cornerRadius: 8)
@@ -506,7 +528,8 @@ private struct ClipboardRowView: View {
             Image(systemName: systemName)
                 .font(.system(size: 11, weight: .medium))
                 .foregroundStyle(tokens.inkMuted)
-                .frame(width: 24, height: 24)
+                .frame(width: 28, height: 28)
+                .contentShape(Rectangle())
         }
         .buttonStyle(.plain)
         .help(help)
@@ -564,8 +587,10 @@ private struct ClipboardCategoryChip: View {
                     Capsule()
                         .strokeBorder(tokens.border, lineWidth: isSelected ? 1 : 0)
                 )
+                .contentShape(Capsule())
         }
         .buttonStyle(.plain)
+        .contentShape(Capsule())
         .onHover { hovering = $0 }
     }
 
@@ -588,6 +613,7 @@ private struct ClipboardHoverFill: ViewModifier {
                 RoundedRectangle(cornerRadius: cornerRadius, style: .continuous)
                     .fill(hovering ? tokens.ink.opacity(0.1) : Color.clear)
             )
+            .contentShape(RoundedRectangle(cornerRadius: cornerRadius, style: .continuous))
             .onHover { hovering = $0 }
     }
 }
