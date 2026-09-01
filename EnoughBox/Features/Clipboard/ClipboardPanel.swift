@@ -332,9 +332,9 @@ private struct ClipboardPanelView: View {
                     .font(.system(size: 11, weight: .semibold))
                     .foregroundStyle(tokens.inkMuted)
                     .frame(width: 24, height: 24)
-                    .background(tokens.ink.opacity(0.08), in: RoundedRectangle(cornerRadius: 6))
             }
             .buttonStyle(.plain)
+            .clipboardHoverFill(cornerRadius: 7)
         }
         .background(ClipboardWindowDragRegion())
     }
@@ -377,24 +377,12 @@ private struct ClipboardPanelView: View {
         HStack(spacing: 6) {
             HStack(spacing: 6) {
                 ForEach(ClipboardCategory.allCases) { item in
-                    Button {
+                    ClipboardCategoryChip(
+                        title: categoryTitle(item),
+                        isSelected: store.category == item
+                    ) {
                         store.updateCategory(item)
-                    } label: {
-                        Text(categoryTitle(item))
-                            .font(.system(size: 11, weight: store.category == item ? .semibold : .medium))
-                            .foregroundStyle(store.category == item ? tokens.ink : tokens.inkMuted)
-                            .padding(.horizontal, 10)
-                            .padding(.vertical, 6)
-                            .background(
-                                store.category == item ? tokens.accentSoft : tokens.card,
-                                in: Capsule()
-                            )
-                            .overlay(
-                                Capsule()
-                                    .strokeBorder(tokens.border, lineWidth: store.category == item ? 0 : 1)
-                            )
                     }
-                    .buttonStyle(.plain)
                 }
             }
 
@@ -408,6 +396,7 @@ private struct ClipboardPanelView: View {
                     .padding(.vertical, 6)
             }
             .buttonStyle(.plain)
+            .clipboardHoverFill(cornerRadius: 8)
             .disabled(store.entries.isEmpty)
         }
     }
@@ -522,6 +511,7 @@ private struct ClipboardRowView: View {
         .buttonStyle(.plain)
         .help(help)
         .accessibilityLabel(help)
+        .clipboardHoverFill(cornerRadius: 7)
     }
 
     private var rowBackground: Color {
@@ -552,6 +542,59 @@ private struct ClipboardRowView: View {
             .foregroundStyle(tokens.inkMuted)
             .frame(width: 36, height: 36)
             .background(tokens.page, in: RoundedRectangle(cornerRadius: 6, style: .continuous))
+    }
+}
+
+private struct ClipboardCategoryChip: View {
+    @Environment(\.designTokens) private var tokens
+    @State private var hovering = false
+    let title: String
+    let isSelected: Bool
+    let action: () -> Void
+
+    var body: some View {
+        Button(action: action) {
+            Text(title)
+                .font(.system(size: 11, weight: isSelected ? .semibold : .medium))
+                .foregroundStyle(isSelected ? tokens.ink : tokens.inkMuted)
+                .padding(.horizontal, 10)
+                .padding(.vertical, 6)
+                .background(chipFill, in: Capsule())
+                .overlay(
+                    Capsule()
+                        .strokeBorder(tokens.border, lineWidth: isSelected ? 1 : 0)
+                )
+        }
+        .buttonStyle(.plain)
+        .onHover { hovering = $0 }
+    }
+
+    private var chipFill: Color {
+        if hovering {
+            return tokens.ink.opacity(0.1)
+        }
+        return isSelected ? tokens.card : tokens.accentSoft
+    }
+}
+
+private struct ClipboardHoverFill: ViewModifier {
+    @Environment(\.designTokens) private var tokens
+    var cornerRadius: CGFloat
+    @State private var hovering = false
+
+    func body(content: Content) -> some View {
+        content
+            .background(
+                RoundedRectangle(cornerRadius: cornerRadius, style: .continuous)
+                    .fill(hovering ? tokens.ink.opacity(0.1) : Color.clear)
+            )
+            .onHover { hovering = $0 }
+    }
+}
+
+private extension View {
+    func clipboardHoverFill(cornerRadius: CGFloat) -> some View {
+        modifier(ClipboardHoverFill(cornerRadius: cornerRadius))
     }
 }
 
