@@ -30,7 +30,7 @@ struct BuiltInTool: Identifiable, Equatable {
         [
             BuiltInTool(
                 id: "com.enoughbox.translate",
-                iconName: "character.book.closed",
+                iconName: "textformat",
                 version: "0.1.0",
                 capabilities: [.hotkey, .accessibility],
                 name: UIStrings.Tool.translateName,
@@ -38,7 +38,7 @@ struct BuiltInTool: Identifiable, Equatable {
             ),
             BuiltInTool(
                 id: "com.enoughbox.screenshot",
-                iconName: "camera.viewfinder",
+                iconName: "viewfinder",
                 version: "0.1.0",
                 capabilities: [.hotkey],
                 name: UIStrings.Tool.screenshotName,
@@ -46,7 +46,7 @@ struct BuiltInTool: Identifiable, Equatable {
             ),
             BuiltInTool(
                 id: "com.enoughbox.clipboard",
-                iconName: "doc.on.clipboard",
+                iconName: "clipboard",
                 version: "0.1.0",
                 capabilities: [.hotkey, .clipboard],
                 name: UIStrings.Tool.clipboardName,

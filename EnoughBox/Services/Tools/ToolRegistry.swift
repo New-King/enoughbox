@@ -32,11 +32,15 @@ final class ToolRegistry {
     func load() -> [EnabledTool] {
         guard let data = try? Data(contentsOf: AppPaths.registryFile) else { return [] }
         guard let snapshot = try? JSONDecoder().decode(ToolRegistrySnapshot.self, from: data) else { return [] }
-        return snapshot.tools
-            .map { $0.toEnabledTool() }
-            .filter { installedTool in
-                BuiltInTool.catalog.contains { $0.id == installedTool.id }
-            }
+        return snapshot.tools.compactMap { record in
+            guard let catalog = BuiltInTool.catalog.first(where: { $0.id == record.id }) else { return nil }
+            return EnabledTool(
+                id: record.id,
+                iconName: catalog.iconName,
+                version: record.version,
+                capabilities: record.capabilities
+            )
+        }
     }
 
     func save(_ tools: [EnabledTool]) throws {

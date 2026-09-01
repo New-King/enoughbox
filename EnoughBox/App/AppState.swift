@@ -122,7 +122,7 @@ final class AppState: ObservableObject {
             state.enabledTools = [
                 EnabledTool(
                     id: "com.enoughbox.translate",
-                    iconName: "character.book.closed",
+                    iconName: "textformat",
                     version: "0.1.0",
                     capabilities: [.hotkey, .accessibility]
                 ),

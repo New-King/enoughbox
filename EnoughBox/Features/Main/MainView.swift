@@ -11,7 +11,6 @@ struct MainView: View {
     var body: some View {
         HStack(spacing: 0) {
             sidebar
-            shellDivider
             detail
         }
         .background(tokens.shell)
@@ -34,13 +33,6 @@ struct MainView: View {
         .onChange(of: appState.selectedToolID) { _, _ in
             clearWindowFocus()
         }
-    }
-
-    private var shellDivider: some View {
-        Rectangle()
-            .fill(tokens.border)
-            .frame(width: 1)
-            .frame(maxHeight: .infinity)
     }
 
     private func clearWindowFocus() {
