@@ -267,18 +267,22 @@ final class ScreenshotOverlayController {
                 self.scrollingCaptureID = nil
                 self.scrollingTask = nil
                 self.scrollingCaptureDriver = nil
-                ScreenshotScrollingHUD.dismiss()
+                let saveFile = self.scrollingShouldSave
+                self.scrollingShouldSave = false
+                if !saveFile {
+                    ScreenshotScrollingHUD.dismiss()
+                }
 
                 if let image {
-                    self.finishScrollingCapture(image)
+                    self.finishScrollingCapture(image, saveFile: saveFile)
+                } else {
+                    ScreenshotScrollingHUD.dismiss()
                 }
             }
         }
     }
 
-    private func finishScrollingCapture(_ image: NSImage) {
-        let saveFile = scrollingShouldSave
-        scrollingShouldSave = false
+    private func finishScrollingCapture(_ image: NSImage, saveFile: Bool) {
         if saveFile {
             presentSavePanel(for: image)
             return
@@ -289,6 +293,7 @@ final class ScreenshotOverlayController {
 
     private func presentSavePanel(for image: NSImage) {
         guard let data = pngData(from: image) else {
+            ScreenshotScrollingHUD.dismiss()
             ScreenshotCenterToast.show(UIStrings.Screenshot.toastFailed)
             return
         }
@@ -300,7 +305,8 @@ final class ScreenshotOverlayController {
         panel.nameFieldStringValue = defaultFileName()
         panel.title = UIStrings.Screenshot.save
         panel.prompt = UIStrings.Screenshot.save
-        panel.begin { [weak self] response in
+        ScreenshotScrollingHUD.beginSaveSheet(panel) { [weak self] response in
+            ScreenshotScrollingHUD.dismiss()
             guard let self else { return }
             if response == .OK, let url = panel.url {
                 try? data.write(to: url)

@@ -85,6 +85,17 @@ enum ScreenshotScrollingHUD {
         previewTopY = nil
     }
 
+    static func beginSaveSheet(_ savePanel: NSSavePanel, completion: @escaping (NSApplication.ModalResponse) -> Void) {
+        NSApp.activate(ignoringOtherApps: true)
+        if let host = panel {
+            host.makeKeyAndOrderFront(nil)
+            savePanel.beginSheetModal(for: host, completionHandler: completion)
+            return
+        }
+        savePanel.level = NSWindow.Level(rawValue: Int(NSWindow.Level.statusBar.rawValue) + 1)
+        savePanel.begin(completionHandler: completion)
+    }
+
     private static func presentPreview(_ image: NSImage) {
         guard image.size.width > 0, image.size.height > 0 else { return }
         let panel = ensurePreviewPanel()
@@ -301,28 +312,53 @@ enum ScreenshotScrollingHUD {
                         .foregroundStyle(.secondary)
                         .monospacedDigit()
                 }
-                hudIconButton("xmark", help: UIStrings.Screenshot.cancel, action: onCancel)
+                HUDIconButton(systemName: "xmark", help: UIStrings.Screenshot.cancel, action: onCancel)
                     .keyboardShortcut(.cancelAction)
-                hudIconButton("square.and.arrow.down.fill", help: UIStrings.Screenshot.save, action: onSave)
-                hudIconButton("checkmark", help: UIStrings.Screenshot.scrollingDone, action: onFinish)
+                HUDIconButton(systemName: "square.and.arrow.down.fill", help: UIStrings.Screenshot.save, action: onSave)
+                HUDIconButton(systemName: "checkmark", help: UIStrings.Screenshot.scrollingDone, action: onFinish)
                     .keyboardShortcut(.defaultAction)
             }
             .padding(.horizontal, 12)
             .padding(.vertical, 8)
             .background(.regularMaterial, in: RoundedRectangle(cornerRadius: 10, style: .continuous))
         }
+    }
 
-        private func hudIconButton(_ systemName: String, help: String, action: @escaping () -> Void) -> some View {
+    private struct HUDIconButton: View {
+        @Environment(\.designTokens) private var tokens
+        @State private var hovering = false
+        let systemName: String
+        let help: String
+        let action: () -> Void
+
+        var body: some View {
             Button(action: action) {
                 Image(systemName: systemName)
                     .font(.system(size: 12.6, weight: .semibold))
-                    .foregroundStyle(.primary)
+                    .foregroundStyle(tokens.ink)
                     .frame(width: 28, height: 28)
-                    .contentShape(Rectangle())
+                    .background(
+                        RoundedRectangle(cornerRadius: 7, style: .continuous)
+                            .fill(hovering ? tokens.ink.opacity(0.1) : Color.clear)
+                    )
+                    .contentShape(RoundedRectangle(cornerRadius: 7, style: .continuous))
             }
-            .buttonStyle(.plain)
+            .buttonStyle(HUDIconPressStyle())
+            .onHover { hovering = $0 }
             .help(help)
             .accessibilityLabel(help)
+        }
+    }
+
+    private struct HUDIconPressStyle: ButtonStyle {
+        @Environment(\.designTokens) private var tokens
+
+        func makeBody(configuration: Configuration) -> some View {
+            configuration.label
+                .background {
+                    RoundedRectangle(cornerRadius: 7, style: .continuous)
+                        .fill(configuration.isPressed ? tokens.border : Color.clear)
+                }
         }
     }
 }
