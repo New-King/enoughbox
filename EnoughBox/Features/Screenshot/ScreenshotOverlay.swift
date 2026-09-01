@@ -305,18 +305,13 @@ final class ScreenshotOverlayController {
         panel.nameFieldStringValue = defaultFileName()
         panel.title = UIStrings.Screenshot.save
         panel.prompt = UIStrings.Screenshot.save
-        ScreenshotScrollingHUD.beginSaveSheet(panel) { [weak self] response in
+        ScreenshotScrollingHUD.beginSaveSheet(panel) { response in
             ScreenshotScrollingHUD.dismiss()
-            guard let self else { return }
-            if response == .OK, let url = panel.url {
-                try? data.write(to: url)
-                ScreenshotCenterToast.show(
-                    String(format: UIStrings.Screenshot.toastSavedFormat, url.lastPathComponent)
-                )
-            } else {
-                self.writePasteboard(image)
-                ScreenshotCenterToast.show(UIStrings.Screenshot.toastCopied)
-            }
+            guard response == .OK, let url = panel.url else { return }
+            try? data.write(to: url)
+            ScreenshotCenterToast.show(
+                String(format: UIStrings.Screenshot.toastSavedFormat, url.lastPathComponent)
+            )
         }
     }
 

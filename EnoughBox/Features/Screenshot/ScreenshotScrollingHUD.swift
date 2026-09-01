@@ -86,13 +86,13 @@ enum ScreenshotScrollingHUD {
     }
 
     static func beginSaveSheet(_ savePanel: NSSavePanel, completion: @escaping (NSApplication.ModalResponse) -> Void) {
-        NSApp.activate(ignoringOtherApps: true)
         if let host = panel {
-            host.makeKeyAndOrderFront(nil)
+            host.orderFrontRegardless()
             savePanel.beginSheetModal(for: host, completionHandler: completion)
             return
         }
         savePanel.level = NSWindow.Level(rawValue: Int(NSWindow.Level.statusBar.rawValue) + 1)
+        savePanel.orderFrontRegardless()
         savePanel.begin(completionHandler: completion)
     }
 
