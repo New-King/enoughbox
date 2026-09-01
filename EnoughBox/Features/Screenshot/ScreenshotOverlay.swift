@@ -188,7 +188,7 @@ final class ScreenshotOverlayController {
             NSPasteboard.general.clearContents()
             NSPasteboard.general.setString(text, forType: .string)
             dismiss(copyColor: true)
-            ScreenshotCenterToast.show(UIStrings.Screenshot.toastColorCopied)
+            CenterToast.show(UIStrings.Screenshot.toastColorCopied)
         case .confirm:
             guard let image = view.croppedImage() else {
                 dismiss(copyColor: false)
@@ -196,7 +196,7 @@ final class ScreenshotOverlayController {
             }
             writePasteboard(image)
             dismiss(copyColor: false)
-            ScreenshotCenterToast.show(UIStrings.Screenshot.toastCopied)
+            CenterToast.show(UIStrings.Screenshot.toastCopied)
         case .save:
             guard let image = view.croppedImage() else { return }
             save(image)
@@ -288,13 +288,13 @@ final class ScreenshotOverlayController {
             return
         }
         writePasteboard(image)
-        ScreenshotCenterToast.show(UIStrings.Screenshot.toastCopied)
+        CenterToast.show(UIStrings.Screenshot.toastCopied)
     }
 
     private func presentSavePanel(for image: NSImage) {
         guard let data = pngData(from: image) else {
             ScreenshotScrollingHUD.dismiss()
-            ScreenshotCenterToast.show(UIStrings.Screenshot.toastFailed)
+            CenterToast.show(UIStrings.Screenshot.toastFailed)
             return
         }
         let panel = NSSavePanel()
@@ -309,7 +309,7 @@ final class ScreenshotOverlayController {
             ScreenshotScrollingHUD.dismiss()
             guard response == .OK, let url = panel.url else { return }
             try? data.write(to: url)
-            ScreenshotCenterToast.show(
+            CenterToast.show(
                 String(format: UIStrings.Screenshot.toastSavedFormat, url.lastPathComponent)
             )
         }
@@ -320,7 +320,7 @@ final class ScreenshotOverlayController {
         ocrGeneration += 1
         let generation = ocrGeneration
         view.setToolbarInteractionEnabled(false)
-        ScreenshotCenterToast.show(UIStrings.Screenshot.ocrProcessing)
+        CenterToast.show(UIStrings.Screenshot.ocrProcessing)
 
         Task { @MainActor [weak self, weak view] in
             do {
@@ -329,7 +329,7 @@ final class ScreenshotOverlayController {
                 let trimmed = text.trimmingCharacters(in: .whitespacesAndNewlines)
                 if trimmed.isEmpty {
                     self.dismiss(copyColor: false)
-                    ScreenshotCenterToast.show(UIStrings.Screenshot.ocrNoText)
+                    CenterToast.show(UIStrings.Screenshot.ocrNoText)
                 } else {
                     NSPasteboard.general.clearContents()
                     NSPasteboard.general.setString(trimmed, forType: .string)
@@ -338,13 +338,13 @@ final class ScreenshotOverlayController {
                         self.translationController.present(sourceText: trimmed)
                     } else {
                         self.ocrResultPanel.present(text: trimmed)
-                        ScreenshotCenterToast.show(UIStrings.Screenshot.ocrCopied)
+                        CenterToast.show(UIStrings.Screenshot.ocrCopied)
                     }
                 }
             } catch {
                 guard let self, self.ocrGeneration == generation else { return }
                 self.dismiss(copyColor: false)
-                ScreenshotCenterToast.show(UIStrings.Screenshot.ocrFailed)
+                CenterToast.show(UIStrings.Screenshot.ocrFailed)
             }
             view?.setToolbarInteractionEnabled(true)
         }
@@ -368,7 +368,7 @@ final class ScreenshotOverlayController {
             if response == .OK, let url = panel.url, let data = pngData(image) {
                 try? data.write(to: url)
                 self.dismiss(copyColor: false)
-                ScreenshotCenterToast.show(
+                CenterToast.show(
                     String(format: UIStrings.Screenshot.toastSavedFormat, url.lastPathComponent)
                 )
             }

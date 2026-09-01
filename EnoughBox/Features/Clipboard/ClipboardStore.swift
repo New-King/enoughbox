@@ -14,8 +14,6 @@ final class ClipboardStore: ObservableObject {
     }
     @Published private(set) var searchFocusToken = 0
     @Published private(set) var listFocusToken = 0
-    @Published var panelToast: String?
-    private var toastGeneration = 0
 
     private var sortedEntries: [ClipboardItem] = []
     private var timer: Timer?
@@ -78,20 +76,7 @@ final class ClipboardStore: ObservableObject {
 
     func endPanelSession() {
         resetPanelState()
-        panelToast = nil
         ClipboardImageStore.clearCache()
-    }
-
-    func showPanelToast(_ message: String) {
-        toastGeneration += 1
-        let generation = toastGeneration
-        panelToast = message
-        Task { @MainActor in
-            try? await Task.sleep(for: .seconds(2))
-            if toastGeneration == generation {
-                panelToast = nil
-            }
-        }
     }
 
     func updateQuery(_ value: String) {

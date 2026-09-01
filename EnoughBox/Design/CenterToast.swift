@@ -1,9 +1,9 @@
 import AppKit
 import SwiftUI
 
-/// Brief centered message after the screenshot session ends (e.g. color copied).
+/// Screen-centered banner for copy / capture feedback across tools.
 @MainActor
-enum ScreenshotCenterToast {
+enum CenterToast {
     private static var activePanel: NSPanel?
 
     static func show(_ message: String) {

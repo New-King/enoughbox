@@ -15,8 +15,6 @@ final class TranslationPanelModel: ObservableObject {
         didSet { TranslateSettings.panelPinned = isPinned }
     }
     @Published var isTranslating = false
-    @Published var panelToast: String?
-    private var toastGeneration = 0
     @Published var targetLanguage = TranslateSettings.targetLanguage
     @Published var sourceLanguage: TranslateLanguage = .en
     @Published var engine = TranslateSettings.engine
@@ -141,19 +139,7 @@ final class TranslationPanelModel: ObservableObject {
         guard !text.isEmpty else { return }
         NSPasteboard.general.clearContents()
         NSPasteboard.general.setString(text, forType: .string)
-        showPanelToast(UIStrings.Translate.toastCopied)
-    }
-
-    private func showPanelToast(_ message: String) {
-        toastGeneration += 1
-        let generation = toastGeneration
-        panelToast = message
-        Task { @MainActor in
-            try? await Task.sleep(for: .seconds(2))
-            if toastGeneration == generation {
-                panelToast = nil
-            }
-        }
+        CenterToast.show(UIStrings.Translate.toastCopied)
     }
 
     func speak(_ text: String, language: TranslateLanguage) {
@@ -393,14 +379,6 @@ private struct TranslationPanelView: View {
                 .strokeBorder(tokens.border, lineWidth: 1)
         )
         .fixedSize(horizontal: true, vertical: true)
-        .overlay(alignment: .top) {
-            if let panelToast = session.panelToast {
-                FloatingBanner(message: panelToast)
-                    .padding(.top, 16)
-                    .transition(.move(edge: .top).combined(with: .opacity))
-            }
-        }
-        .animation(.easeOut(duration: 0.2), value: session.panelToast)
         .modifier(AppleTranslationBridge(session: session))
     }
 

@@ -5,13 +5,8 @@ import SwiftUI
 final class ClipboardTool {
     static let id = "com.enoughbox.clipboard"
 
-    private let toastHandler: (String) -> Void
     private let store = ClipboardStore()
     private var panelController: ClipboardPanelController?
-
-    init(toastHandler: @escaping (String) -> Void) {
-        self.toastHandler = toastHandler
-    }
 
     func activate() {
         store.startMonitoring()
@@ -34,10 +29,7 @@ final class ClipboardTool {
             return
         }
         if panelController == nil {
-            panelController = ClipboardPanelController(
-                store: store,
-                toastHandler: toastHandler
-            )
+            panelController = ClipboardPanelController(store: store)
         }
         panelController?.present()
     }

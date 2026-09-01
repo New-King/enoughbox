@@ -42,7 +42,7 @@
 		9D61841BFBE1CFC6C59525DE /* ToolToggleButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = 14C269FA1FD0194F652CAABB /* ToolToggleButton.swift */; };
 		9F589EB4AFC0ECFCCDCDD1B7 /* PressScaleButtonStyle.swift in Sources */ = {isa = PBXBuildFile; fileRef = B4E754D388D917256B2452D4 /* PressScaleButtonStyle.swift */; };
 		A3A46C8C570BDE24A266E1CA /* SettingsControlMetrics.swift in Sources */ = {isa = PBXBuildFile; fileRef = 65F87ED40E4F7C018ACE437D /* SettingsControlMetrics.swift */; };
-		A578552C79CDB7774F38AAA0 /* ScreenshotCenterToast.swift in Sources */ = {isa = PBXBuildFile; fileRef = 86E1B05429EF4CCD61A9F25E /* ScreenshotCenterToast.swift */; };
+		A578552C79CDB7774F38AAA0 /* CenterToast.swift in Sources */ = {isa = PBXBuildFile; fileRef = 86E1B05429EF4CCD61A9F25E /* CenterToast.swift */; };
 		ACCADF8A7DB3AA3508940D25 /* ScreenshotGeometry.swift in Sources */ = {isa = PBXBuildFile; fileRef = 96DEEDEE73F1E1A55828F09F /* ScreenshotGeometry.swift */; };
 		AD9A4C1100C3CD807019BAD1 /* ClipboardStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = C42B1C9BE0F727620E81BAA7 /* ClipboardStore.swift */; };
 		B4570B6FEF37DE9A2E92487A /* AppState.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2E798AA90D4ECE990344C323 /* AppState.swift */; };
@@ -97,7 +97,7 @@
 		7A9719AB838FCF7C96F308B9 /* DesignTokens+AppKit.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "DesignTokens+AppKit.swift"; sourceTree = "<group>"; };
 		7B76CEE7616F6A58C6560676 /* SettingsMenuPicker.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsMenuPicker.swift; sourceTree = "<group>"; };
 		7BF25D8EFD48AABA211A16FA /* TranslationPanel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TranslationPanel.swift; sourceTree = "<group>"; };
-		86E1B05429EF4CCD61A9F25E /* ScreenshotCenterToast.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScreenshotCenterToast.swift; sourceTree = "<group>"; };
+		86E1B05429EF4CCD61A9F25E /* CenterToast.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CenterToast.swift; sourceTree = "<group>"; };
 		8957EBCDFDF293B1AF4706B1 /* SettingsTrailingRow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsTrailingRow.swift; sourceTree = "<group>"; };
 		8F36E3F1DF931390FA757F3A /* EnoughBoxApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EnoughBoxApp.swift; sourceTree = "<group>"; };
 		9310CF80D6394B6335D68306 /* AppearanceManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppearanceManager.swift; sourceTree = "<group>"; };
@@ -205,7 +205,6 @@
 		4FACDAE2404CD342A907DCEF /* Screenshot */ = {
 			isa = PBXGroup;
 			children = (
-				86E1B05429EF4CCD61A9F25E /* ScreenshotCenterToast.swift */,
 				D8CF3930BDD24F9AB878C4AF /* ScreenshotOCR.swift */,
 				3F2C6A56FE0705445AAB519B /* ScreenshotOCRResultPanel.swift */,
 				4C546E38CE8EADA9BC2B946E /* ScreenshotOverlay.swift */,
@@ -307,6 +306,7 @@
 				9310CF80D6394B6335D68306 /* AppearanceManager.swift */,
 				11F132A4E6E47759F5683FA8 /* DesignTokens.swift */,
 				7A9719AB838FCF7C96F308B9 /* DesignTokens+AppKit.swift */,
+				86E1B05429EF4CCD61A9F25E /* CenterToast.swift */,
 				E64C21170554FB94B7A3BFD4 /* FloatingBanner.swift */,
 				B4E754D388D917256B2452D4 /* PressScaleButtonStyle.swift */,
 			);
@@ -464,7 +464,7 @@
 				9F589EB4AFC0ECFCCDCDD1B7 /* PressScaleButtonStyle.swift in Sources */,
 				124297EB6B78D57A58888F0C /* ScreenCapture.swift in Sources */,
 				BA3C78584A708ACE7F43C773 /* ScreenshotCapturePolicy.swift in Sources */,
-				A578552C79CDB7774F38AAA0 /* ScreenshotCenterToast.swift in Sources */,
+				A578552C79CDB7774F38AAA0 /* CenterToast.swift in Sources */,
 				ACCADF8A7DB3AA3508940D25 /* ScreenshotGeometry.swift in Sources */,
 				E16641AF78743B5B57D11A41 /* ScreenshotOCR.swift in Sources */,
 				8727C6B90AA5802624DF76B8 /* ScreenshotOCRResultPanel.swift in Sources */,

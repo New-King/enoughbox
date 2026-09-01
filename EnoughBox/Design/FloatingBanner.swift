@@ -1,6 +1,6 @@
 import SwiftUI
 
-/// Shared top toast / banner chrome (MainView toast, screenshot center toast, etc.).
+/// Shared toast / banner chrome (main-window toast and screen-centered CenterToast).
 struct FloatingBanner: View {
     @Environment(\.designTokens) private var tokens
 

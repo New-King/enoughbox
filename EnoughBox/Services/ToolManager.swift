@@ -10,7 +10,7 @@ final class ToolManager: ObservableObject {
     init(toastHandler: @escaping (String) -> Void) {
         translateTool = TranslateTool(toastHandler: toastHandler)
         screenshotTool = ScreenshotTool(toastHandler: toastHandler)
-        clipboardTool = ClipboardTool(toastHandler: toastHandler)
+        clipboardTool = ClipboardTool()
     }
 
     func loadEnabled(_ tools: [EnabledTool]) {

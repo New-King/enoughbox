@@ -9,18 +9,13 @@ private final class ClipboardNSPanel: NSPanel {
 @MainActor
 final class ClipboardPanelController: NSWindowController, NSWindowDelegate {
     private let store: ClipboardStore
-    private let toastHandler: (String) -> Void
     private var hostingController: NSHostingController<ClipboardPanelRootView>!
     private var keyMonitor: Any?
     private var presentationID = UUID()
     private(set) var isVisible = false
 
-    init(
-        store: ClipboardStore,
-        toastHandler: @escaping (String) -> Void
-    ) {
+    init(store: ClipboardStore) {
         self.store = store
-        self.toastHandler = toastHandler
         let panel = ClipboardNSPanel(
             contentRect: NSRect(x: 0, y: 0, width: 360, height: 440),
             styleMask: [.borderless, .nonactivatingPanel],
@@ -107,7 +102,7 @@ final class ClipboardPanelController: NSWindowController, NSWindowDelegate {
         case .pasted:
             break
         case .copiedOnly:
-            toastHandler(UIStrings.Clipboard.toastCopied)
+            CenterToast.show(UIStrings.Clipboard.toastCopied)
             if !keepOpen {
                 dismissPanel(returningToMainWindow: false)
             }
@@ -130,7 +125,7 @@ final class ClipboardPanelController: NSWindowController, NSWindowDelegate {
             },
             onCopy: { [weak self] entry in
                 guard let self, self.store.applyToPasteboard(entry) else { return }
-                self.store.showPanelToast(UIStrings.Clipboard.toastCopied)
+                CenterToast.show(UIStrings.Clipboard.toastCopied)
             },
             onClose: { [weak self] in
                 self?.close()
@@ -314,14 +309,6 @@ private struct ClipboardPanelView: View {
             RoundedRectangle(cornerRadius: 11, style: .continuous)
                 .strokeBorder(tokens.border, lineWidth: 1)
         )
-        .overlay(alignment: .top) {
-            if let panelToast = store.panelToast {
-                FloatingBanner(message: panelToast)
-                    .padding(.top, 16)
-                    .transition(.move(edge: .top).combined(with: .opacity))
-            }
-        }
-        .animation(.easeOut(duration: 0.2), value: store.panelToast)
         .appleShadow(tokens)
         .onChange(of: store.searchFocusToken) { _, _ in
             searchFocused = true
