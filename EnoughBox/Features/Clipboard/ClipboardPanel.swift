@@ -126,6 +126,10 @@ final class ClipboardPanelController: NSWindowController, NSWindowDelegate {
             onDelete: { [weak self] entry in
                 self?.store.remove(entry)
             },
+            onCopy: { [weak self] entry in
+                guard let self, self.store.applyToPasteboard(entry) else { return }
+                self.toastHandler(UIStrings.Clipboard.toastCopied)
+            },
             onClose: { [weak self] in
                 self?.close()
             },
@@ -264,6 +268,7 @@ private struct ClipboardPanelRootView: View {
     @ObservedObject var store: ClipboardStore
     let onApply: (ClipboardItem) -> Void
     let onDelete: (ClipboardItem) -> Void
+    let onCopy: (ClipboardItem) -> Void
     let onClose: () -> Void
     let onClearAll: () -> Void
 
@@ -272,6 +277,7 @@ private struct ClipboardPanelRootView: View {
             store: store,
             onApply: onApply,
             onDelete: onDelete,
+            onCopy: onCopy,
             onClose: onClose,
             onClearAll: onClearAll
         )
@@ -287,6 +293,7 @@ private struct ClipboardPanelView: View {
     @FocusState private var searchFocused: Bool
     let onApply: (ClipboardItem) -> Void
     let onDelete: (ClipboardItem) -> Void
+    let onCopy: (ClipboardItem) -> Void
     let onClose: () -> Void
     let onClearAll: () -> Void
 
@@ -429,6 +436,7 @@ private struct ClipboardPanelView: View {
                                         store.selectedIndex = index
                                         onApply(entry)
                                     },
+                                    onCopy: { onCopy(entry) },
                                     onDelete: { onDelete(entry) }
                                 )
                                 .id(entry.id)
@@ -470,6 +478,7 @@ private struct ClipboardRowView: View {
     let entry: ClipboardItem
     let isSelected: Bool
     let onPaste: () -> Void
+    let onCopy: () -> Void
     let onDelete: () -> Void
     @State private var isHovered = false
 
@@ -494,19 +503,25 @@ private struct ClipboardRowView: View {
             }
             .buttonStyle(.plain)
 
-            Button(action: onDelete) {
-                Image(systemName: "trash")
-                    .font(.system(size: 11, weight: .medium))
-                    .foregroundStyle(tokens.inkMuted)
-                    .frame(width: 24, height: 24)
-            }
-            .buttonStyle(.plain)
-            .help(UIStrings.Clipboard.delete)
+            rowActionButton("square.on.square", help: UIStrings.Clipboard.copy, action: onCopy)
+            rowActionButton("trash", help: UIStrings.Clipboard.delete, action: onDelete)
         }
         .padding(.horizontal, 10)
         .padding(.vertical, 8)
         .background(rowBackground, in: RoundedRectangle(cornerRadius: 8, style: .continuous))
         .onHover { isHovered = $0 }
+    }
+
+    private func rowActionButton(_ systemName: String, help: String, action: @escaping () -> Void) -> some View {
+        Button(action: action) {
+            Image(systemName: systemName)
+                .font(.system(size: 11, weight: .medium))
+                .foregroundStyle(tokens.inkMuted)
+                .frame(width: 24, height: 24)
+        }
+        .buttonStyle(.plain)
+        .help(help)
+        .accessibilityLabel(help)
     }
 
     private var rowBackground: Color {

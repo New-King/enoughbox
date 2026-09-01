@@ -144,6 +144,7 @@ enum UIStrings {
     static let categoryOther = "其他"
     static let empty = "还没有剪贴板历史"
     static let delete = "删除"
+    static let copy = "复制"
     static let clearAll = "清空"
     static let toastCopied = "已复制到剪贴板"
     static let imageEntry = "图片"
