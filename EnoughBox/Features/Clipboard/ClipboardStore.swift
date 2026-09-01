@@ -124,8 +124,7 @@ final class ClipboardStore: ObservableObject {
         switch category {
         case .recent:
             filteredEntries = searched
-                .filter { $0.lastUsedAt != nil }
-                .sorted { ($0.lastUsedAt ?? .distantPast) > ($1.lastUsedAt ?? .distantPast) }
+                .sorted { $0.recency > $1.recency }
                 .prefix(ClipboardLimits.recentCount)
                 .map { $0 }
         default:

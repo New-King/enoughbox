@@ -20,6 +20,10 @@ struct ClipboardItem: Identifiable, Codable, Equatable, Sendable {
     let id: UUID
     var copiedAt: Date
     var lastUsedAt: Date?
+
+    var recency: Date {
+        max(copiedAt, lastUsedAt ?? copiedAt)
+    }
     let kind: ClipboardItemKind
     var text: String
     var imageFile: String?

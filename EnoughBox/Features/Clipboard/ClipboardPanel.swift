@@ -300,6 +300,7 @@ private struct ClipboardPanelView: View {
             searchField
             categoryBar
             entryList
+            shortcutFooter
         }
         .padding(12)
         .frame(width: 360, height: 440)
@@ -355,8 +356,8 @@ private struct ClipboardPanelView: View {
             ZStack(alignment: .leading) {
                 if store.query.isEmpty {
                     Text(UIStrings.Clipboard.searchPlaceholder)
-                        .font(.system(size: 13))
-                        .foregroundStyle(tokens.inkMuted)
+                        .font(.system(size: 12))
+                        .foregroundStyle(tokens.inkFaint)
                         .allowsHitTesting(false)
                 }
                 TextField(
@@ -408,6 +409,33 @@ private struct ClipboardPanelView: View {
             .clipboardHoverFill(cornerRadius: 8)
             .disabled(store.entries.isEmpty)
         }
+    }
+
+    private var shortcutFooter: some View {
+        HStack(spacing: 0) {
+            footerHint(UIStrings.Clipboard.shortcutPaste)
+            footerSeparator
+            footerHint(UIStrings.Clipboard.shortcutMove)
+            footerSeparator
+            footerHint(UIStrings.Clipboard.shortcutCategory)
+            footerSeparator
+            footerHint(UIStrings.Clipboard.shortcutSearch)
+            Spacer(minLength: 0)
+        }
+        .padding(.top, 6)
+    }
+
+    private var footerSeparator: some View {
+        Text("｜")
+            .font(.system(size: 11))
+            .foregroundStyle(tokens.inkFaint.opacity(0.4))
+    }
+
+    private func footerHint(_ text: String) -> some View {
+        Text(text)
+            .font(.system(size: 11))
+            .foregroundStyle(tokens.inkFaint)
+            .lineLimit(1)
     }
 
     private var entryList: some View {
