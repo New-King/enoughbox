@@ -23,6 +23,10 @@ struct EnoughBoxApp: App {
         }
         .defaultSize(width: 900, height: 560)
         .windowResizability(.contentMinSize)
+        .commands {
+            // WindowGroup 默认绑定 ⌘N「新建窗口」；工具箱只需单窗口。
+            CommandGroup(replacing: .newItem) { }
+        }
     }
 }
 
