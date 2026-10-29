@@ -19,8 +19,10 @@ final class TranslationPanelModel: ObservableObject {
     @Published var sourceLanguage: TranslateLanguage = .en
     @Published var engine = TranslateSettings.engine
     @Published var appleRequestID: UUID?
+    @Published var phonetic: String?
 
     private var translateTask: Task<Void, Never>?
+    private var phoneticTask: Task<Void, Never>?
     private var requestID = UUID()
     private let synthesizer = AVSpeechSynthesizer()
 
@@ -33,6 +35,7 @@ final class TranslationPanelModel: ObservableObject {
         if sourceText.isEmpty {
             translatedText = ""
             isTranslating = false
+            phonetic = nil
             return
         }
         translate()
@@ -58,6 +61,7 @@ final class TranslationPanelModel: ObservableObject {
         }
         let target = targetLanguage.resolvedTarget(for: sourceLanguage)
         let source = sourceLanguage
+        refreshPhonetic(for: text, source: source)
         translateTask?.cancel()
         let id = UUID()
         requestID = id
@@ -108,6 +112,20 @@ final class TranslationPanelModel: ObservableObject {
         translatedText = message
         isTranslating = false
         appleRequestID = nil
+    }
+
+    /// 只在源语言为英文且是单个单词时查询音标；其余情况立即清空，避免残留上一次的结果。
+    private func refreshPhonetic(for text: String, source: TranslateLanguage) {
+        phoneticTask?.cancel()
+        guard source == .en, PhoneticService.isLookupCandidate(text) else {
+            phonetic = nil
+            return
+        }
+        phoneticTask = Task {
+            let value = await PhoneticService.lookup(text)
+            guard !Task.isCancelled else { return }
+            phonetic = value
+        }
     }
 
     func toggleTargetLanguage() {
@@ -217,14 +235,22 @@ final class TranslationPanelController: NSWindowController, NSWindowDelegate {
         session.present(sourceText: sourceText)
         guard let window else { return }
         let keepPlace = session.isPinned && window.isVisible
-        if !keepPlace {
-            positionNearMouse(window)
+
+        // 内容变更后 SwiftUI 要到下一轮 runloop 才重新布局。等它算完再显示，
+        // 否则窗口会带着上一次的尺寸先闪一下空白面板，随后 scheduleFit 才跳到正确大小。
+        DispatchQueue.main.async { [weak self] in
+            guard let self, let window = self.window else { return }
+            self.hostingController?.view.layoutSubtreeIfNeeded()
+            self.fitToFittingSize()
+            if !keepPlace {
+                self.positionNearMouse(window)
+            }
+            window.orderFrontRegardless()
+            window.makeKey()
+            self.installCloseKeyMonitor()
+            self.installClickOutsideMonitor()
+            self.scheduleFit()
         }
-        window.orderFrontRegardless()
-        window.makeKey()
-        installCloseKeyMonitor()
-        installClickOutsideMonitor()
-        scheduleFit()
     }
 
     override func close() {
@@ -414,14 +440,14 @@ private struct TranslationPanelView: View {
                 panelIconButton("speaker.wave.2") {
                     session.speak(session.sourceText, language: session.sourceLanguage)
                 }
-                panelIconButton("square.on.square") {
-                    session.copy(session.sourceText)
-                }
-                panelIconButton("xmark.square") {
-                    session.clearSource()
-                }
 
-                languageChip(session.sourceLanguage.localizedName)
+                if let phonetic = session.phonetic {
+                    Text(phonetic)
+                        .font(.system(size: 12))
+                        .foregroundStyle(tokens.inkSoft)
+                        .lineLimit(1)
+                        .textSelection(.enabled)
+                }
 
                 Spacer(minLength: 8)
 
@@ -543,16 +569,6 @@ private struct TranslationPanelView: View {
                 .strokeBorder(tokens.border, lineWidth: 1)
         )
         .clipShape(RoundedRectangle(cornerRadius: 11, style: .continuous))
-    }
-
-    private func languageChip(_ title: String) -> some View {
-        Text(title)
-            .font(.system(size: 11, weight: .medium))
-            .foregroundStyle(tokens.inkSoft)
-            .padding(.horizontal, 8)
-            .padding(.vertical, 4)
-            .background(tokens.card, in: Capsule())
-            .overlay(Capsule().strokeBorder(tokens.border, lineWidth: 1))
     }
 
     private func panelIconButton(_ systemName: String, action: @escaping () -> Void) -> some View {

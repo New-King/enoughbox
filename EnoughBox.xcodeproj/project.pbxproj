@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		00B2CF75B8B481CAF61A5044 /* ScreenshotScrollingCapture.swift in Sources */ = {isa = PBXBuildFile; fileRef = 50D96C8DB7A0DB310F460E0A /* ScreenshotScrollingCapture.swift */; };
 		124297EB6B78D57A58888F0C /* ScreenCapture.swift in Sources */ = {isa = PBXBuildFile; fileRef = F930C8715715A653D3E948A9 /* ScreenCapture.swift */; };
 		1E41C82CF85A823406D6C8D6 /* ScreenshotOverlay.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4C546E38CE8EADA9BC2B946E /* ScreenshotOverlay.swift */; };
 		1F4EFADC3E075EAE45A6EF43 /* CropGeometry.swift in Sources */ = {isa = PBXBuildFile; fileRef = A34E64A5251DC7C7464EA77F /* CropGeometry.swift */; };
@@ -14,14 +15,19 @@
 		260AE1B0C08B0E1327D2DF25 /* Translator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4EE514A1DB319ECEECBD11D6 /* Translator.swift */; };
 		28C9F2ED69BE3EE4308D1A1D /* EnoughBoxApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8F36E3F1DF931390FA757F3A /* EnoughBoxApp.swift */; };
 		3103A71F8E0AA548034A28B4 /* InputRecovery.swift in Sources */ = {isa = PBXBuildFile; fileRef = 01FE46A40A388AD246F749C5 /* InputRecovery.swift */; };
+		3208193B039548E9CAB35C9D /* 1024*1024.png in Resources */ = {isa = PBXBuildFile; fileRef = 99C2F4106B287B39793359B4 /* 1024*1024.png */; };
 		33DD9EA0D451DDDE603938C1 /* ClipboardThumbnailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2E38CD5FD2881106587A2594 /* ClipboardThumbnailView.swift */; };
 		33E5765256D3B926DA23D4D0 /* HotkeyCenter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6E505AD4E4312D4C01B58E38 /* HotkeyCenter.swift */; };
 		380BC38145D7A1851ABEB894 /* MainView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9704745508B442108DF65CF7 /* MainView.swift */; };
+		3A611FBD0472DD30AC9D0704 /* PhoneticService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8C4AFB70A35B67641894833D /* PhoneticService.swift */; };
 		3B252953FA4637D5832036B6 /* TranslateTool.swift in Sources */ = {isa = PBXBuildFile; fileRef = 76FE9361E1B6C73CD9FF0C4E /* TranslateTool.swift */; };
 		46DF70774D7DB46B95026D79 /* ToolManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 73E3DEEA794027A64CD6CBE8 /* ToolManager.swift */; };
 		4A7454D68468C9573AA34C73 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = C8789202810DA85768E64FA7 /* Assets.xcassets */; };
 		4B6D64409B89CD73E5D69CE6 /* ToolModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = 01C5758E291DD9B1841DCA2A /* ToolModels.swift */; };
 		4EC05B0EBE4900CC66185019 /* ToolCenterView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37D14F070EAC7A8DB9468625 /* ToolCenterView.swift */; };
+		5089D346416AFC8FF0990B77 /* ScreenshotScrollingSupport.swift in Sources */ = {isa = PBXBuildFile; fileRef = 889B34D00A507A7D91F33A5D /* ScreenshotScrollingSupport.swift */; };
+		50AEAD435AC75DF6621CB673 /* ScreenshotScrollingHUD.swift in Sources */ = {isa = PBXBuildFile; fileRef = D650E0B8FE68FFC722C77247 /* ScreenshotScrollingHUD.swift */; };
+		52549B15EA14453A46524C90 /* ScrollingCaptureSession.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9E196B7F385DD9356C2F3414 /* ScrollingCaptureSession.swift */; };
 		57CDEAB143DD2E5AFE1057C9 /* ClipboardImageStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1B1559F206BEE8E3BF7CD51B /* ClipboardImageStore.swift */; };
 		59C02E12DF1EEC71052AD777 /* DesignTokens+AppKit.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7A9719AB838FCF7C96F308B9 /* DesignTokens+AppKit.swift */; };
 		59CCF4647E78DF74B06B0CB6 /* ClipboardTool.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5074CCEF534017CB23CCC326 /* ClipboardTool.swift */; };
@@ -32,6 +38,7 @@
 		621E8609D681721BE09E1CA8 /* AppearanceManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9310CF80D6394B6335D68306 /* AppearanceManager.swift */; };
 		6515F98D85F95D465DE580A7 /* HostWindowFocus.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4AED9185A036C1C201DD9130 /* HostWindowFocus.swift */; };
 		6BE33CF12E96ABC0ABCAEC62 /* ClipboardSettings.swift in Sources */ = {isa = PBXBuildFile; fileRef = 34986F4C22934DB76AFD3FBD /* ClipboardSettings.swift */; };
+		6D5FBF87CAEE5FC48AC0EE54 /* 微信图片_20260901164733_126_15.png in Resources */ = {isa = PBXBuildFile; fileRef = C678EDD0434A08A56714A4DF /* 微信图片_20260901164733_126_15.png */; };
 		72358958B8EBDA22CBA76FBE /* ScreenshotTool.swift in Sources */ = {isa = PBXBuildFile; fileRef = B8370BBAD0FEEF3FFC391DA3 /* ScreenshotTool.swift */; };
 		83D841C043F334BACE14CA9B /* EmptyStateView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 20D4F8A95FC0E6F624CAE2D9 /* EmptyStateView.swift */; };
 		8727C6B90AA5802624DF76B8 /* ScreenshotOCRResultPanel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3F2C6A56FE0705445AAB519B /* ScreenshotOCRResultPanel.swift */; };
@@ -42,7 +49,6 @@
 		9D61841BFBE1CFC6C59525DE /* ToolToggleButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = 14C269FA1FD0194F652CAABB /* ToolToggleButton.swift */; };
 		9F589EB4AFC0ECFCCDCDD1B7 /* PressScaleButtonStyle.swift in Sources */ = {isa = PBXBuildFile; fileRef = B4E754D388D917256B2452D4 /* PressScaleButtonStyle.swift */; };
 		A3A46C8C570BDE24A266E1CA /* SettingsControlMetrics.swift in Sources */ = {isa = PBXBuildFile; fileRef = 65F87ED40E4F7C018ACE437D /* SettingsControlMetrics.swift */; };
-		A578552C79CDB7774F38AAA0 /* CenterToast.swift in Sources */ = {isa = PBXBuildFile; fileRef = 86E1B05429EF4CCD61A9F25E /* CenterToast.swift */; };
 		ACCADF8A7DB3AA3508940D25 /* ScreenshotGeometry.swift in Sources */ = {isa = PBXBuildFile; fileRef = 96DEEDEE73F1E1A55828F09F /* ScreenshotGeometry.swift */; };
 		AD9A4C1100C3CD807019BAD1 /* ClipboardStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = C42B1C9BE0F727620E81BAA7 /* ClipboardStore.swift */; };
 		B4570B6FEF37DE9A2E92487A /* AppState.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2E798AA90D4ECE990344C323 /* AppState.swift */; };
@@ -52,30 +58,30 @@
 		BD0B807854E51729B61C2C92 /* SettingsTrailingRow.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8957EBCDFDF293B1AF4706B1 /* SettingsTrailingRow.swift */; };
 		BD0C7CEA6BDCFFA52B7E941C /* YoudaoTranslator.swift in Sources */ = {isa = PBXBuildFile; fileRef = E87D5AA12725A1A39F4C3729 /* YoudaoTranslator.swift */; };
 		BD7C981FBBD73641187474F3 /* ClipboardItem.swift in Sources */ = {isa = PBXBuildFile; fileRef = CCACA503B1AE210B314EDEAC /* ClipboardItem.swift */; };
+		BEB34AA8B1914A27642F041B /* StitchingManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 035660B2721A541A0A002A7C /* StitchingManager.swift */; };
 		C7AC25CD4296F376687F0FBC /* UIStrings.swift in Sources */ = {isa = PBXBuildFile; fileRef = 73BC34BD0610838C32FA4A4D /* UIStrings.swift */; };
 		CDCB3BA16D34C1C94EFAD83E /* ClipboardPasteboardAccess.swift in Sources */ = {isa = PBXBuildFile; fileRef = 79D9332C698A90320EDDA98B /* ClipboardPasteboardAccess.swift */; };
 		CDF06785774E0298440C8CA9 /* AppPaths.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1E332521763E4DEB27F1F241 /* AppPaths.swift */; };
+		CE0D6B245BB56A03A6D216B7 /* CenterToast.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1F0A8FDBE89F6B2F3E96DD59 /* CenterToast.swift */; };
 		D28B8F2BA3FFA5AED880BCCA /* ClipboardTextStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9C1F2AA45BE59E815306395C /* ClipboardTextStore.swift */; };
+		D79340418866E9462D1EE8C0 /* ScreenshotCaptureSession.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C6C12FD3C32FD63D4282513 /* ScreenshotCaptureSession.swift */; };
 		DBABEE2A02E47EB37E426784 /* ClipboardPaste.swift in Sources */ = {isa = PBXBuildFile; fileRef = 13B21A13C4CB4502F7AD0103 /* ClipboardPaste.swift */; };
 		DCB529BC069B942C9AD53E1C /* ShortcutSettingsViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = B4AACB91BDE6536D0F957C13 /* ShortcutSettingsViewController.swift */; };
 		E16641AF78743B5B57D11A41 /* ScreenshotOCR.swift in Sources */ = {isa = PBXBuildFile; fileRef = D8CF3930BDD24F9AB878C4AF /* ScreenshotOCR.swift */; };
 		F388ADD80A9428352261C67E /* ShortcutRecorderField.swift in Sources */ = {isa = PBXBuildFile; fileRef = B0842B672B213124ACF3D0C9 /* ShortcutRecorderField.swift */; };
-		SCROLLCAP001BUILD /* ScreenshotScrollingCapture.swift in Sources */ = {isa = PBXBuildFile; fileRef = SCROLLCAP001REF /* ScreenshotScrollingCapture.swift */; };
-		SCROLLHUD001BUILD /* ScreenshotScrollingHUD.swift in Sources */ = {isa = PBXBuildFile; fileRef = SCROLLHUD001REF /* ScreenshotScrollingHUD.swift */; };
-		SCROLLSESS001BUILD /* ScrollingCaptureSession.swift in Sources */ = {isa = PBXBuildFile; fileRef = SCROLLSESS001REF /* ScrollingCaptureSession.swift */; };
-		SCROLLSNAPCAP001BUILD /* ScreenshotCaptureSession.swift in Sources */ = {isa = PBXBuildFile; fileRef = SCROLLSNAPCAP001REF /* ScreenshotCaptureSession.swift */; };
-		SCROLLSTITCH001BUILD /* StitchingManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = SCROLLSTITCH001REF /* StitchingManager.swift */; };
-		SCROLLSUP001BUILD /* ScreenshotScrollingSupport.swift in Sources */ = {isa = PBXBuildFile; fileRef = SCROLLSUP001REF /* ScreenshotScrollingSupport.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
 		01C5758E291DD9B1841DCA2A /* ToolModels.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ToolModels.swift; sourceTree = "<group>"; };
 		01FE46A40A388AD246F749C5 /* InputRecovery.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InputRecovery.swift; sourceTree = "<group>"; };
+		035660B2721A541A0A002A7C /* StitchingManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StitchingManager.swift; sourceTree = "<group>"; };
+		0C6C12FD3C32FD63D4282513 /* ScreenshotCaptureSession.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScreenshotCaptureSession.swift; sourceTree = "<group>"; };
 		11F132A4E6E47759F5683FA8 /* DesignTokens.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DesignTokens.swift; sourceTree = "<group>"; };
 		13B21A13C4CB4502F7AD0103 /* ClipboardPaste.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ClipboardPaste.swift; sourceTree = "<group>"; };
 		14C269FA1FD0194F652CAABB /* ToolToggleButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ToolToggleButton.swift; sourceTree = "<group>"; };
 		1B1559F206BEE8E3BF7CD51B /* ClipboardImageStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ClipboardImageStore.swift; sourceTree = "<group>"; };
 		1E332521763E4DEB27F1F241 /* AppPaths.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppPaths.swift; sourceTree = "<group>"; };
+		1F0A8FDBE89F6B2F3E96DD59 /* CenterToast.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CenterToast.swift; sourceTree = "<group>"; };
 		20D4F8A95FC0E6F624CAE2D9 /* EmptyStateView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EmptyStateView.swift; sourceTree = "<group>"; };
 		2ACA6E86E67229F1AB53A0DE /* EnoughBox.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = EnoughBox.entitlements; sourceTree = "<group>"; };
 		2E38CD5FD2881106587A2594 /* ClipboardThumbnailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ClipboardThumbnailView.swift; sourceTree = "<group>"; };
@@ -87,6 +93,7 @@
 		4C546E38CE8EADA9BC2B946E /* ScreenshotOverlay.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScreenshotOverlay.swift; sourceTree = "<group>"; };
 		4EE514A1DB319ECEECBD11D6 /* Translator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Translator.swift; sourceTree = "<group>"; };
 		5074CCEF534017CB23CCC326 /* ClipboardTool.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ClipboardTool.swift; sourceTree = "<group>"; };
+		50D96C8DB7A0DB310F460E0A /* ScreenshotScrollingCapture.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScreenshotScrollingCapture.swift; sourceTree = "<group>"; };
 		65F87ED40E4F7C018ACE437D /* SettingsControlMetrics.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsControlMetrics.swift; sourceTree = "<group>"; };
 		6E505AD4E4312D4C01B58E38 /* HotkeyCenter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HotkeyCenter.swift; sourceTree = "<group>"; };
 		7134855C14460D4F364127DF /* SelectionCapture.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SelectionCapture.swift; sourceTree = "<group>"; };
@@ -97,13 +104,16 @@
 		7A9719AB838FCF7C96F308B9 /* DesignTokens+AppKit.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "DesignTokens+AppKit.swift"; sourceTree = "<group>"; };
 		7B76CEE7616F6A58C6560676 /* SettingsMenuPicker.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsMenuPicker.swift; sourceTree = "<group>"; };
 		7BF25D8EFD48AABA211A16FA /* TranslationPanel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TranslationPanel.swift; sourceTree = "<group>"; };
-		86E1B05429EF4CCD61A9F25E /* CenterToast.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CenterToast.swift; sourceTree = "<group>"; };
+		889B34D00A507A7D91F33A5D /* ScreenshotScrollingSupport.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScreenshotScrollingSupport.swift; sourceTree = "<group>"; };
 		8957EBCDFDF293B1AF4706B1 /* SettingsTrailingRow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsTrailingRow.swift; sourceTree = "<group>"; };
+		8C4AFB70A35B67641894833D /* PhoneticService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PhoneticService.swift; sourceTree = "<group>"; };
 		8F36E3F1DF931390FA757F3A /* EnoughBoxApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EnoughBoxApp.swift; sourceTree = "<group>"; };
 		9310CF80D6394B6335D68306 /* AppearanceManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppearanceManager.swift; sourceTree = "<group>"; };
 		96DEEDEE73F1E1A55828F09F /* ScreenshotGeometry.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScreenshotGeometry.swift; sourceTree = "<group>"; };
 		9704745508B442108DF65CF7 /* MainView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainView.swift; sourceTree = "<group>"; };
+		99C2F4106B287B39793359B4 /* 1024*1024.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "1024*1024.png"; sourceTree = "<group>"; };
 		9C1F2AA45BE59E815306395C /* ClipboardTextStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ClipboardTextStore.swift; sourceTree = "<group>"; };
+		9E196B7F385DD9356C2F3414 /* ScrollingCaptureSession.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScrollingCaptureSession.swift; sourceTree = "<group>"; };
 		A34E64A5251DC7C7464EA77F /* CropGeometry.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CropGeometry.swift; sourceTree = "<group>"; };
 		AC68B83E8FB2F0A3642B1BAD /* ClipboardPanel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ClipboardPanel.swift; sourceTree = "<group>"; };
 		AE131292BBC87EB9A4ACE293 /* ScreenshotCapturePolicy.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScreenshotCapturePolicy.swift; sourceTree = "<group>"; };
@@ -113,9 +123,11 @@
 		B4E754D388D917256B2452D4 /* PressScaleButtonStyle.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PressScaleButtonStyle.swift; sourceTree = "<group>"; };
 		B8370BBAD0FEEF3FFC391DA3 /* ScreenshotTool.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScreenshotTool.swift; sourceTree = "<group>"; };
 		C42B1C9BE0F727620E81BAA7 /* ClipboardStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ClipboardStore.swift; sourceTree = "<group>"; };
+		C678EDD0434A08A56714A4DF /* 微信图片_20260901164733_126_15.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "微信图片_20260901164733_126_15.png"; sourceTree = "<group>"; };
 		C8789202810DA85768E64FA7 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		CCACA503B1AE210B314EDEAC /* ClipboardItem.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ClipboardItem.swift; sourceTree = "<group>"; };
 		CEF495582C9BFB2CA05DC64B /* ToolDetailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ToolDetailView.swift; sourceTree = "<group>"; };
+		D650E0B8FE68FFC722C77247 /* ScreenshotScrollingHUD.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScreenshotScrollingHUD.swift; sourceTree = "<group>"; };
 		D8CF3930BDD24F9AB878C4AF /* ScreenshotOCR.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScreenshotOCR.swift; sourceTree = "<group>"; };
 		E2ED94DCA5F2CE554FDF5E07 /* DeepSeekTranslator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeepSeekTranslator.swift; sourceTree = "<group>"; };
 		E64C21170554FB94B7A3BFD4 /* FloatingBanner.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FloatingBanner.swift; sourceTree = "<group>"; };
@@ -123,12 +135,6 @@
 		EDDC78515BD7BABFC248986C /* ScreenshotPin.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScreenshotPin.swift; sourceTree = "<group>"; };
 		F930C8715715A653D3E948A9 /* ScreenCapture.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScreenCapture.swift; sourceTree = "<group>"; };
 		FECBD5A1083E8656811A832F /* ToolRegistry.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ToolRegistry.swift; sourceTree = "<group>"; };
-		SCROLLCAP001REF /* ScreenshotScrollingCapture.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScreenshotScrollingCapture.swift; sourceTree = "<group>"; };
-		SCROLLHUD001REF /* ScreenshotScrollingHUD.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScreenshotScrollingHUD.swift; sourceTree = "<group>"; };
-		SCROLLSESS001REF /* ScrollingCaptureSession.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScrollingCaptureSession.swift; sourceTree = "<group>"; };
-		SCROLLSNAPCAP001REF /* ScreenshotCaptureSession.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScreenshotCaptureSession.swift; sourceTree = "<group>"; };
-		SCROLLSTITCH001REF /* StitchingManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StitchingManager.swift; sourceTree = "<group>"; };
-		SCROLLSUP001REF /* ScreenshotScrollingSupport.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScreenshotScrollingSupport.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -202,20 +208,29 @@
 			path = Models;
 			sourceTree = "<group>";
 		};
+		4DEFFAE711CF9C3F6EC2BD8C /* Icon */ = {
+			isa = PBXGroup;
+			children = (
+				99C2F4106B287B39793359B4 /* 1024*1024.png */,
+				C678EDD0434A08A56714A4DF /* 微信图片_20260901164733_126_15.png */,
+			);
+			path = Icon;
+			sourceTree = "<group>";
+		};
 		4FACDAE2404CD342A907DCEF /* Screenshot */ = {
 			isa = PBXGroup;
 			children = (
+				0C6C12FD3C32FD63D4282513 /* ScreenshotCaptureSession.swift */,
 				D8CF3930BDD24F9AB878C4AF /* ScreenshotOCR.swift */,
 				3F2C6A56FE0705445AAB519B /* ScreenshotOCRResultPanel.swift */,
 				4C546E38CE8EADA9BC2B946E /* ScreenshotOverlay.swift */,
-				SCROLLCAP001REF /* ScreenshotScrollingCapture.swift */,
-				SCROLLHUD001REF /* ScreenshotScrollingHUD.swift */,
-				SCROLLSESS001REF /* ScrollingCaptureSession.swift */,
-				SCROLLSNAPCAP001REF /* ScreenshotCaptureSession.swift */,
-				SCROLLSTITCH001REF /* StitchingManager.swift */,
-				SCROLLSUP001REF /* ScreenshotScrollingSupport.swift */,
 				EDDC78515BD7BABFC248986C /* ScreenshotPin.swift */,
+				50D96C8DB7A0DB310F460E0A /* ScreenshotScrollingCapture.swift */,
+				D650E0B8FE68FFC722C77247 /* ScreenshotScrollingHUD.swift */,
+				889B34D00A507A7D91F33A5D /* ScreenshotScrollingSupport.swift */,
 				B8370BBAD0FEEF3FFC391DA3 /* ScreenshotTool.swift */,
+				9E196B7F385DD9356C2F3414 /* ScrollingCaptureSession.swift */,
+				035660B2721A541A0A002A7C /* StitchingManager.swift */,
 			);
 			path = Screenshot;
 			sourceTree = "<group>";
@@ -284,6 +299,7 @@
 			isa = PBXGroup;
 			children = (
 				E2ED94DCA5F2CE554FDF5E07 /* DeepSeekTranslator.swift */,
+				8C4AFB70A35B67641894833D /* PhoneticService.swift */,
 				76FE9361E1B6C73CD9FF0C4E /* TranslateTool.swift */,
 				7BF25D8EFD48AABA211A16FA /* TranslationPanel.swift */,
 				4EE514A1DB319ECEECBD11D6 /* Translator.swift */,
@@ -304,9 +320,9 @@
 			isa = PBXGroup;
 			children = (
 				9310CF80D6394B6335D68306 /* AppearanceManager.swift */,
+				1F0A8FDBE89F6B2F3E96DD59 /* CenterToast.swift */,
 				11F132A4E6E47759F5683FA8 /* DesignTokens.swift */,
 				7A9719AB838FCF7C96F308B9 /* DesignTokens+AppKit.swift */,
-				86E1B05429EF4CCD61A9F25E /* CenterToast.swift */,
 				E64C21170554FB94B7A3BFD4 /* FloatingBanner.swift */,
 				B4E754D388D917256B2452D4 /* PressScaleButtonStyle.swift */,
 			);
@@ -330,6 +346,7 @@
 				6557732E3A40E61B614D10DF /* App */,
 				BB19F94EA5E00F6D40BB9E87 /* Design */,
 				742D4E826DE74962654C9B62 /* Features */,
+				4DEFFAE711CF9C3F6EC2BD8C /* Icon */,
 				2C29CED39767808F2F675CB3 /* Models */,
 				C724369BC42A068D52BB7DE6 /* Resources */,
 				052FC5E3020C3D9293C27D1F /* Services */,
@@ -426,7 +443,9 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				3208193B039548E9CAB35C9D /* 1024*1024.png in Resources */,
 				4A7454D68468C9573AA34C73 /* Assets.xcassets in Resources */,
+				6D5FBF87CAEE5FC48AC0EE54 /* 微信图片_20260901164733_126_15.png in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -440,6 +459,7 @@
 				CDF06785774E0298440C8CA9 /* AppPaths.swift in Sources */,
 				B4570B6FEF37DE9A2E92487A /* AppState.swift in Sources */,
 				621E8609D681721BE09E1CA8 /* AppearanceManager.swift in Sources */,
+				CE0D6B245BB56A03A6D216B7 /* CenterToast.swift in Sources */,
 				57CDEAB143DD2E5AFE1057C9 /* ClipboardImageStore.swift in Sources */,
 				BD7C981FBBD73641187474F3 /* ClipboardItem.swift in Sources */,
 				889D0070946486DFB4064407 /* ClipboardPanel.swift in Sources */,
@@ -461,28 +481,28 @@
 				33E5765256D3B926DA23D4D0 /* HotkeyCenter.swift in Sources */,
 				3103A71F8E0AA548034A28B4 /* InputRecovery.swift in Sources */,
 				380BC38145D7A1851ABEB894 /* MainView.swift in Sources */,
+				3A611FBD0472DD30AC9D0704 /* PhoneticService.swift in Sources */,
 				9F589EB4AFC0ECFCCDCDD1B7 /* PressScaleButtonStyle.swift in Sources */,
 				124297EB6B78D57A58888F0C /* ScreenCapture.swift in Sources */,
 				BA3C78584A708ACE7F43C773 /* ScreenshotCapturePolicy.swift in Sources */,
-				A578552C79CDB7774F38AAA0 /* CenterToast.swift in Sources */,
+				D79340418866E9462D1EE8C0 /* ScreenshotCaptureSession.swift in Sources */,
 				ACCADF8A7DB3AA3508940D25 /* ScreenshotGeometry.swift in Sources */,
 				E16641AF78743B5B57D11A41 /* ScreenshotOCR.swift in Sources */,
 				8727C6B90AA5802624DF76B8 /* ScreenshotOCRResultPanel.swift in Sources */,
 				1E41C82CF85A823406D6C8D6 /* ScreenshotOverlay.swift in Sources */,
-				SCROLLCAP001BUILD /* ScreenshotScrollingCapture.swift in Sources */,
-				SCROLLHUD001BUILD /* ScreenshotScrollingHUD.swift in Sources */,
-				SCROLLSESS001BUILD /* ScrollingCaptureSession.swift in Sources */,
-				SCROLLSNAPCAP001BUILD /* ScreenshotCaptureSession.swift in Sources */,
-				SCROLLSTITCH001BUILD /* StitchingManager.swift in Sources */,
-				SCROLLSUP001BUILD /* ScreenshotScrollingSupport.swift in Sources */,
 				8B2721D27BBCA95BB04213A7 /* ScreenshotPin.swift in Sources */,
+				00B2CF75B8B481CAF61A5044 /* ScreenshotScrollingCapture.swift in Sources */,
+				50AEAD435AC75DF6621CB673 /* ScreenshotScrollingHUD.swift in Sources */,
+				5089D346416AFC8FF0990B77 /* ScreenshotScrollingSupport.swift in Sources */,
 				72358958B8EBDA22CBA76FBE /* ScreenshotTool.swift in Sources */,
+				52549B15EA14453A46524C90 /* ScrollingCaptureSession.swift in Sources */,
 				BA6F1A0D0DA29688E644415E /* SelectionCapture.swift in Sources */,
 				A3A46C8C570BDE24A266E1CA /* SettingsControlMetrics.swift in Sources */,
 				25E23466CD6CB7341D52896F /* SettingsMenuPicker.swift in Sources */,
 				BD0B807854E51729B61C2C92 /* SettingsTrailingRow.swift in Sources */,
 				F388ADD80A9428352261C67E /* ShortcutRecorderField.swift in Sources */,
 				DCB529BC069B942C9AD53E1C /* ShortcutSettingsViewController.swift in Sources */,
+				BEB34AA8B1914A27642F041B /* StitchingManager.swift in Sources */,
 				4EC05B0EBE4900CC66185019 /* ToolCenterView.swift in Sources */,
 				621917A894DCB54EE377E157 /* ToolDetailView.swift in Sources */,
 				46DF70774D7DB46B95026D79 /* ToolManager.swift in Sources */,
